@@ -12,6 +12,7 @@ Nicholas Padmanabhan, Christine Sun, Jenny Sun, Byron Zhang
 npm run dev
 ```
 
+- **Important**: Create a file named `.env.local` and store all environment variables (e.g. DB connection string) here.
 - Open [http://localhost:3000](http://localhost:3000) with your browser to see the result. Pages auto-update as you edit their files.
 - The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
 - Create helper components (e.g. custom buttons) in the `/components` folder.
