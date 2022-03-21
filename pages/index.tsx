@@ -1,5 +1,5 @@
 import { Box, ThemeProvider, Typography } from "@mui/material";
-import { gigTheme } from "../components/Theme";
+import { gigTheme } from "../src/Theme";
 
 export default function Landing() {
   return (
