@@ -58,7 +58,8 @@ export const gigTheme = createTheme({
       secondary: "#6F86FF",
     },
     secondaryCTA: {
-      primary: "#302C3F",
+      primary: "#392c3e",
+      secondary: "#1c1a26",
     },
   },
   typography: {
