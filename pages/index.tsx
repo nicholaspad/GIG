@@ -1,4 +1,6 @@
 import { Box, ThemeProvider, Typography } from "@mui/material";
+import PrimaryButtonCTA from "../components/buttons/PrimaryButtonCTA";
+import SecondaryButtonCTA from "../components/buttons/SecondaryButtonCTA";
 import { gigTheme } from "../src/Theme";
 
 export default function Landing() {
@@ -16,6 +18,13 @@ export default function Landing() {
         >
           Secondary color text
         </Typography>
+        <PrimaryButtonCTA text="Big Primary CTA" size="big" to="/" />
+        <br />
+        <PrimaryButtonCTA text="Small Primary CTA" size="small" to="/" />
+        <br />
+        <SecondaryButtonCTA text="Big Secondary CTA" size="big" to="/" />
+        <br />
+        <SecondaryButtonCTA text="Small Secondary CTA" size="small" to="/" />
       </Box>
     </ThemeProvider>
   );
