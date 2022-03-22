@@ -1,5 +1,22 @@
-import { Typography } from "@mui/material";
+import { Box, ThemeProvider, Typography } from "@mui/material";
+import { gigTheme } from "../src/Theme";
 
 export default function Landing() {
-  return <Typography fontStyle="bolder">Hello world!</Typography>;
+  return (
+    <ThemeProvider theme={gigTheme}>
+      <Box sx={{ backgroundColor: "background.default", p: 3 }}>
+        <Typography variant="h4" fontStyle="bold" color="primary.main">
+          Primary color text
+        </Typography>
+        <Typography
+          variant="h5"
+          fontStyle="italic"
+          mt={2}
+          color="secondary.main"
+        >
+          Secondary color text
+        </Typography>
+      </Box>
+    </ThemeProvider>
+  );
 }
