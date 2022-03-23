@@ -6,7 +6,7 @@ import { gigTheme } from "../src/Theme";
 export default function Landing() {
   return (
     <ThemeProvider theme={gigTheme}>
-      <Box sx={{ backgroundColor: "background.default", p: 3 }}>
+      <Box sx={{ p: 3 }}>
         <Typography variant="h4" fontStyle="bold" color="primary.main">
           Primary color text
         </Typography>
