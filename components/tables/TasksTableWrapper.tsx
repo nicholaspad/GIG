@@ -5,6 +5,7 @@ export default function TasksTableWrapper(props: {
   type: "Tasks" | "MyTasks";
   data: TaskData[];
 }) {
+  // TODO @nicholaspad wrap the table in Byron's card component, center header text
   return (
     <>
       <Box p={2}>
@@ -31,6 +32,7 @@ export default function TasksTableWrapper(props: {
         p={2}
         sx={{ backgroundColor: "background.paper" }}
       >
+        {/* TODO @nicholaspad replace button links with proper routes */}
         <TasksTable type={props.type} data={props.data} />
       </Box>
     </>
