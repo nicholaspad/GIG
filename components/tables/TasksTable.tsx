@@ -100,15 +100,17 @@ export default function TasksTable(props: {
       align: "left",
       renderCell: (params: GridValueGetterParams) => (
         <>
-          <PrimaryButtonCTA
-            text={props.type === "Tasks" ? "Details" : "Continue"}
-            size="small"
-            to="/"
-          />
           {/* Render Abandon buttons for "In Progress" and "Pending Verification" rows */}
           {(params.row.status as TaskStatus) < 2 ? (
+            <SecondaryButtonCTA text="Abandon" size="small" to="/" />
+          ) : null}
+          {(params.row.status as TaskStatus) == 0 ? (
             <Box ml={2}>
-              <SecondaryButtonCTA text="Abandon" size="small" to="/" />
+              <PrimaryButtonCTA
+                text={props.type === "Tasks" ? "Details" : "Continue"}
+                size="small"
+                to="/"
+              />
             </Box>
           ) : null}
         </>
