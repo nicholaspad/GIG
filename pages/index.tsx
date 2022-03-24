@@ -11,7 +11,7 @@ export default function Landing() {
       <Typography variant="h5" fontStyle="italic" mt={2} color="secondary.main">
         Secondary color text
       </Typography>
-      <PrimaryButtonCTA text="Big Primary CTA" size="big" to="/" />
+      <PrimaryButtonCTA text="Tasks" size="big" to="/tasks" />
       <br />
       <PrimaryButtonCTA text="Small Primary CTA" size="small" to="/" />
       <br />
