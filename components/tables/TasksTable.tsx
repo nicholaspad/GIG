@@ -17,9 +17,9 @@ import {
   useGridApiContext,
   useGridSelector,
 } from "@mui/x-data-grid";
-import { gigTheme } from "../src/Theme";
-import PrimaryButtonCTA from "./buttons/PrimaryButtonCTA";
-import SecondaryButtonCTA from "./buttons/SecondaryButtonCTA";
+import { gigTheme } from "../../src/Theme";
+import PrimaryButtonCTA from "../buttons/PrimaryButtonCTA";
+import SecondaryButtonCTA from "../buttons/SecondaryButtonCTA";
 
 export type TaskStatus = 0 | 1 | 2 | 3;
 

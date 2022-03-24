@@ -1,5 +1,5 @@
-import { Box, Typography } from "@mui/material";
-import TasksTable, { TaskData } from "../components/TasksTable";
+import { TaskData } from "../components/tables/TasksTable";
+import TasksTableWrapper from "../components/tables/TasksTableWrapper";
 
 export default function Tasks() {
   // TODO @nicholaspad hard-coded for now
@@ -14,32 +14,5 @@ export default function Tasks() {
     }
   );
 
-  return (
-    <>
-      <Box p={2}>
-        <Typography color="primary.main" fontWeight={600} fontSize={40}>
-          Browse Tasks
-        </Typography>
-        <Typography
-          color="secondary.main"
-          fontStyle="italic"
-          fontWeight={400}
-          fontSize={20}
-          mt={1}
-        >
-          Find your next task.
-        </Typography>
-      </Box>
-      <Box
-        width={1100}
-        height={800}
-        display="flex"
-        flexDirection="column"
-        p={2}
-        sx={{ backgroundColor: "background.paper" }}
-      >
-        <TasksTable type="Tasks" data={data} />
-      </Box>
-    </>
-  );
+  return <TasksTableWrapper type="Tasks" data={data} />;
 }
