@@ -13,7 +13,7 @@ export default function Landing() {
       </Typography>
       <PrimaryButtonCTA text="Tasks" size="big" to="/tasks" />
       <br />
-      <PrimaryButtonCTA text="Small Primary CTA" size="small" to="/" />
+      <PrimaryButtonCTA text="My Tasks" size="small" to="/mytasks" />
       <br />
       <SecondaryButtonCTA text="Big Secondary CTA" size="big" to="/" />
       <br />

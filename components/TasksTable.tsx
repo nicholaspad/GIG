@@ -1,25 +1,146 @@
-import { Pagination, PaginationItem, styled } from "@mui/material";
+import StarOutlineRoundedIcon from "@mui/icons-material/StarOutlineRounded";
+import StarRoundedIcon from "@mui/icons-material/StarRounded";
+import {
+  Box,
+  Pagination,
+  PaginationItem,
+  Rating,
+  styled,
+  Typography,
+} from "@mui/material";
 import {
   DataGrid,
   GridColDef,
   gridPageCountSelector,
   gridPageSelector,
+  GridValueGetterParams,
   useGridApiContext,
   useGridSelector,
 } from "@mui/x-data-grid";
+import { gigTheme } from "../src/Theme";
+import PrimaryButtonCTA from "./buttons/PrimaryButtonCTA";
+import SecondaryButtonCTA from "./buttons/SecondaryButtonCTA";
+
+export type TaskStatus = 0 | 1 | 2 | 3;
 
 export type TaskData = {
   task_id: number;
   name: string;
   rating?: number;
+  status?: TaskStatus;
   reward: number;
+};
+
+const statusMap = {
+  0: "In progress",
+  1: "Pending verification",
+  2: "Verified & paid",
+  3: "Abandoned",
+};
+
+const statusColorMap = {
+  0: gigTheme.palette.info.main,
+  1: gigTheme.palette.warning.main,
+  2: gigTheme.palette.success.main,
+  3: gigTheme.palette.error.main,
 };
 
 export default function TasksTable(props: {
   type: "Tasks" | "MyTasks";
   data: TaskData[];
-  columns: GridColDef[];
 }) {
+  const columns: GridColDef[] = [
+    {
+      field: "name",
+      headerName: "Task Name",
+      sortable: false,
+      disableColumnMenu: true,
+      type: "string",
+      minWidth: 400,
+    },
+    {
+      field: "reward",
+      headerName: "Reward",
+      sortable: false,
+      disableColumnMenu: true,
+      type: "number",
+      minWidth: 150,
+      align: "left",
+      renderCell: (params: GridValueGetterParams) => (
+        <Typography fontSize={18}>{params.row.reward} ETH</Typography>
+      ),
+    },
+  ];
+
+  if (props.type === "MyTasks") {
+    columns.push({
+      field: "status",
+      headerName: "Status",
+      sortable: false,
+      disableColumnMenu: true,
+      type: "number",
+      minWidth: 200,
+      align: "left",
+      renderCell: (params: GridValueGetterParams) => (
+        <Typography
+          fontSize={18}
+          color={statusColorMap[params.row.status as TaskStatus]}
+        >
+          {statusMap[params.row.status as TaskStatus]}
+        </Typography>
+      ),
+    });
+    columns.push({
+      field: "",
+      headerName: "",
+      sortable: false,
+      disableColumnMenu: true,
+      minWidth: 200,
+      flex: 1,
+      align: "left",
+      renderCell: (params: GridValueGetterParams) => (
+        <>
+          <PrimaryButtonCTA text="Details" size="small" to="/" />
+          {(params.row.status as TaskStatus) < 2 ? (
+            <Box ml={2}>
+              <SecondaryButtonCTA text="Abandon" size="small" to="/" />
+            </Box>
+          ) : null}
+        </>
+      ),
+    });
+  } else if (props.type === "Tasks") {
+    columns.push({
+      field: "rating",
+      headerName: "Rating",
+      sortable: false,
+      disableColumnMenu: true,
+      type: "number",
+      minWidth: 200,
+      align: "left",
+      renderCell: (params: GridValueGetterParams) => (
+        <StyledRating
+          readOnly
+          value={params.row.rating}
+          size="large"
+          precision={0.5}
+          icon={<StarRoundedIcon fontSize="inherit" />}
+          emptyIcon={<StarOutlineRoundedIcon fontSize="inherit" />}
+        />
+      ),
+    });
+    columns.push({
+      field: "",
+      headerName: "",
+      sortable: false,
+      disableColumnMenu: true,
+      minWidth: 200,
+      flex: 1,
+      align: "left",
+      renderCell: () => <PrimaryButtonCTA text="Details" size="small" to="/" />,
+    });
+  }
+
   return (
     <StyledTasksTable
       disableSelectionOnClick
@@ -32,7 +153,7 @@ export default function TasksTable(props: {
       }}
       getRowId={(row) => row.task_id}
       rows={props.data}
-      columns={props.columns}
+      columns={columns}
     />
   );
 }
@@ -94,3 +215,14 @@ function CustomPagination() {
     />
   );
 }
+
+const StyledRating = styled(Rating)(({ theme }) => ({
+  "& .MuiRating-iconFilled": {
+    color: theme.palette.warning.main,
+  },
+  "& .MuiRating-iconEmpty": {
+    // color: theme.palette.primaryCTA.secondary,
+    color: theme.palette.primary.main,
+    opacity: 0.3,
+  },
+}));

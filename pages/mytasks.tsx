@@ -1,14 +1,14 @@
 import { Box, Typography } from "@mui/material";
-import TasksTable, { TaskData } from "../components/TasksTable";
+import TasksTable, { TaskData, TaskStatus } from "../components/TasksTable";
 
-export default function Tasks() {
+export default function MyTasks() {
   // TODO @nicholaspad hard-coded for now
   const data: TaskData[] = [1.5, 2.5, 3, 4.5, 5, 6.5, 7, 8.5, 9, 10, 10.5].map(
     (e, i) => {
       return {
         task_id: e,
         name: `Task ${i + 1}`,
-        rating: e % 6,
+        status: (i % 4) as TaskStatus,
         reward: e,
       };
     }
@@ -18,7 +18,7 @@ export default function Tasks() {
     <>
       <Box p={2}>
         <Typography color="primary.main" fontWeight={600} fontSize={40}>
-          Browse Tasks
+          My Tasks
         </Typography>
         <Typography
           color="secondary.main"
@@ -27,7 +27,7 @@ export default function Tasks() {
           fontSize={20}
           mt={1}
         >
-          Find your next task.
+          View {"&"} continue your claimed tasks.
         </Typography>
       </Box>
       <Box
@@ -38,7 +38,7 @@ export default function Tasks() {
         p={2}
         sx={{ backgroundColor: "background.paper" }}
       >
-        <TasksTable type="Tasks" data={data} />
+        <TasksTable type="MyTasks" data={data} />
       </Box>
     </>
   );
