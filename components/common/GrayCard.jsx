@@ -1,4 +1,4 @@
-import Card from "@mui/material";
+import { Card } from "@mui/material";
 import shadows from "../../styles/shadows";
 
 export default function GrayCard(props) {
