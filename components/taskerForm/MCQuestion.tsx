@@ -8,13 +8,7 @@ import {
 } from "@mui/material";
 
 import GrayCard from "../common/DefaultGrayCard";
-
-export interface mcQuestionProps {
-  idx: number;
-  id: string;
-  question: string;
-  options: string[];
-}
+import { mcQuestionProps } from "../../src/Types";
 
 export default function MCQuestion(props: mcQuestionProps) {
   return (

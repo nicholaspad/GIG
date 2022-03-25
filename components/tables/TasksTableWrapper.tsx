@@ -1,5 +1,6 @@
 import { Box, Typography } from "@mui/material";
-import TasksTable, { TaskData } from "./TasksTable";
+import TasksTable from "./TasksTable";
+import { TaskData } from "../../src/Types";
 
 export default function TasksTableWrapper(props: {
   type: "Tasks" | "MyTasks";

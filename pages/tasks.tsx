@@ -1,5 +1,5 @@
 import BrowseTasksTable from "../components/tables/BrowseTasks";
-import { TaskData } from "../components/tables/TasksTable";
+import { TaskData } from "../src/Types";
 
 export default function Tasks() {
   // TODO @nicholaspad hard-coded for now

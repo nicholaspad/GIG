@@ -18,18 +18,9 @@ import {
   useGridSelector,
 } from "@mui/x-data-grid";
 import { gigTheme } from "../../src/Theme";
+import { TaskData, TaskStatus } from "../../src/Types";
 import PrimaryButtonCTA from "../buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../buttons/SecondaryButtonCTA";
-
-export type TaskStatus = 0 | 1 | 2 | 3;
-
-export type TaskData = {
-  task_id: number;
-  name: string;
-  rating?: number;
-  status?: TaskStatus;
-  reward: number;
-};
 
 const statusMap = {
   0: "In progress",

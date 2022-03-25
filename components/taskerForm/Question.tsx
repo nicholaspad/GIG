@@ -1,13 +1,6 @@
 import MCQuestion from "./MCQuestion";
 import { Box, Typography } from "@mui/material";
-
-export interface questionProps {
-  type: number;
-  idx: number;
-  id: string;
-  question: string;
-  options?: string[];
-}
+import { questionProps } from "../../src/Types";
 
 export default function Question(props: questionProps) {
   if (props.options && props.type === 1) {
