@@ -49,25 +49,44 @@ export default function TasksTable(props: {
   type: "Tasks" | "MyTasks";
   data: TaskData[];
 }) {
+  function Header(props: { children: React.ReactNode }) {
+    return (
+      <Typography variant="h5" fontWeight={500}>
+        {props.children}
+      </Typography>
+    );
+  }
+
+  function Cell(props: { color?: string; children: React.ReactNode }) {
+    return (
+      <Typography color={props.color} variant="body1">
+        {props.children}
+      </Typography>
+    );
+  }
+
   const columns: GridColDef[] = [
     {
       field: "name",
-      headerName: "Task Name",
       sortable: false,
       disableColumnMenu: true,
       type: "string",
       minWidth: 400,
+      renderHeader: () => <Header>Task Name</Header>,
+      renderCell: (params: GridValueGetterParams) => (
+        <Cell>{params.row.name}</Cell>
+      ),
     },
     {
       field: "reward",
-      headerName: "Reward",
       sortable: false,
       disableColumnMenu: true,
       type: "number",
       minWidth: 150,
       align: "left",
+      renderHeader: () => <Header>Reward</Header>,
       renderCell: (params: GridValueGetterParams) => (
-        <Typography fontSize={18}>{params.row.reward} ETH</Typography>
+        <Cell>{params.row.reward} ETH</Cell>
       ),
     },
   ];
@@ -75,19 +94,16 @@ export default function TasksTable(props: {
   if (props.type === "MyTasks") {
     columns.push({
       field: "status",
-      headerName: "Status",
       sortable: false,
       disableColumnMenu: true,
       type: "number",
       minWidth: 200,
       align: "left",
+      renderHeader: () => <Header>Status</Header>,
       renderCell: (params: GridValueGetterParams) => (
-        <Typography
-          fontSize={18}
-          color={statusColorMap[params.row.status as TaskStatus]}
-        >
+        <Cell color={statusColorMap[params.row.status as TaskStatus]}>
           {statusMap[params.row.status as TaskStatus]}
-        </Typography>
+        </Cell>
       ),
     });
     columns.push({
@@ -122,12 +138,12 @@ export default function TasksTable(props: {
   } else if (props.type === "Tasks") {
     columns.push({
       field: "rating",
-      headerName: "Rating",
       sortable: false,
       disableColumnMenu: true,
       type: "number",
       minWidth: 200,
       align: "left",
+      renderHeader: () => <Header>Rating</Header>,
       renderCell: (params: GridValueGetterParams) => (
         <StyledRating
           readOnly
@@ -178,7 +194,6 @@ const StyledTasksTable = styled(DataGrid)(({ theme }) => ({
   },
   "& .MuiDataGrid-columnHeaderTitleContainer": {
     color: theme.palette.primary.main,
-    fontSize: 24,
     justifyContent: "left",
     paddingLeft: "10px",
   },
@@ -197,7 +212,6 @@ const StyledTasksTable = styled(DataGrid)(({ theme }) => ({
   },
   "& .MuiDataGrid-cell": {
     color: theme.palette.primary.main,
-    fontSize: 18,
     borderBottom: 0,
   },
   "& .MuiDataGrid-footerContainer, .MuiButtonBase-root": {
