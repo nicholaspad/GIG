@@ -4,15 +4,15 @@ import TaskerPageHeader from "../common/TaskerPageHeader";
 import TasksTable, { TaskData } from "./TasksTable";
 
 export default function TasksTableWrapper(props: {
-  type: "Tasks" | "MyTasks";
+  type: "BrowseTasks" | "MyTasks";
   data: TaskData[];
 }) {
   return (
     <Container maxWidth="lg">
       <TaskerPageHeader
-        title={props.type === "Tasks" ? "Browse Tasks" : "My Tasks"}
+        title={props.type === "BrowseTasks" ? "Browse Tasks" : "My Tasks"}
         subtitle={
-          props.type === "Tasks"
+          props.type === "BrowseTasks"
             ? "Find your next task."
             : "View & continue your claimed tasks."
         }

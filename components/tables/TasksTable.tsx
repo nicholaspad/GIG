@@ -47,7 +47,7 @@ const statusColorMap = {
 };
 
 export default function TasksTable(props: {
-  type: "Tasks" | "MyTasks";
+  type: "BrowseTasks" | "MyTasks";
   data: TaskData[];
 }) {
   function Header(props: { children: React.ReactNode }) {
@@ -136,7 +136,7 @@ export default function TasksTable(props: {
         </>
       ),
     });
-  } else if (props.type === "Tasks") {
+  } else if (props.type === "BrowseTasks") {
     columns.push({
       field: "rating",
       sortable: false,
