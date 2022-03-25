@@ -6,6 +6,7 @@ import {
   PaginationItem,
   Rating,
   styled,
+  TableContainer,
   Typography,
 } from "@mui/material";
 import {
@@ -71,7 +72,7 @@ export default function TasksTable(props: {
       sortable: false,
       disableColumnMenu: true,
       type: "string",
-      minWidth: 400,
+      minWidth: 300,
       renderHeader: () => <Header>Task Name</Header>,
       renderCell: (params: GridValueGetterParams) => (
         <Cell>{params.row.name}</Cell>
@@ -168,19 +169,21 @@ export default function TasksTable(props: {
   }
 
   return (
-    <StyledTasksTable
-      disableSelectionOnClick
-      disableColumnSelector
-      disableDensitySelector
-      density="comfortable"
-      pageSize={10}
-      components={{
-        Pagination: CustomPagination,
-      }}
-      getRowId={(row) => row.task_id}
-      rows={props.data}
-      columns={columns}
-    />
+    <TableContainer sx={{ height: 600 }}>
+      <StyledTasksTable
+        disableSelectionOnClick
+        disableColumnSelector
+        disableDensitySelector
+        density="comfortable"
+        pageSize={10}
+        components={{
+          Pagination: CustomPagination,
+        }}
+        getRowId={(row) => row.task_id}
+        rows={props.data}
+        columns={columns}
+      />
+    </TableContainer>
   );
 }
 
