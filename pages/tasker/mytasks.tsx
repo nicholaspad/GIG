@@ -1,5 +1,5 @@
-import MyTasksTable from "../components/tables/MyTasks";
-import { TaskData, TaskStatus } from "../components/tables/TasksTable";
+import MyTasksTable from "../../components/tables/MyTasks";
+import { TaskData, TaskStatus } from "../../components/tables/TasksTable";
 
 export default function MyTasks() {
   // TODO @nicholaspad hard-coded for now
