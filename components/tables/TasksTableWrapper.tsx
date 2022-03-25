@@ -1,14 +1,14 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Container, Typography } from "@mui/material";
+import CustomizableGrayCard from "../common/CustomizableGrayCard";
 import TasksTable, { TaskData } from "./TasksTable";
 
 export default function TasksTableWrapper(props: {
   type: "Tasks" | "MyTasks";
   data: TaskData[];
 }) {
-  // TODO @nicholaspad wrap the table in Byron's card component, center header text
   return (
-    <>
-      <Box p={2}>
+    <Container maxWidth="lg">
+      <Box textAlign="center" my={3} p={2}>
         <Typography color="primary.main" fontWeight={600} fontSize={40}>
           {props.type === "Tasks" ? "Browse Tasks" : "My Tasks"}
         </Typography>
@@ -24,17 +24,10 @@ export default function TasksTableWrapper(props: {
             : "View & continue your claimed tasks."}
         </Typography>
       </Box>
-      <Box
-        width={1100}
-        height={800}
-        display="flex"
-        flexDirection="column"
-        p={2}
-        sx={{ backgroundColor: "background.paper" }}
-      >
+      <CustomizableGrayCard sx={{ px: 5, py: 2.5 }}>
         {/* TODO @nicholaspad replace button links with proper routes */}
         <TasksTable type={props.type} data={props.data} />
-      </Box>
-    </>
+      </CustomizableGrayCard>
+    </Container>
   );
 }

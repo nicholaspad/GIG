@@ -44,7 +44,7 @@ export default function PrimaryButtonCTA(props: {
           }}
         >
           <Typography
-            fontSize={isBig ? 20 : 16}
+            variant={isBig ? "h6" : "body1"}
             fontWeight={650}
             textTransform="none"
           >
