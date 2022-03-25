@@ -1,7 +1,7 @@
 import { Card } from "@mui/material";
 import shadows from "../../styles/shadows";
 
-export default function GrayCard(props) {
+export default function GrayCard(props: { children: React.ReactNode }) {
   return (
     <Card
       sx={{
