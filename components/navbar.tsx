@@ -19,7 +19,7 @@ const connectionColorMap = {
 };
 
 export default function Navbar() {
-    const [isTasker, setIsTasker] = useState(true);
+    const [currentTask, setCurrentTask] = useState(true);
 
   return (
     <AppBar
@@ -29,6 +29,7 @@ export default function Navbar() {
       }}
     >
       <Toolbar>
+        {/* INSERT LOGO HERE */}
         <Typography
             color = {gigTheme.palette.primary.main}
             sx={{
@@ -48,42 +49,16 @@ export default function Navbar() {
             flexGrow: 1,
           }}
         >
-
-            {/* <Typography
-            color = {isTasker ? gigTheme.palette.secondary.main : gigTheme.palette.primary.main}
-                sx={{
-                    "&:hover": {
-                        cursor: "pointer",
-                        transition: "ease 0.1s",
-                    },
-                }}
-                onClick={() => setIsTasker(true)}
-            >
-                Tasker
-            </Typography>
-
-            <Typography
-                color = {isTasker ? gigTheme.palette.primary.main : gigTheme.palette.secondary.main}
-                sx={{
-                "&:hover": {
-                    cursor: "pointer",
-                    transition: "ease 0.1s",
-                },
-                }}
-                onClick={() => setIsTasker(false)}
-            >
-                Requester
-            </Typography> */}
             <NavbarTab
                 tabIsTasker={true}
-                isTasker={isTasker}
-                setIsTasker={setIsTasker}
+                currentTask={currentTask}
+                setCurrentTask={setCurrentTask}
                 tabName='Tasker'
             />
             <NavbarTab
                 tabIsTasker={false}
-                isTasker={isTasker}
-                setIsTasker={setIsTasker}
+                currentTask={currentTask}
+                setCurrentTask={setCurrentTask}
                 tabName='Requester'
             />
         </Stack>
