@@ -112,7 +112,7 @@ export default function TasksTable(props: {
       headerName: "",
       sortable: false,
       disableColumnMenu: true,
-      minWidth: 200,
+      minWidth: 290,
       flex: 1,
       align: "left",
       renderCell: (params: GridValueGetterParams) => (
@@ -161,7 +161,7 @@ export default function TasksTable(props: {
       headerName: "",
       sortable: false,
       disableColumnMenu: true,
-      minWidth: 200,
+      minWidth: 130,
       flex: 1,
       align: "left",
       renderCell: () => <PrimaryButtonCTA text="Details" size="small" to="/" />,
