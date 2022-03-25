@@ -1,16 +1,12 @@
 import { AppBar, Avatar, Stack, Toolbar, Typography } from "@mui/material";
 import * as React from "react";
+import { useState } from "react";
 import { gigTheme } from "../src/Theme";
+import NavbarTab from "./NavbarTab";
 
 export type connectionStatus = 0 | 1;
 
 export type workerView = "tasker" | "requester";
-
-export type userData = {
-  username: string;
-  status: number;
-  walletAddress: string;
-};
 
 const connectionMap = {
   0: "connected",
@@ -22,28 +18,25 @@ const connectionColorMap = {
   1: gigTheme.palette.warning.main,
 };
 
-export default function Navbar(props: {
-  username: string;
-  status: connectionStatus;
-  walletAddress: string;
-}) {
+export default function Navbar() {
+    const [isTasker, setIsTasker] = useState(true);
+
   return (
     <AppBar
       elevation={0}
       sx={{
         backgroundColor: gigTheme.palette.background.default,
-        color: gigTheme.palette.primary.main,
       }}
     >
       <Toolbar>
         <Typography
-          sx={{
-            flexGrow: 1,
-            color: gigTheme.palette.secondary.main,
-            "&:hover": {
-              cursor: "pointer",
-            },
-          }}
+            color = {gigTheme.palette.primary.main}
+            sx={{
+                flexGrow: 1,
+                "&:hover": {
+                    cursor: "pointer",
+                },
+            }}
         >
           GIG
         </Typography>
@@ -55,31 +48,48 @@ export default function Navbar(props: {
             flexGrow: 1,
           }}
         >
-          <Typography
-            sx={{
-              "&:hover": {
-                color: gigTheme.palette.secondary.main,
-                cursor: "pointer",
-                transition: "ease 0.3s",
-              },
-            }}
-          >
-            Tasker
-          </Typography>
-          <Typography
-            sx={{
-              "&:hover": {
-                color: gigTheme.palette.secondary.main,
-                cursor: "pointer",
-                transition: "ease 0.3s",
-              },
-            }}
-          >
-            Requester
-          </Typography>
+
+            {/* <Typography
+            color = {isTasker ? gigTheme.palette.secondary.main : gigTheme.palette.primary.main}
+                sx={{
+                    "&:hover": {
+                        cursor: "pointer",
+                        transition: "ease 0.1s",
+                    },
+                }}
+                onClick={() => setIsTasker(true)}
+            >
+                Tasker
+            </Typography>
+
+            <Typography
+                color = {isTasker ? gigTheme.palette.primary.main : gigTheme.palette.secondary.main}
+                sx={{
+                "&:hover": {
+                    cursor: "pointer",
+                    transition: "ease 0.1s",
+                },
+                }}
+                onClick={() => setIsTasker(false)}
+            >
+                Requester
+            </Typography> */}
+            <NavbarTab
+                tabIsTasker={true}
+                isTasker={isTasker}
+                setIsTasker={setIsTasker}
+                tabName='Tasker'
+            />
+            <NavbarTab
+                tabIsTasker={false}
+                isTasker={isTasker}
+                setIsTasker={setIsTasker}
+                tabName='Requester'
+            />
         </Stack>
 
         <Stack
+          color = {gigTheme.palette.primary.main}
           direction="row"
           spacing={1}
           alignItems="center"
@@ -99,11 +109,11 @@ export default function Navbar(props: {
               flexGrow: 1,
             }}
           >
-            <Typography>{props.username}</Typography>
-            <Typography color={connectionColorMap[props.status]}>
-              {connectionMap[props.status]}
+            <Typography>username</Typography>
+            <Typography color={connectionColorMap[0]}>
+              {connectionMap[0]}
             </Typography>
-            <Typography>{props.walletAddress}</Typography>
+            <Typography>Wallet Address</Typography>
           </Stack>
         </Stack>
       </Toolbar>

@@ -1,17 +1,12 @@
 import { AppBar, Box, Toolbar, Typography } from "@mui/material";
 import PrimaryButtonCTA from "../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../components/buttons/SecondaryButtonCTA";
-import Navbar from "../components/navbar";
+import Navbar from "../components/Navbar";
 
 export default function Landing() {
   return (
     <Box sx={{ p: 3 }}>
-      <Navbar
-        username="user"
-        status={0}
-        walletAddress = "wallet address"
-      />
-
+      <Navbar />
       <Typography variant="h4" fontStyle="bold" color="primary.main">
         Primary color text
       </Typography>
