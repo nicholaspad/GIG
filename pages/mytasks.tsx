@@ -1,5 +1,5 @@
+import MyTasksTable from "../components/tables/MyTasks";
 import { TaskData, TaskStatus } from "../components/tables/TasksTable";
-import TasksTableWrapper from "../components/tables/TasksTableWrapper";
 
 export default function MyTasks() {
   // TODO @nicholaspad hard-coded for now
@@ -14,5 +14,5 @@ export default function MyTasks() {
     }
   );
 
-  return <TasksTableWrapper type="MyTasks" data={data} />;
+  return <MyTasksTable data={data} />;
 }

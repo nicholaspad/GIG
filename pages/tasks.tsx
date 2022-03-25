@@ -1,5 +1,5 @@
+import BrowseTasksTable from "../components/tables/BrowseTasks";
 import { TaskData } from "../components/tables/TasksTable";
-import TasksTableWrapper from "../components/tables/TasksTableWrapper";
 
 export default function Tasks() {
   // TODO @nicholaspad hard-coded for now
@@ -14,5 +14,5 @@ export default function Tasks() {
     }
   );
 
-  return <TasksTableWrapper type="Tasks" data={data} />;
+  return <BrowseTasksTable data={data} />;
 }
