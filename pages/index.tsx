@@ -15,7 +15,11 @@ export default function Landing() {
       <br />
       <PrimaryButtonCTA text="My Tasks" size="small" to="/tasker/my-tasks" />
       <br />
-      <SecondaryButtonCTA text="Big Secondary CTA" size="big" to="/" />
+      <SecondaryButtonCTA
+        text="Task Overview"
+        size="big"
+        to="/tasker/task-overview"
+      />
       <br />
       <SecondaryButtonCTA text="Small Secondary CTA" size="small" to="/" />
     </Box>
