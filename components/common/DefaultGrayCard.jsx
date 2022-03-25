@@ -1,4 +1,4 @@
-import Card from "@mui/material";
+import {Card} from "@mui/material";
 import shadows from "../../styles/shadows";
 
 export default function GrayCard(props) {
@@ -12,7 +12,7 @@ export default function GrayCard(props) {
         px: "5%",
         my: "3%",
         bgcolor: "background.paper",
-        borderRadius: 1,
+        borderRadius: 3,
         boxShadow: shadows[8],
       }}
     >

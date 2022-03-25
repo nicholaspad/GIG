@@ -7,8 +7,7 @@ import {
   RadioGroup,
 } from "@mui/material";
 
-// import shadows from "../../styles/shadows";
-import GrayCard from "../common/GrayCard";
+import GrayCard from "../common/DefaultGrayCard";
 
 export interface mcQuestionProps {
   idx: number;

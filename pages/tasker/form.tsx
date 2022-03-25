@@ -1,9 +1,9 @@
-import { Container, Box, Card } from "@mui/material";
+import { Container, Box } from "@mui/material";
 import Question from "../../components/taskerForm/Question";
 import PrimaryButtonCTA from "../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../components/buttons/SecondaryButtonCTA";
 import { Typography } from "@mui/material";
-import GrayCard from "../../components/common/GrayCard";
+import GrayCard from "../../components/common/DefaultGrayCard";
 
 export default function taskerForm() {
   /* Test Data */
@@ -64,7 +64,6 @@ export default function taskerForm() {
           flexDirection: "row",
         }}
       >
-        {/* <SecondaryButtonCTA></SecondaryButtonCTA> */}
         <SecondaryButtonCTA size="small" text="Abandon" to="/" />
         <Box>
           <Typography
