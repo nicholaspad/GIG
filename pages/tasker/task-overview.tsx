@@ -89,7 +89,7 @@ export default function TaskOverview() {
               {data.name}
             </Typography>
             <SectionTitle>Description</SectionTitle>
-            <SectionContent>{data.name}</SectionContent>
+            <SectionContent>{data.description}</SectionContent>
             <SectionTitle>Reward</SectionTitle>
             <Box
               borderRadius={2}
