@@ -1,3 +1,4 @@
+import PageTitle from "../../components/common/PageTitle";
 import MyTasksTable from "../../components/tables/MyTasks";
 import { TaskData, TaskStatus } from "../../components/tables/TasksTable";
 
@@ -14,5 +15,10 @@ export default function MyTasks() {
     }
   );
 
-  return <MyTasksTable data={data} />;
+  return (
+    <>
+      <PageTitle title={"My Tasks"} />
+      <MyTasksTable data={data} />
+    </>
+  );
 }
