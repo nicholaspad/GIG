@@ -4,7 +4,7 @@ import { gigTheme } from "../src/Theme";
 export default function Landing() {
   return (
     <Container maxWidth="md">
-      <Box display="flex" flexDirection="column" alignItems="center">
+      <Box display="flex" flexDirection="column" alignItems="center" mt={8}>
         <Typography
           fontWeight={700}
           color="primary"
@@ -43,7 +43,7 @@ export default function Landing() {
           color="secondary"
           textAlign="center"
           fontWeight={500}
-          my={4}
+          my={6}
           sx={{
             fontSize: {
               lg: 28,
