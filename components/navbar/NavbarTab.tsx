@@ -1,6 +1,6 @@
 import { Typography } from "@mui/material";
 import * as React from "react";
-import { gigTheme } from "../src/Theme";
+import { gigTheme } from "../../src/Theme";
 
 export default function NavbarTab(props: {
   tabIsTasker: boolean;

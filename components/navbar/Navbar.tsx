@@ -1,7 +1,8 @@
 import { AppBar, Avatar, Stack, Toolbar, Typography } from "@mui/material";
 import * as React from "react";
 import { useState } from "react";
-import { gigTheme } from "../src/Theme";
+import Link from "next/link";
+import { gigTheme } from "../../src/Theme";
 import NavbarTab from "./NavbarTab";
 
 export type connectionStatus = 0 | 1;
@@ -29,18 +30,20 @@ export default function Navbar() {
       }}
     >
       <Toolbar>
-        {/* INSERT LOGO HERE */}
-        <Typography
-            color = {gigTheme.palette.primary.main}
-            sx={{
-                flexGrow: 1,
-                "&:hover": {
-                    cursor: "pointer",
-                },
-            }}
-        >
-          GIG
-        </Typography>
+        <Link href="\">
+          {/* INSERT LOGO HERE */}
+          <Typography
+              color = {gigTheme.palette.primary.main}
+              sx={{
+                  flexGrow: 1,
+                  "&:hover": {
+                      cursor: "pointer",
+                  },
+              }}
+          >
+            GIG
+          </Typography>
+        </Link>
         <Stack
           direction="row"
           spacing={1}
@@ -89,6 +92,7 @@ export default function Navbar() {
               {connectionMap[0]}
             </Typography>
             <Typography>Wallet Address</Typography>
+            <Typography>Log Out</Typography>
           </Stack>
         </Stack>
       </Toolbar>
