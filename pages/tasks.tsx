@@ -38,7 +38,8 @@ export default function Tasks() {
         }}
         sx={{ mt: 4 }}
       >
-        Logout from address {user?.get("ethAddress")}
+        Logout from address "{user?.get("ethAddress")}", displayName "
+        {user?.get("displayName")}"
       </Button>
     </>
   );

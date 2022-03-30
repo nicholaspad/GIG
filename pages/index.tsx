@@ -1,17 +1,33 @@
 import { Box, CircularProgress, Container, Typography } from "@mui/material";
+import MoralisType from "moralis";
 import router from "next/router";
 import { useEffect } from "react";
 import { useMoralis } from "react-moralis";
 import PageTitle from "../components/common/PageTitle";
+import { maybeMakeNewUser } from "../src/Database";
 import { gigTheme } from "../src/Theme";
 
 export default function Landing() {
-  const { authenticate, isAuthenticated, isAuthenticating, authError } =
-    useMoralis();
+  const {
+    authenticate,
+    isAuthenticated,
+    isAuthenticating,
+    authError,
+    user,
+    setUserData,
+    Moralis,
+  } = useMoralis();
 
   useEffect(() => {
-    // TODO @nicholaspad replace link
-    if (isAuthenticated) router.push("/tasks");
+    if (!isAuthenticated || authError || !user) return;
+
+    maybeMakeNewUser(Moralis, user.get("ethAddress")).then(
+      (res: MoralisType.Object) => {
+        console.log(`Logged in as ${res.get("ethAddress")}`);
+        // TODO @nicholaspad replace pushed link
+        router.push("/tasks");
+      }
+    );
   }, [isAuthenticated]);
 
   return (
