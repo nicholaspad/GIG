@@ -5,8 +5,17 @@ import SecondaryButtonCTA from "../../components/buttons/SecondaryButtonCTA";
 import { Typography } from "@mui/material";
 import GrayCard from "../../components/common/DefaultGrayCard";
 import PageTitle from "../../components/common/PageTitle";
+import { useEffect } from "react";
+import router from "next/router";
+import { useMoralis } from "react-moralis";
 
 export default function taskerForm() {
+  const { isUnauthenticated } = useMoralis();
+
+  useEffect(() => {
+    if (isUnauthenticated) router.push("/");
+  }, [isUnauthenticated]);
+
   /* Test Data */
   const q1 = {
     id: "00001",
