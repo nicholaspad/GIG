@@ -4,6 +4,7 @@ import PrimaryButtonCTA from "../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../components/buttons/SecondaryButtonCTA";
 import { Typography } from "@mui/material";
 import GrayCard from "../../components/common/DefaultGrayCard";
+import PageTitle from "../../components/common/PageTitle";
 
 export default function taskerForm() {
   /* Test Data */
@@ -37,49 +38,52 @@ export default function taskerForm() {
   /* End of Test Data */
 
   return (
-    <Container maxWidth="sm">
-      <GrayCard>
-        <Typography variant="h4" color="primary">
-          {formInfo.title}
-        </Typography>
-        <Typography sx={{ mt: "3%" }} variant="body2" color="primary">
-          {formInfo.description}
-        </Typography>
-      </GrayCard>
-      {formData.map((props, idx) => (
-        <Question
-          type={props.type}
-          idx={idx}
-          id={props.id}
-          question={props.question}
-          options={props.options}
-          key={props.id}
-        />
-      ))}
-      <Box
-        sx={{
-          mb: "15%",
-          display: "flex",
-          justifyContent: "space-between",
-          flexDirection: "row",
-        }}
-      >
-        <SecondaryButtonCTA size="small" text="Abandon" to="/" />
-        <Box>
-          <Typography
-            variant="body1"
-            color="secondary"
-            align="center"
-            fontStyle="italic"
-          >
-            Approximate time to complete
+    <>
+      <PageTitle title={"Task"} />
+      <Container maxWidth="sm">
+        <GrayCard>
+          <Typography variant="h4" color="primary">
+            {formInfo.title}
           </Typography>
-          <Typography variant="body1" color="primary" align="center">
-            {formInfo.eta} minutes
+          <Typography sx={{ mt: "3%" }} variant="body2" color="primary">
+            {formInfo.description}
           </Typography>
+        </GrayCard>
+        {formData.map((props, idx) => (
+          <Question
+            type={props.type}
+            idx={idx}
+            id={props.id}
+            question={props.question}
+            options={props.options}
+            key={props.id}
+          />
+        ))}
+        <Box
+          sx={{
+            mb: "15%",
+            display: "flex",
+            justifyContent: "space-between",
+            flexDirection: "row",
+          }}
+        >
+          <SecondaryButtonCTA size="small" text="Abandon" to="/" />
+          <Box>
+            <Typography
+              variant="body1"
+              color="secondary"
+              align="center"
+              fontStyle="italic"
+            >
+              Approximate time to complete
+            </Typography>
+            <Typography variant="body1" color="primary" align="center">
+              {formInfo.eta} minutes
+            </Typography>
+          </Box>
+          <PrimaryButtonCTA size="small" text="Submit" to="/" />
         </Box>
-        <PrimaryButtonCTA size="small" text="Submit" to="/" />
-      </Box>
-    </Container>
+      </Container>
+    </>
   );
 }
