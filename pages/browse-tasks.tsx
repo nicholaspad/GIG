@@ -1,3 +1,4 @@
+import PageTitle from "../components/common/PageTitle";
 import BrowseTasksTable from "../components/tables/BrowseTasks";
 import { TaskData } from "../components/tables/TasksTable";
 
@@ -14,5 +15,10 @@ export default function Tasks() {
     }
   );
 
-  return <BrowseTasksTable data={data} />;
+  return (
+    <>
+      <PageTitle title={"Browse Tasks"} />
+      <BrowseTasksTable data={data} />
+    </>
+  );
 }
