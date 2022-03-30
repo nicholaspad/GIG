@@ -41,7 +41,7 @@ export default function SecondaryButtonCTA(props: {
           }}
         >
           <Typography
-            fontSize={isBig ? 20 : 16}
+            variant={isBig ? "h6" : "body1"}
             fontWeight={500}
             textTransform="none"
             p="2px"
