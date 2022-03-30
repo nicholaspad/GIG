@@ -11,11 +11,15 @@ export default function Landing() {
       <Typography variant="h5" fontStyle="italic" mt={2} color="secondary.main">
         Secondary color text
       </Typography>
-      <PrimaryButtonCTA text="Tasks" size="big" to="/tasks" />
+      <PrimaryButtonCTA text="Tasks" size="big" to="/browse-tasks" />
       <br />
-      <PrimaryButtonCTA text="My Tasks" size="small" to="/tasker/mytasks" />
+      <PrimaryButtonCTA text="My Tasks" size="small" to="/tasker/my-tasks" />
       <br />
-      <SecondaryButtonCTA text="Big Secondary CTA" size="big" to="/" />
+      <SecondaryButtonCTA
+        text="Task Overview"
+        size="big"
+        to="/tasker/task-overview"
+      />
       <br />
       <SecondaryButtonCTA text="Small Secondary CTA" size="small" to="/" />
     </Box>
