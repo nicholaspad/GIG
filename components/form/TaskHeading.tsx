@@ -1,30 +1,40 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
+import styles from '../styles/utils.module.css';
+import InputLabel from '@mui/material/InputLabel';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import FormControl from '@mui/material/FormControl';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FilledInput from '@mui/material/FilledInput';
 import Grid from '@mui/material/Grid';
-import { gigTheme } from '../src/Theme.ts';
+import { gigTheme } from '../../src/Theme';
+import Typography from '@mui/material/Typography';
+import DefaultGrayCard from "../common/DefaultGrayCard"
+
+//BELOW IS TEMP
+import { ThemeProvider } from "@mui/material";
+
 
 export default function TaskHeading() {
     return (
-        <Box
-            display="flex"
-            flexWrap="wrap"
-            alignItems="center"
-            justifyContent="center"
-            sx={{
-                // backgroundColor: gigTheme.palette.background.paper,
-            }}
-        >
+        <DefaultGrayCard>
             {/* Task Title */}
+            {/* <ThemeProvider theme={gigTheme}> */}
             <TextField
                 label="Task Title"
                 variant="filled"
                 fullWidth
+                color="secondary"
                 font={gigTheme.typography.fontFamily}
                 sx={{
-                    m: 1
+                    m: 1,
+                    color: 'red'
                 }}
             />
+
+            {/* </ThemeProvider> */}
+
 
             {/* Task Description */}
             <TextField
@@ -59,6 +69,6 @@ export default function TaskHeading() {
                 </Grid>
             </Grid>
 
-        </Box>
+        </DefaultGrayCard>
     )
 }
