@@ -14,7 +14,6 @@ export default function Landing() {
     isAuthenticating,
     authError,
     user,
-    setUserData,
     Moralis,
   } = useMoralis();
 
