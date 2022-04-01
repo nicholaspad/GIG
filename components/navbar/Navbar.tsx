@@ -92,7 +92,7 @@ export default function Navbar(props: {
             src="https://t4.ftcdn.net/jpg/00/64/67/63/360_F_64676383_LdbmhiNM6Ypzb3FM4PPuFP9rHe7ri8Ju.jpg"
           />
           <Stack
-            spacing={-0.3}
+            spacing={-0.6}
             sx={{
               flexGrow: 1,
             }}
