@@ -1,17 +1,28 @@
-import { Button } from "@mui/material";
+import MoralisType from "moralis";
 import router from "next/router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
-import PageTitle from "../components/common/PageTitle";
+import PageHeader from "../components/common/PageHeader";
 import BrowseTasksTable from "../components/tables/BrowseTasks";
 import { TaskData } from "../components/tables/TasksTable";
+import { makeOrGetNewUser } from "../src/Database";
 
 export default function Tasks() {
-  const { logout, user, isUnauthenticated } = useMoralis();
+  const { user, isAuthenticated, isUnauthenticated, authError, Moralis } =
+    useMoralis();
+  const [userData, setUserData] = useState<MoralisType.Object>();
 
   useEffect(() => {
     if (isUnauthenticated) router.push("/");
   }, [isUnauthenticated]);
+
+  useEffect(() => {
+    if (!isAuthenticated || authError || !user) return;
+
+    makeOrGetNewUser(Moralis, user.get("ethAddress")).then(
+      (res: MoralisType.Object) => setUserData(res)
+    );
+  }, [isAuthenticated]);
 
   // TODO @nicholaspad hard-coded for now
   const data: TaskData[] = [1.5, 2.5, 3, 4.5, 5, 6.5, 7, 8.5, 9, 10, 10.5].map(
@@ -27,20 +38,13 @@ export default function Tasks() {
 
   return (
     <>
-      <PageTitle title={"Browse Tasks"} />
+      <PageHeader
+        title={"Browse Tasks"}
+        walletAddress={userData?.get("ethAddress")}
+        isConnected={isAuthenticated}
+        username={userData?.get("displayName")}
+      />
       <BrowseTasksTable data={data} />
-      {/* TODO @nicholaspad remove this temporary logout button */}
-      <Button
-        color="secondary"
-        variant="contained"
-        onClick={() => {
-          logout();
-        }}
-        sx={{ mt: 4 }}
-      >
-        Logout from address "{user?.get("ethAddress")}", displayName "
-        {user?.get("displayName")}"
-      </Button>
     </>
   );
 }

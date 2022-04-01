@@ -1,11 +1,10 @@
 import { Box, CircularProgress, Container, Typography } from "@mui/material";
 import MoralisType from "moralis";
 import router from "next/router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
-import Navbar from "../components/navbar/Navbar";
-import PageTitle from "../components/common/PageTitle";
-import { maybeMakeNewUser } from "../src/Database";
+import PageHeader from "../components/common/PageHeader";
+import { makeOrGetNewUser } from "../src/Database";
 import { gigTheme } from "../src/Theme";
 
 export default function Landing() {
@@ -17,23 +16,28 @@ export default function Landing() {
     user,
     Moralis,
   } = useMoralis();
+  const [userData, setUserData] = useState<MoralisType.Object>();
 
   useEffect(() => {
     if (!isAuthenticated || authError || !user) return;
 
-    maybeMakeNewUser(Moralis, user.get("ethAddress")).then(
+    makeOrGetNewUser(Moralis, user.get("ethAddress")).then(
       (res: MoralisType.Object) => {
         console.log(`Logged in as ${res.get("ethAddress")}`);
-        // TODO @nicholaspad replace pushed link
-        router.push("/tasks");
+        setUserData(res);
+        router.push("/browse-tasks");
       }
     );
   }, [isAuthenticated]);
 
   return (
     <>
-      <PageTitle title={"Login"} />
-      <Navbar />
+      <PageHeader
+        title={"Login"}
+        walletAddress={userData?.get("ethAddress")}
+        isConnected={isAuthenticated}
+        username={userData?.get("displayName")}
+      />
       <Container maxWidth="md">
         <Box display="flex" flexDirection="column" alignItems="center" mt={8}>
           <Typography

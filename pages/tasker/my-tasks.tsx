@@ -1,7 +1,7 @@
 import router from "next/router";
 import { useEffect } from "react";
 import { useMoralis } from "react-moralis";
-import PageTitle from "../../components/common/PageTitle";
+import PageHeader from "../../components/common/PageHeader";
 import MyTasksTable from "../../components/tables/MyTasks";
 import { TaskData, TaskStatus } from "../../components/tables/TasksTable";
 
@@ -26,7 +26,7 @@ export default function MyTasks() {
 
   return (
     <>
-      <PageTitle title={"My Tasks"} />
+      <PageHeader title={"My Tasks"} />
       <MyTasksTable data={data} />
     </>
   );

@@ -5,7 +5,7 @@ import MoralisType from "moralis";
     Uses ethAddress as the primary key. Returns the user's data as a
     MoralisTye.Object.
 */
-export async function maybeMakeNewUser(
+export async function makeOrGetNewUser(
   Moralis: MoralisType,
   ethAddress: string
 ): Promise<MoralisType.Object> {
