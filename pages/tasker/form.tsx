@@ -5,6 +5,7 @@ import SecondaryButtonCTA from "../../components/buttons/SecondaryButtonCTA";
 import { Typography } from "@mui/material";
 import GrayCard from "../../components/common/DefaultGrayCard";
 import PageTitle from "../../components/common/PageTitle";
+import { useState } from "react";
 
 export default function taskerForm() {
   /* Test Data */
@@ -37,6 +38,11 @@ export default function taskerForm() {
   };
   /* End of Test Data */
 
+  const [answers, setAnswers] = useState({});
+  const handleSetAnswers = (id: string, answer: string) => {
+    setAnswers({ ...answers, [id]: answer });
+  };
+
   return (
     <>
       <PageTitle title={"Task"} />
@@ -57,6 +63,7 @@ export default function taskerForm() {
             question={props.question}
             options={props.options}
             key={props.id}
+            handleSetAnswers={handleSetAnswers}
           />
         ))}
         <Box
@@ -81,7 +88,7 @@ export default function taskerForm() {
               {formInfo.eta} minutes
             </Typography>
           </Box>
-          <PrimaryButtonCTA size="small" text="Submit" to="/" />
+          <PrimaryButtonCTA size="small" text="Submit" to="/completed" />
         </Box>
       </Container>
     </>
