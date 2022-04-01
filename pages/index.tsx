@@ -1,43 +1,22 @@
 import { Box, CircularProgress, Container, Typography } from "@mui/material";
-import MoralisType from "moralis";
 import router from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useMoralis } from "react-moralis";
 import PageHeader from "../components/common/PageHeader";
-import { makeOrGetNewUser } from "../src/Database";
 import { gigTheme } from "../src/Theme";
 
 export default function Landing() {
-  const {
-    authenticate,
-    isAuthenticated,
-    isAuthenticating,
-    authError,
-    user,
-    Moralis,
-  } = useMoralis();
-  const [userData, setUserData] = useState<MoralisType.Object>();
+  const { authenticate, isAuthenticated, isAuthenticating, authError } =
+    useMoralis();
 
   useEffect(() => {
-    if (!isAuthenticated || authError || !user) return;
-
-    makeOrGetNewUser(Moralis, user.get("ethAddress")).then(
-      (res: MoralisType.Object) => {
-        console.log(`Logged in as ${res.get("ethAddress")}`);
-        setUserData(res);
-        router.push("/browse-tasks");
-      }
-    );
-  }, [isAuthenticated]);
+    if (!isAuthenticated || authError) return;
+    router.push("/browse-tasks");
+  }, [isAuthenticated, authError]);
 
   return (
     <>
-      <PageHeader
-        title={"Login"}
-        walletAddress={userData?.get("ethAddress")}
-        isConnected={isAuthenticated}
-        username={userData?.get("displayName")}
-      />
+      <PageHeader title={"Login"} disableAuthFunc />
       <Container maxWidth="md">
         <Box display="flex" flexDirection="column" alignItems="center" mt={8}>
           <Typography

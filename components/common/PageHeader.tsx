@@ -6,7 +6,10 @@ import Navbar from "../navbar/Navbar";
 import { makeOrGetNewUser } from "../../src/Database";
 import router from "next/router";
 
-export default function PageHeader(props: { title: string }) {
+export default function PageHeader(props: {
+  title: string;
+  disableAuthFunc?: boolean;
+}) {
   const { user, isAuthenticated, isUnauthenticated, authError, Moralis } =
     useMoralis();
   const [userData, setUserData] = useState<MoralisType.Object>();
@@ -16,7 +19,7 @@ export default function PageHeader(props: { title: string }) {
   }, [isUnauthenticated]);
 
   useEffect(() => {
-    if (!isAuthenticated || authError || !user) return;
+    if (props.disableAuthFunc || !isAuthenticated || authError || !user) return;
 
     makeOrGetNewUser(Moralis, user.get("ethAddress")).then(
       (res: MoralisType.Object) => setUserData(res)
