@@ -186,11 +186,23 @@ export default function TasksTable(props: {
     // TODO: Use proper parameters for CreatedTasks
     // Created Tasks
     columns.push({
+      field: "completed",
+      sortable: false,
+      disableColumnMenu: true,
+      type: "number",
+      minWidth: 150,
+      align: "left",
+      renderHeader: () => <Header>Completed</Header>,
+      renderCell: (params: GridValueGetterParams) => (
+        <Cell>{params.row.completedTasks} / {params.row.totalTasks}</Cell>
+      ),
+    });
+    columns.push({
       field: "status",
       sortable: false,
       disableColumnMenu: true,
       type: "number",
-      minWidth: 200,
+      minWidth: 150,
       align: "left",
       renderHeader: () => <Header>Status</Header>,
       renderCell: (params: GridValueGetterParams) => (

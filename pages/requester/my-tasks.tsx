@@ -10,6 +10,8 @@ export default function MyTasks() {
         name: `Task ${i + 1}`,
         status: (i % 4) as TaskStatus,
         reward: e,
+        completedTasks: Math.floor(Math.random() * 50),
+        totalTasks: Math.floor(Math.random() * 50) + Math.floor(Math.random() * 50),
       };
     }
   );
