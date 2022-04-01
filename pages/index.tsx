@@ -3,6 +3,7 @@ import MoralisType from "moralis";
 import router from "next/router";
 import { useEffect } from "react";
 import { useMoralis } from "react-moralis";
+import Navbar from "../components/navbar/Navbar";
 import PageTitle from "../components/common/PageTitle";
 import { maybeMakeNewUser } from "../src/Database";
 import { gigTheme } from "../src/Theme";
@@ -32,6 +33,7 @@ export default function Landing() {
   return (
     <>
       <PageTitle title={"Login"} />
+      <Navbar />
       <Container maxWidth="md">
         <Box display="flex" flexDirection="column" alignItems="center" mt={8}>
           <Typography
