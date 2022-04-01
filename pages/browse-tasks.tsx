@@ -1,5 +1,6 @@
 import PageTitle from "../components/common/PageTitle";
-import BrowseTasksTable from "../components/tables/BrowseTasks";
+import BrowseTasksTable from "../components/tables/BrowseTasksTable";
+import TasksTableWrapper from "../components/tables/BrowseTasksTable";
 import { TaskData } from "../components/tables/TasksTable";
 
 export default function Tasks() {
@@ -18,7 +19,10 @@ export default function Tasks() {
   return (
     <>
       <PageTitle title={"Browse Tasks"} />
-      <BrowseTasksTable data={data} />
+      <BrowseTasksTable 
+        type={1}
+        data={data} 
+      />
     </>
   );
 }

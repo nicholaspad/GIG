@@ -20,7 +20,7 @@ const connectionColorMap = {
 };
 
 export default function Navbar() {
-    const [currentTask, setCurrentTask] = useState(true);
+  const [currentTask, setCurrentTask] = useState(true);
 
   return (
     <AppBar
@@ -30,16 +30,16 @@ export default function Navbar() {
       }}
     >
       <Toolbar>
-        <Link href="\">
+        <Link href="/">
           {/* INSERT LOGO HERE */}
           <Typography
-              color = {gigTheme.palette.primary.main}
-              sx={{
-                  flexGrow: 1,
-                  "&:hover": {
-                      cursor: "pointer",
-                  },
-              }}
+            color={gigTheme.palette.primary.main}
+            sx={{
+              flexGrow: 1,
+              "&:hover": {
+                cursor: "pointer",
+              },
+            }}
           >
             GIG
           </Typography>
@@ -52,22 +52,22 @@ export default function Navbar() {
             flexGrow: 1,
           }}
         >
-            <NavbarTab
-                tabIsTasker={true}
-                currentTask={currentTask}
-                setCurrentTask={setCurrentTask}
-                tabName='Tasker'
-            />
-            <NavbarTab
-                tabIsTasker={false}
-                currentTask={currentTask}
-                setCurrentTask={setCurrentTask}
-                tabName='Requester'
-            />
+          <NavbarTab
+            tabIsTasker={true}
+            currentTask={currentTask}
+            setCurrentTask={setCurrentTask}
+            tabName="Tasker"
+          />
+          <NavbarTab
+            tabIsTasker={false}
+            currentTask={currentTask}
+            setCurrentTask={setCurrentTask}
+            tabName="Requester"
+          />
         </Stack>
 
         <Stack
-          color = {gigTheme.palette.primary.main}
+          color={gigTheme.palette.primary.main}
           direction="row"
           spacing={1}
           alignItems="center"
