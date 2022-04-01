@@ -37,46 +37,51 @@ export default function Navbar(props: {
       }}
     >
       <Toolbar>
-        <Link href="/">
-          {/* INSERT LOGO HERE */}
-          <Typography
-            variant="h4"
-            fontWeight={700}
+        <Box sx={{ flexGrow: isAuthenticated ? 0 : 1 }}>
+          <Link href="/">
+            {/* INSERT LOGO HERE */}
+            <Typography
+              variant="h4"
+              fontWeight={700}
+              sx={{
+                maxWidth: 100,
+                "&:hover": {
+                  cursor: "pointer",
+                },
+                backgroundImage: `linear-gradient(90deg, ${gigTheme.palette.primaryCTA.primary}, ${gigTheme.palette.primaryCTA.secondary})`,
+                backgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              GIG
+            </Typography>
+          </Link>
+        </Box>
+        {isAuthenticated && (
+          <Stack
+            direction="row"
+            spacing={1}
+            ml={5}
             sx={{
-              "&:hover": {
-                cursor: "pointer",
-              },
-              backgroundImage: `linear-gradient(90deg, ${gigTheme.palette.primaryCTA.primary}, ${gigTheme.palette.primaryCTA.secondary})`,
-              backgroundClip: "text",
-              WebkitTextFillColor: "transparent",
+              flexGrow: 1,
             }}
           >
-            GIG
-          </Typography>
-        </Link>
-        <Stack
-          direction="row"
-          spacing={1}
-          ml={5}
-          sx={{
-            flexGrow: 1,
-          }}
-        >
-          <NavbarTab
-            tabIsTasker={true}
-            currentTask={currentTask}
-            setCurrentTask={setCurrentTask}
-            isSelected={currentTask}
-            tabName="Tasker"
-          />
-          <NavbarTab
-            tabIsTasker={false}
-            currentTask={currentTask}
-            setCurrentTask={setCurrentTask}
-            isSelected={!currentTask}
-            tabName="Requester"
-          />
-        </Stack>
+            <NavbarTab
+              tabIsTasker={true}
+              currentTask={currentTask}
+              setCurrentTask={setCurrentTask}
+              isSelected={currentTask}
+              tabName="Tasker"
+            />
+            <NavbarTab
+              tabIsTasker={false}
+              currentTask={currentTask}
+              setCurrentTask={setCurrentTask}
+              isSelected={!currentTask}
+              tabName="Requester"
+            />
+          </Stack>
+        )}
         <Stack
           color={gigTheme.palette.primary.main}
           direction="row"
