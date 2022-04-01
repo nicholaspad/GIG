@@ -43,6 +43,11 @@ export default function Tasks() {
         walletAddress={userData?.get("ethAddress")}
         isConnected={isAuthenticated}
         username={userData?.get("displayName")}
+      <PrimaryButtonCTA
+        text="My Tasks →"
+        size="small"
+        to="/tasker/my-tasks"
+        sx={{ mx: "auto" }}
       />
       <BrowseTasksTable data={data} />
     </>

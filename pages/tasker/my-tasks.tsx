@@ -27,6 +27,12 @@ export default function MyTasks() {
   return (
     <>
       <PageHeader title={"My Tasks"} />
+      <PrimaryButtonCTA
+        text="Browse Tasks →"
+        size="small"
+        to="/browse-tasks"
+        sx={{ mx: "auto" }}
+      />
       <MyTasksTable data={data} />
     </>
   );
