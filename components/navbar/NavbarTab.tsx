@@ -9,17 +9,6 @@ export default function NavbarTab(props: {
   isSelected: boolean;
   tabName: string;
 }) {
-  const getColor = () => {
-    if (props.tabIsTasker) {
-      return props.currentTask
-        ? gigTheme.palette.secondary.main
-        : gigTheme.palette.primary.main;
-    }
-    return props.currentTask
-      ? gigTheme.palette.primary.main
-      : gigTheme.palette.secondary.main;
-  };
-
   return (
     <Box
       sx={{
@@ -30,7 +19,6 @@ export default function NavbarTab(props: {
     >
       <Typography
         color="primary"
-        // fontSize={props.isSelected ? "2em" : "1em"}
         fontWeight={props.isSelected ? 800 : 400}
         sx={{
           "&:hover": {

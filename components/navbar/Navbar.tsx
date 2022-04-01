@@ -1,5 +1,4 @@
 import { AppBar, Avatar, Box, Stack, Toolbar, Typography } from "@mui/material";
-import * as React from "react";
 import { useState } from "react";
 import Link from "next/link";
 import { gigTheme } from "../../src/Theme";
@@ -11,8 +10,8 @@ export type connectionStatus = 0 | 1;
 export type workerView = "tasker" | "requester";
 
 const connectionMap = {
-  0: "connected",
-  1: "not connected",
+  0: "Connected",
+  1: "Not Connected",
 };
 
 const connectionColorMap = {
@@ -98,7 +97,7 @@ export default function Navbar(props: {
               flexGrow: 1,
             }}
           >
-            <Typography fontWeight="medium">{props.username}</Typography>
+            <Typography fontWeight="bold">{props.username}</Typography>
             <Typography color={connectionColorMap[props.isConnected ? 0 : 1]}>
               {connectionMap[props.isConnected ? 0 : 1]}
               {props.walletAddress ? (
@@ -118,7 +117,7 @@ export default function Navbar(props: {
                 },
               }}
             >
-              Log Out
+              Log Out →
             </Typography>
           </Stack>
         </Stack>
