@@ -1,4 +1,5 @@
 import { Box, Container, Typography } from "@mui/material";
+import Navbar from "../components/navbar/Navbar";
 import PageTitle from "../components/common/PageTitle";
 import { gigTheme } from "../src/Theme";
 
@@ -6,6 +7,7 @@ export default function Landing() {
   return (
     <>
       <PageTitle title={"Login"} />
+      <Navbar />
       <Container maxWidth="md">
         <Box display="flex" flexDirection="column" alignItems="center" mt={8}>
           <Typography
