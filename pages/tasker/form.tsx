@@ -4,9 +4,18 @@ import PrimaryButtonCTA from "../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../components/buttons/SecondaryButtonCTA";
 import { Typography } from "@mui/material";
 import GrayCard from "../../components/common/DefaultGrayCard";
-import PageTitle from "../../components/common/PageTitle";
+import PageHeader from "../../components/common/PageHeader";
+import { useEffect } from "react";
+import router from "next/router";
+import { useMoralis } from "react-moralis";
 
 export default function taskerForm() {
+  const { isUnauthenticated } = useMoralis();
+
+  useEffect(() => {
+    if (isUnauthenticated) router.push("/");
+  }, [isUnauthenticated]);
+
   /* Test Data */
   const q1 = {
     id: "00001",
@@ -39,7 +48,7 @@ export default function taskerForm() {
 
   return (
     <>
-      <PageTitle title={"Task"} />
+      <PageHeader title={"Task"} />
       <Container maxWidth="sm">
         <GrayCard>
           <Typography variant="h4" color="primary">
