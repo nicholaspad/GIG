@@ -4,6 +4,7 @@ import Link from "next/link";
 import { gigTheme } from "../../src/Theme";
 import NavbarTab from "./NavbarTab";
 import { useMoralis } from "react-moralis";
+import router from "next/router";
 
 export type connectionStatus = 0 | 1;
 
@@ -69,14 +70,14 @@ export default function Navbar(props: {
               tabIsTasker={true}
               currentTask={currentTask}
               setCurrentTask={setCurrentTask}
-              isSelected={currentTask}
+              isSelected={router.pathname === "/tasker/my-tasks"}
               tabName="Tasker"
             />
             <NavbarTab
               tabIsTasker={false}
               currentTask={currentTask}
               setCurrentTask={setCurrentTask}
-              isSelected={!currentTask}
+              isSelected={router.pathname === "/requester/my-tasks"}
               tabName="Requester"
             />
           </Stack>
