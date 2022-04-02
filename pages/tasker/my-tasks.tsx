@@ -1,4 +1,5 @@
-import PageTitle from "../../components/common/PageTitle";
+import PrimaryButtonCTA from "../../components/buttons/PrimaryButtonCTA";
+import PageHeader from "../../components/common/PageHeader";
 import MyTasksTable from "../../components/tables/MyTasks";
 import { TaskData, TaskStatus } from "../../components/tables/TasksTable";
 
@@ -17,7 +18,13 @@ export default function MyTasks() {
 
   return (
     <>
-      <PageTitle title={"My Tasks"} />
+      <PageHeader title={"My Tasks"} />
+      <PrimaryButtonCTA
+        text="Browse Tasks →"
+        size="small"
+        to="/browse-tasks"
+        sx={{ mx: "auto" }}
+      />
       <MyTasksTable data={data} />
     </>
   );
