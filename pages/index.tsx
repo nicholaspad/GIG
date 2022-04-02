@@ -1,13 +1,22 @@
-import { Box, Container, Typography } from "@mui/material";
-import Navbar from "../components/navbar/Navbar";
-import PageTitle from "../components/common/PageTitle";
+import { Box, CircularProgress, Container, Typography } from "@mui/material";
+import router from "next/router";
+import { useEffect } from "react";
+import { useMoralis } from "react-moralis";
+import PageHeader from "../components/common/PageHeader";
 import { gigTheme } from "../src/Theme";
 
 export default function Landing() {
+  const { authenticate, isAuthenticated, isAuthenticating, authError } =
+    useMoralis();
+
+  useEffect(() => {
+    if (!isAuthenticated || authError) return;
+    router.push("/browse-tasks");
+  }, [isAuthenticated, authError]);
+
   return (
     <>
-      <PageTitle title={"Login"} />
-      <Navbar />
+      <PageHeader title={"Login"} disableAuthFunc />
       <Container maxWidth="md">
         <Box display="flex" flexDirection="column" alignItems="center" mt={8}>
           <Typography
@@ -66,7 +75,8 @@ export default function Landing() {
             borderRadius={3}
             sx={{
               background: gigTheme.palette.primary.main,
-              cursor: "pointer",
+              cursor: isAuthenticating ? "progress" : "pointer",
+              pointerEvents: isAuthenticating ? "none" : "auto",
               transitionDuration: "0.2s",
               "&:hover": {
                 transform: "scale(1.05)",
@@ -77,9 +87,49 @@ export default function Landing() {
                 xs: 230,
               },
             }}
-            // TODO @nicholaspad replace with Moralis authentication and remove Link
-            onClick={() => {}}
+            onClick={() => {
+              authenticate({ signingMessage: "GIG Authentication" });
+            }}
           />
+          {isAuthenticating && (
+            <>
+              <CircularProgress color="secondary" sx={{ mt: 6 }} />
+              <Typography
+                color="secondary"
+                textAlign="center"
+                fontWeight={500}
+                mt={2}
+                sx={{
+                  fontSize: {
+                    lg: 20,
+                    md: 18,
+                    sm: 16,
+                    xs: 14,
+                  },
+                }}
+              >
+                Logging in...
+              </Typography>
+            </>
+          )}
+          {authError && (
+            <Typography
+              color="error"
+              textAlign="center"
+              fontWeight={500}
+              mt={2}
+              sx={{
+                fontSize: {
+                  lg: 20,
+                  md: 18,
+                  sm: 16,
+                  xs: 14,
+                },
+              }}
+            >
+              {authError.message}
+            </Typography>
+          )}
         </Box>
       </Container>
     </>
