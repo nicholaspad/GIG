@@ -21,6 +21,7 @@ import {
 import { gigTheme } from "../../src/Theme";
 import PrimaryButtonCTA from "../buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../buttons/SecondaryButtonCTA";
+import { TableType } from "./TasksTableWrapper";
 
 export type TaskStatus = 0 | 1 | 2 | 3;
 
@@ -61,7 +62,7 @@ const createdStatusColorMap = {
 };
 
 export default function TasksTable(props: {
-  type: 0 | 1 | 2;
+  type: TableType;
   data: TaskData[];
 }) {
   function Header(props: { children: React.ReactNode }) {
@@ -194,7 +195,9 @@ export default function TasksTable(props: {
       align: "left",
       renderHeader: () => <Header>Completed</Header>,
       renderCell: (params: GridValueGetterParams) => (
-        <Cell>{params.row.completedTasks} / {params.row.totalTasks}</Cell>
+        <Cell>
+          {params.row.completedTasks} / {params.row.totalTasks}
+        </Cell>
       ),
     });
     columns.push({
