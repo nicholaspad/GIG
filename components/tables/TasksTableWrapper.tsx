@@ -3,22 +3,27 @@ import CustomizableGrayCard from "../common/CustomizableGrayCard";
 import TaskerPageHeader from "../common/TaskerPageHeader";
 import TasksTable, { TaskData } from "./TasksTable";
 
-export type TableType = 0 | 1 | 2 ;
+/*
+  0: Tasker - My Tasks table
+  1: Browse Tasks table
+  2: Requester - My Tasks table
+*/
+export type TableType = 0 | 1 | 2;
 
 const tableTitleMap = {
   0: "My Tasks",
   1: "Browse Tasks",
   2: "Created Tasks",
-}
+};
 
 const tableSubtitleMap = {
   0: "View & continue your claimed tasks.",
   1: "Find your next task.",
   2: "View your created tasks here.",
-}
+};
 
 export default function TasksTableWrapper(props: {
-  type: 0 | 1 | 2;
+  type: TableType;
   data: TaskData[];
 }) {
   return (

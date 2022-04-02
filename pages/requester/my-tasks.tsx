@@ -1,4 +1,4 @@
-import PageTitle from "../../components/common/PageTitle";
+import PageHeader from "../../components/common/PageHeader";
 import MyTasksTable from "../../components/tables/MyTasksTable";
 import { TaskData, TaskStatus } from "../../components/tables/TasksTable";
 
@@ -11,14 +11,15 @@ export default function MyTasks() {
         status: (i % 4) as TaskStatus,
         reward: e,
         completedTasks: Math.floor(Math.random() * 50),
-        totalTasks: Math.floor(Math.random() * 50) + Math.floor(Math.random() * 50),
+        totalTasks:
+          Math.floor(Math.random() * 50) + Math.floor(Math.random() * 50),
       };
     }
   );
 
   return (
     <>
-      <PageTitle title={"Requester Created Tasks"} />
+      <PageHeader title="Requester Created Tasks" />
       <MyTasksTable type={2} data={data} />
     </>
   );
