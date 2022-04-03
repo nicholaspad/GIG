@@ -45,7 +45,7 @@ export default function Navbar(props: {
       }}
     >
       <Toolbar>
-        <Box sx={{ flexGrow: isAuthenticated ? 0 : 1 }}>
+        <Box sx={{ flexGrow: isAuthenticated && shouldShowToggle() ? 0 : 1 }}>
           <Link href="/browse-tasks">
             <Typography
               variant="h4"
