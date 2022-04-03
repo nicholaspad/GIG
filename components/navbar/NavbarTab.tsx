@@ -10,8 +10,7 @@ export default function NavbarTab(props: {
   tabName: string;
 }) {
   return (
-    // TODO @nicholaspad replace second link with requester table route
-    <Link href={props.tabIsTasker ? "/tasker/my-tasks" : ""}>
+    <Link href={props.tabIsTasker ? "/tasker/my-tasks" : "/requester/my-tasks"}>
       <Box
         sx={{
           background: props.isSelected ? gigTheme.palette.secondary.main : null,

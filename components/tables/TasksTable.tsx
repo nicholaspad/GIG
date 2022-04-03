@@ -21,6 +21,7 @@ import {
 import { gigTheme } from "../../src/Theme";
 import PrimaryButtonCTA from "../buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../buttons/SecondaryButtonCTA";
+import { TableType } from "./TasksTableWrapper";
 
 export type TaskStatus = 0 | 1 | 2 | 3;
 
@@ -46,8 +47,22 @@ const statusColorMap = {
   3: gigTheme.palette.error.main,
 };
 
+const createdStatusMap = {
+  0: "Draft",
+  1: "In Progress",
+  2: "Completed",
+  3: "Abandoned",
+};
+
+const createdStatusColorMap = {
+  0: gigTheme.palette.info.main,
+  1: gigTheme.palette.warning.main,
+  2: gigTheme.palette.success.main,
+  3: gigTheme.palette.error.main,
+};
+
 export default function TasksTable(props: {
-  type: "BrowseTasks" | "MyTasks";
+  type: TableType;
   data: TaskData[];
 }) {
   function Header(props: { children: React.ReactNode }) {
@@ -92,7 +107,8 @@ export default function TasksTable(props: {
     },
   ];
 
-  if (props.type === "MyTasks") {
+  // My Tasks
+  if (props.type === 0) {
     columns.push({
       field: "status",
       sortable: false,
@@ -136,7 +152,8 @@ export default function TasksTable(props: {
         </>
       ),
     });
-  } else if (props.type === "BrowseTasks") {
+  } else if (props.type === 1) {
+    // Browse Tasks
     columns.push({
       field: "rating",
       sortable: false,
@@ -165,6 +182,66 @@ export default function TasksTable(props: {
       flex: 1,
       align: "left",
       renderCell: () => <PrimaryButtonCTA text="Details" size="small" to="/" />,
+    });
+  } else if (props.type === 2) {
+    // TODO: Use proper parameters for CreatedTasks
+    // Created Tasks
+    columns.push({
+      field: "completed",
+      sortable: false,
+      disableColumnMenu: true,
+      type: "number",
+      minWidth: 150,
+      align: "left",
+      renderHeader: () => <Header>Completed</Header>,
+      renderCell: (params: GridValueGetterParams) => (
+        <Cell>
+          {params.row.completedTasks} / {params.row.totalTasks}
+        </Cell>
+      ),
+    });
+    columns.push({
+      field: "status",
+      sortable: false,
+      disableColumnMenu: true,
+      type: "number",
+      minWidth: 150,
+      align: "left",
+      renderHeader: () => <Header>Status</Header>,
+      renderCell: (params: GridValueGetterParams) => (
+        <Cell color={createdStatusColorMap[params.row.status as TaskStatus]}>
+          {createdStatusMap[params.row.status as TaskStatus]}
+        </Cell>
+      ),
+    });
+    columns.push({
+      field: "",
+      headerName: "",
+      sortable: false,
+      disableColumnMenu: true,
+      minWidth: 290,
+      flex: 1,
+      align: "left",
+      renderCell: (params: GridValueGetterParams) => (
+        <>
+          {/* Render Abandon buttons for "In Progress" and "Pending Verification" rows */}
+          <Box
+            visibility={
+              (params.row.status as TaskStatus) >= 2 ? "hidden" : "visible"
+            }
+            mr={2}
+          >
+            <SecondaryButtonCTA text="Abandon" size="small" to="/" />
+          </Box>
+          <PrimaryButtonCTA
+            text={
+              (params.row.status as TaskStatus) == 0 ? "Continue" : "Details"
+            }
+            size="small"
+            to="/"
+          />
+        </>
+      ),
     });
   }
 
