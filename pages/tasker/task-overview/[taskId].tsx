@@ -10,12 +10,13 @@ import {
   styled,
   Typography,
 } from "@mui/material";
-import PrimaryButtonCTA from "../../components/buttons/PrimaryButtonCTA";
-import SecondaryButtonCTA from "../../components/buttons/SecondaryButtonCTA";
-import CustomizableGrayCard from "../../components/common/CustomizableGrayCard";
-import TaskerPageHeader from "../../components/common/TaskerPageHeader";
-import { TaskData } from "../../components/tables/TasksTable";
-import { gigTheme } from "../../src/Theme";
+import router from "next/router";
+import PrimaryButtonCTA from "../../../components/buttons/PrimaryButtonCTA";
+import SecondaryButtonCTA from "../../../components/buttons/SecondaryButtonCTA";
+import CustomizableGrayCard from "../../../components/common/CustomizableGrayCard";
+import TaskerPageHeader from "../../../components/common/TaskerPageHeader";
+import { TaskData } from "../../../components/tables/TasksTable";
+import { gigTheme } from "../../../src/Theme";
 
 export type TaskOverviewData = TaskData & {
   description: string;
@@ -25,6 +26,8 @@ export type TaskOverviewData = TaskData & {
 };
 
 export default function TaskOverview() {
+  const { taskId } = router.query;
+
   // TODO @nicholaspad hard-coded for now
   const data: TaskOverviewData = {
     task_id: 1,
