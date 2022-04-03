@@ -77,7 +77,7 @@ export default function taskerForm() {
             flexDirection: "row",
           }}
         >
-          <SecondaryButtonCTA size="small" text="Abandon" to="/" />
+          <SecondaryButtonCTA size="small" text="Abandon" to="/browse-tasks" />
           <Box>
             <Typography
               variant="body1"

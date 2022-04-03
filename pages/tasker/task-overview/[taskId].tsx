@@ -158,11 +158,14 @@ export default function TaskOverview() {
             </SectionContent>
           </Grid>
           <Grid item sm={12} display="flex" justifyContent="center" mt={2}>
-            {/* TODO @nicholaspad replace button links with proper routes */}
             <Box mr={4}>
-              <SecondaryButtonCTA text="Cancel" size="big" to="/" />
+              <SecondaryButtonCTA text="Cancel" size="big" to="/browse-tasks" />
             </Box>
-            <PrimaryButtonCTA text="Claim" size="big" to="/" />
+            <PrimaryButtonCTA
+              text="Claim"
+              size="big"
+              to={`/tasker/task/${taskId}`}
+            />
           </Grid>
         </Grid>
       </CustomizableGrayCard>

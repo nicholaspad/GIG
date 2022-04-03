@@ -107,8 +107,8 @@ export default function TasksTable(props: {
     },
   ];
 
-  // My Tasks
   if (props.type === 0) {
+    // My Tasks
     columns.push({
       field: "status",
       sortable: false,
@@ -181,7 +181,13 @@ export default function TasksTable(props: {
       minWidth: 130,
       flex: 1,
       align: "left",
-      renderCell: () => <PrimaryButtonCTA text="Details" size="small" to="/" />,
+      renderCell: (params: GridValueGetterParams) => (
+        <PrimaryButtonCTA
+          text="Details"
+          size="small"
+          to={`/tasker/task-overview/${String(params.row.task_id)}`}
+        />
+      ),
     });
   } else if (props.type === 2) {
     // TODO: Use proper parameters for CreatedTasks
