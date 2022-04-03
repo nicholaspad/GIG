@@ -28,6 +28,14 @@ export default function Navbar(props: {
   const { logout, isAuthenticated } = useMoralis();
   const [currentTask, setCurrentTask] = useState(true);
 
+  const shouldShowToggle = (): boolean => {
+    return (
+      router.pathname === "/tasker/my-tasks" ||
+      router.pathname === "/browse-tasks" ||
+      router.pathname === "/requester/my-tasks"
+    );
+  };
+
   return (
     <AppBar
       elevation={0}
@@ -38,8 +46,7 @@ export default function Navbar(props: {
     >
       <Toolbar>
         <Box sx={{ flexGrow: isAuthenticated ? 0 : 1 }}>
-          <Link href="/">
-            {/* INSERT LOGO HERE */}
+          <Link href="/browse-tasks">
             <Typography
               variant="h4"
               fontWeight={700}
@@ -57,7 +64,7 @@ export default function Navbar(props: {
             </Typography>
           </Link>
         </Box>
-        {isAuthenticated && (
+        {isAuthenticated && shouldShowToggle() && (
           <Stack
             direction="row"
             spacing={1}
@@ -70,7 +77,10 @@ export default function Navbar(props: {
               tabIsTasker={true}
               currentTask={currentTask}
               setCurrentTask={setCurrentTask}
-              isSelected={router.pathname === "/tasker/my-tasks"}
+              isSelected={
+                router.pathname === "/tasker/my-tasks" ||
+                router.pathname === "/browse-tasks"
+              }
               tabName="Tasker"
             />
             <NavbarTab
