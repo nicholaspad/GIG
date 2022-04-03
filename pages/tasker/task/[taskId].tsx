@@ -1,15 +1,16 @@
 import { Container, Box } from "@mui/material";
-import Question from "../../components/taskerForm/Question";
-import PrimaryButtonCTA from "../../components/buttons/PrimaryButtonCTA";
-import SecondaryButtonCTA from "../../components/buttons/SecondaryButtonCTA";
+import Question from "../../../components/taskerForm/Question";
+import PrimaryButtonCTA from "../../../components/buttons/PrimaryButtonCTA";
+import SecondaryButtonCTA from "../../../components/buttons/SecondaryButtonCTA";
 import { Typography } from "@mui/material";
-import GrayCard from "../../components/common/DefaultGrayCard";
-import PageHeader from "../../components/common/PageHeader";
+import GrayCard from "../../../components/common/DefaultGrayCard";
+import PageHeader from "../../../components/common/PageHeader";
 import { useEffect } from "react";
 import router from "next/router";
 import { useMoralis } from "react-moralis";
 
 export default function taskerForm() {
+  const { taskId } = router.query;
   const { isUnauthenticated } = useMoralis();
 
   useEffect(() => {
