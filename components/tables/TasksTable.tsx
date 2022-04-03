@@ -140,14 +140,23 @@ export default function TasksTable(props: {
             }
             mr={2}
           >
-            <SecondaryButtonCTA text="Abandon" size="small" to="/" />
+            <SecondaryButtonCTA
+              text="Abandon"
+              size="small"
+              to="/tasker/my-tasks"
+            />
           </Box>
           <PrimaryButtonCTA
             text={
               (params.row.status as TaskStatus) == 0 ? "Continue" : "Details"
             }
             size="small"
-            to="/"
+            // TODO @nicholaspad replace second link with route to task completed page
+            to={
+              (params.row.status as TaskStatus) == 0
+                ? `/tasker/task/${String(params.row.task_id)}`
+                : `/tasker/task-overview/${String(params.row.task_id)}`
+            }
           />
         </>
       ),
