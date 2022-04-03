@@ -109,7 +109,10 @@ export default function Navbar(props: {
             }}
           >
             <Typography fontWeight="bold">{props.username}</Typography>
-            <Typography color={connectionColorMap[props.isConnected ? 0 : 1]}>
+            <Typography
+              component="div"
+              color={connectionColorMap[props.isConnected ? 0 : 1]}
+            >
               {connectionMap[props.isConnected ? 0 : 1]}
               {props.walletAddress ? (
                 <Typography display="inline" color="primary.main">
