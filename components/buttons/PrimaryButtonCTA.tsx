@@ -5,10 +5,15 @@ import { gigTheme } from "../../src/Theme";
 export default function PrimaryButtonCTA(props: {
   size: "big" | "small";
   text: string;
-  to: string;
+  to?: string;
   sx?: SxProps<Theme>;
+  onClick?: Function;
 }) {
   const isBig = props.size === "big";
+
+  // must provide either a route or an onClick function, but not both!
+  if (!props.to && !props.onClick) return null;
+  if (props.to && props.onClick) return null;
 
   return (
     <Box
@@ -25,35 +30,72 @@ export default function PrimaryButtonCTA(props: {
         ...props.sx,
       }}
     >
-      <Link href={props.to}>
-        <Box
-          display="flex"
-          flexDirection="column"
-          height="100%"
-          borderRadius={100}
-          py={isBig ? 1.8 : 1}
-          px={isBig ? 4 : 3}
-          sx={{
-            justifyContent: "center",
-            backgroundColor: "background.paper",
-            color: "primaryCTA.primary",
-            cursor: "pointer",
-            transitionDuration: "0.2s",
-            "&:hover": {
-              backgroundColor: "transparent",
-              color: "background.paper",
-            },
+      {props.to && (
+        <Link href={props.to}>
+          <Box
+            display="flex"
+            flexDirection="column"
+            height="100%"
+            borderRadius={100}
+            py={isBig ? 1.8 : 1}
+            px={isBig ? 4 : 3}
+            sx={{
+              justifyContent: "center",
+              backgroundColor: "background.paper",
+              color: "primaryCTA.primary",
+              cursor: "pointer",
+              transitionDuration: "0.2s",
+              "&:hover": {
+                backgroundColor: "transparent",
+                color: "background.paper",
+              },
+            }}
+          >
+            <Typography
+              variant={isBig ? "h6" : "body1"}
+              fontWeight={650}
+              textTransform="none"
+            >
+              {props.text}
+            </Typography>
+          </Box>
+        </Link>
+      )}
+      {props.onClick && (
+        <a
+          onClick={() => {
+            (props.onClick as Function)();
           }}
         >
-          <Typography
-            variant={isBig ? "h6" : "body1"}
-            fontWeight={650}
-            textTransform="none"
+          <Box
+            display="flex"
+            flexDirection="column"
+            height="100%"
+            borderRadius={100}
+            py={isBig ? 1.8 : 1}
+            px={isBig ? 4 : 3}
+            sx={{
+              justifyContent: "center",
+              backgroundColor: "background.paper",
+              color: "primaryCTA.primary",
+              cursor: "pointer",
+              transitionDuration: "0.2s",
+              "&:hover": {
+                backgroundColor: "transparent",
+                color: "background.paper",
+              },
+            }}
           >
-            {props.text}
-          </Typography>
-        </Box>
-      </Link>
+            <Typography
+              variant={isBig ? "h6" : "body1"}
+              fontWeight={650}
+              textTransform="none"
+            >
+              {props.text}
+            </Typography>
+          </Box>
+        </a>
+      )}
     </Box>
   );
 }
