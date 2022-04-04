@@ -1,20 +1,32 @@
+import { useEffect, useState } from "react";
+import { useMoralis } from "react-moralis";
 import PrimaryButtonCTA from "../components/buttons/PrimaryButtonCTA";
 import PageHeader from "../components/common/PageHeader";
 import BrowseTasksTable from "../components/tables/BrowseTasksTable";
 import { TaskData } from "../components/tables/TasksTable";
+import { getMyTasksTableData } from "../src/Database";
 
 export default function Tasks() {
-  // TODO @nicholaspad hard-coded for now
-  const data: TaskData[] = [1.5, 2.5, 3, 4.5, 5, 6.5, 7, 8.5, 9, 10, 10.5].map(
-    (e, i) => {
-      return {
-        task_id: e * 100,
-        name: `Task ${i + 1}`,
-        rating: e % 6,
-        reward: e,
-      };
-    }
-  );
+  const { isInitialized, Moralis } = useMoralis();
+  const [data, setData] = useState<TaskData[]>([]);
+
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    getMyTasksTableData(Moralis).then((res) => {
+      let tempData: TaskData[] = [];
+      for (let task_ of res) {
+        let task = task_ as any;
+        tempData.push({
+          task_id: task["objectId"],
+          name: task["title"],
+          reward: task["unitReward"],
+          rating: task["avgRating"],
+        });
+      }
+      setData(tempData);
+    });
+  }, [isInitialized]);
 
   return (
     <>
