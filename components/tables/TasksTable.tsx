@@ -26,7 +26,7 @@ import { TableType } from "./TasksTableWrapper";
 export type TaskStatus = 0 | 1 | 2 | 3;
 
 export type TaskData = {
-  task_id: number;
+  task_id: string;
   name: string;
   rating?: number;
   status?: TaskStatus;
@@ -312,6 +312,9 @@ const StyledTasksTable = styled(DataGrid)(({ theme }) => ({
   "& .MuiDataGrid-footerContainer, .MuiButtonBase-root": {
     color: theme.palette.primary.main,
     fontSize: 16,
+  },
+  "& .MuiDataGrid-overlay": {
+    display: "none",
   },
 }));
 
