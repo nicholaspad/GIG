@@ -48,7 +48,10 @@ export async function getBrowseTasksTableData(
   of the Cloud Functions popup on the Moralis Dashboard).
 */
 export async function getTaskerMyTasksTableData(
-  Moralis: MoralisType
+  Moralis: MoralisType,
+  ethAddress: string
 ): Promise<MoralisType.Object<MoralisType.Attributes>[]> {
-  return await Moralis.Cloud.run("getTaskerMyTasksTableData");
+  return await Moralis.Cloud.run("getTaskerMyTasksTableData", {
+    ethAddress: ethAddress,
+  });
 }
