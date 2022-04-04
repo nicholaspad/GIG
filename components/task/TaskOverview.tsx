@@ -65,7 +65,7 @@ export default function TaskOverviewTemplate(props: {
   return (
     <Container maxWidth="lg">
       <TaskerPageHeader title={props.title} subtitle={props.subtitle} />
-      <CustomizableGrayCard sx={{ px: 5, py: 2.5 }}>
+      <CustomizableGrayCard sx={{ px: 5, py: 2.5, mb: 5 }}>
         <Grid
           container
           justifyContent="center"

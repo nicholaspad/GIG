@@ -32,7 +32,7 @@ export default function TasksTableWrapper(props: {
         title={tableTitleMap[props.type as TableType]}
         subtitle={tableSubtitleMap[props.type as TableType]}
       />
-      <CustomizableGrayCard sx={{ px: 5, py: 2.5 }}>
+      <CustomizableGrayCard sx={{ px: 5, py: 2.5, mb: 5 }}>
         {/* TODO @nicholaspad replace button links with proper routes */}
         <TasksTable type={props.type} data={props.data} />
       </CustomizableGrayCard>
