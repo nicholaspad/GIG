@@ -1,6 +1,6 @@
 import PrimaryButtonCTA from "../components/buttons/PrimaryButtonCTA";
 import PageHeader from "../components/common/PageHeader";
-import BrowseTasksTable from "../components/tables/BrowseTasks";
+import BrowseTasksTable from "../components/tables/BrowseTasksTable";
 import { TaskData } from "../components/tables/TasksTable";
 
 export default function Tasks() {
@@ -18,14 +18,14 @@ export default function Tasks() {
 
   return (
     <>
-      <PageHeader title={"Browse Tasks"} />
+      <PageHeader title="Browse Tasks" />
       <PrimaryButtonCTA
         text="My Tasks →"
         size="small"
         to="/tasker/my-tasks"
         sx={{ mx: "auto" }}
       />
-      <BrowseTasksTable data={data} />
+      <BrowseTasksTable type={1} data={data} />
     </>
   );
 }
