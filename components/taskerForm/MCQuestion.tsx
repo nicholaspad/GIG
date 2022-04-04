@@ -14,6 +14,7 @@ export interface mcQuestionProps {
   id: string;
   question: string;
   options: string[];
+  handleSetAnswers: Function;
 }
 
 export default function MCQuestion(props: mcQuestionProps) {
@@ -26,10 +27,10 @@ export default function MCQuestion(props: mcQuestionProps) {
           </Typography>
         </FormLabel>
         <RadioGroup aria-labelledby={props.id} name={props.id}>
-          {props.options.map((option, optionIdx) => (
+          {props.options.map((option, optionid) => (
             <FormControlLabel
-              value={optionIdx}
-              key={`${props.id}-${optionIdx}`}
+              value={optionid}
+              key={`${props.id}-${optionid}`}
               control={
                 <Radio
                   sx={{
@@ -38,6 +39,7 @@ export default function MCQuestion(props: mcQuestionProps) {
                     },
                   }}
                   required
+                  onClick={() => props.handleSetAnswers(props.id, optionid)}
                 />
               }
               label={

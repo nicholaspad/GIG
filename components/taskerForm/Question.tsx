@@ -6,6 +6,7 @@ export interface questionProps {
   idx: number;
   id: string;
   question: string;
+  handleSetAnswers: Function;
   options?: string[];
 }
 
@@ -17,6 +18,7 @@ export default function Question(props: questionProps) {
         idx={props.idx}
         id={props.id}
         options={props.options}
+        handleSetAnswers={props.handleSetAnswers}
       />
     );
   }

@@ -5,17 +5,9 @@ import SecondaryButtonCTA from "../../components/buttons/SecondaryButtonCTA";
 import { Typography } from "@mui/material";
 import GrayCard from "../../components/common/DefaultGrayCard";
 import PageHeader from "../../components/common/PageHeader";
-import { useEffect } from "react";
-import router from "next/router";
-import { useMoralis } from "react-moralis";
+import { useState } from "react";
 
 export default function taskerForm() {
-  const { isUnauthenticated } = useMoralis();
-
-  useEffect(() => {
-    if (isUnauthenticated) router.push("/");
-  }, [isUnauthenticated]);
-
   /* Test Data */
   const q1 = {
     id: "00001",
@@ -46,12 +38,25 @@ export default function taskerForm() {
   };
   /* End of Test Data */
 
+  const [answers, setAnswers] = useState({});
+  const handleSetAnswers = (id: string, answer: string) => {
+    setAnswers({ ...answers, [id]: answer });
+  };
+
+  /* TODO: use this function after building submit handling */
+  const convertResponseFormat = (responses: { [key: string]: string }) => {
+    return Object.keys(responses).map((key) => ({
+      questionId: key,
+      response: responses[key],
+    }));
+  };
+
   return (
     <>
       <PageHeader title={"Task"} />
       <Container maxWidth="sm">
         <GrayCard>
-          <Typography variant="h4" color="primary">
+          <Typography variant="h4" color="primary" fontWeight={600}>
             {formInfo.title}
           </Typography>
           <Typography sx={{ mt: "3%" }} variant="body2" color="primary">
@@ -66,6 +71,7 @@ export default function taskerForm() {
             question={props.question}
             options={props.options}
             key={props.id}
+            handleSetAnswers={handleSetAnswers}
           />
         ))}
         <Box
@@ -90,7 +96,7 @@ export default function taskerForm() {
               {formInfo.eta} minutes
             </Typography>
           </Box>
-          <PrimaryButtonCTA size="small" text="Submit" to="/" />
+          <PrimaryButtonCTA size="small" text="Submit" to="/tasker/completed" />
         </Box>
       </Container>
     </>
