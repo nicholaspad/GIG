@@ -1,4 +1,6 @@
+import { Box } from "@mui/material";
 import { useRouter } from "next/router";
+import PrimaryButtonCTA from "../../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../../components/buttons/SecondaryButtonCTA";
 import TaskOverviewTemplate, {
   TaskOverviewData,
@@ -21,12 +23,15 @@ export default function TaskDetails() {
   };
 
   return (
-    <TaskOverviewTemplate data={data} title="Task Details">
-      <SecondaryButtonCTA
-        text="Back to My Tasks"
-        size="big"
-        to="/tasker/my-tasks"
-      />
+    <TaskOverviewTemplate
+      data={data}
+      title="Task Details"
+      subtitle="Confirm your task selection."
+    >
+      <Box mr={4}>
+        <SecondaryButtonCTA text="Back" size="big" to="/browse-tasks" />
+      </Box>
+      <PrimaryButtonCTA text="Claim" size="big" to={`/tasker/task/${taskId}`} />
     </TaskOverviewTemplate>
   );
 }
