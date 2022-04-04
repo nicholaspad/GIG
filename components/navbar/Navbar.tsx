@@ -68,7 +68,7 @@ export default function Navbar(props: {
           <Stack
             direction="row"
             spacing={1}
-            ml={5}
+            mx={5}
             sx={{
               flexGrow: 1,
             }}
