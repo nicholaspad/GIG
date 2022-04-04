@@ -43,12 +43,20 @@ export default function taskerForm() {
     setAnswers({ ...answers, [id]: answer });
   };
 
+  /* TODO: use this function after building submit handling */
+  const convertResponseFormat = (responses: { [key: string]: string }) => {
+    return Object.keys(responses).map((key) => ({
+      questionId: key,
+      response: responses[key],
+    }));
+  };
+
   return (
     <>
       <PageTitle title={"Task"} />
       <Container maxWidth="sm">
         <GrayCard>
-          <Typography variant="h4" color="primary">
+          <Typography variant="h4" color="primary" fontWeight={600}>
             {formInfo.title}
           </Typography>
           <Typography sx={{ mt: "3%" }} variant="body2" color="primary">
@@ -88,7 +96,7 @@ export default function taskerForm() {
               {formInfo.eta} minutes
             </Typography>
           </Box>
-          <PrimaryButtonCTA size="small" text="Submit" to="/completed" />
+          <PrimaryButtonCTA size="small" text="Submit" to="/tasker/completed" />
         </Box>
       </Container>
     </>
