@@ -1,22 +1,39 @@
+import MoralisType from "moralis";
 import { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
 import PrimaryButtonCTA from "../components/buttons/PrimaryButtonCTA";
 import PageHeader from "../components/common/PageHeader";
 import BrowseTasksTable from "../components/tables/BrowseTasksTable";
 import { TaskData } from "../components/tables/TasksTable";
-import { getBrowseTasksTableData } from "../src/Database";
+import {
+  getBrowseTasksTableData,
+  getTaskerClaimedTaskIds,
+} from "../src/Database";
 
 export default function Tasks() {
   const { isInitialized, Moralis } = useMoralis();
   const [data, setData] = useState<TaskData[]>([]);
+  const [userData, setUserData] = useState<MoralisType.Object>();
 
   useEffect(() => {
-    if (!isInitialized) return;
+    if (!isInitialized || !userData) return;
 
-    getBrowseTasksTableData(Moralis).then((res) => {
+    getBrowseTasksTableData(Moralis).then(async (res) => {
+      const res_ = await getTaskerClaimedTaskIds(
+        Moralis,
+        userData.get("ethAddress")
+      );
+
+      // filter out tasks the users has claimed
+      const claimedTaskIds: { [key: string]: number } = {};
+      res_.map((task) => {
+        claimedTaskIds[(task as any)["taskId"]] = 1;
+      });
+
       let tempData: TaskData[] = [];
       for (let task_ of res) {
         let task = task_ as any;
+        if (task["objectId"] in claimedTaskIds) continue;
         tempData.push({
           task_id: task["objectId"],
           name: task["title"],
@@ -26,11 +43,11 @@ export default function Tasks() {
       }
       setData(tempData);
     });
-  }, [isInitialized]);
+  }, [isInitialized, userData]);
 
   return (
     <>
-      <PageHeader title="Browse Tasks" />
+      <PageHeader title="Browse Tasks" customSetUserData={setUserData} />
       <PrimaryButtonCTA
         text="My Tasks →"
         size="small"

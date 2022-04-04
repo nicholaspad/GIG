@@ -55,3 +55,12 @@ export async function getTaskerMyTasksTableData(
     ethAddress: ethAddress,
   });
 }
+
+export async function getTaskerClaimedTaskIds(
+  Moralis: MoralisType,
+  ethAddress: string
+): Promise<MoralisType.Object<MoralisType.Attributes>[]> {
+  return await Moralis.Cloud.run("getTaskerClaimedTaskIds", {
+    ethAddress: ethAddress,
+  });
+}

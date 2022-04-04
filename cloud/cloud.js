@@ -32,3 +32,17 @@ Moralis.Cloud.define("getTaskerMyTasksTableData", async (request) => {
 
   return res;
 });
+
+Moralis.Cloud.define("getTaskerClaimedTaskIds", async (request) => {
+  const ethAddress = request.params.ethAddress;
+  const tableName = "TaskUsers";
+
+  const TaskUsers = Moralis.Object.extend(tableName);
+  const query = new Moralis.Query(TaskUsers);
+  const res = query.aggregate([
+    { match: { taskerId: ethAddress } },
+    { project: { objectId: 0, taskId: 1 } },
+  ]);
+
+  return res;
+});
