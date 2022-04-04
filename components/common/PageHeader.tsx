@@ -9,6 +9,7 @@ import router from "next/router";
 export default function PageHeader(props: {
   title: string;
   disableAuthFunc?: boolean;
+  customSetUserData?: Function;
 }) {
   const { user, isAuthenticated, isUnauthenticated, authError, Moralis } =
     useMoralis();
@@ -22,7 +23,10 @@ export default function PageHeader(props: {
     if (props.disableAuthFunc || !isAuthenticated || authError || !user) return;
 
     makeOrGetNewUser(Moralis, user.get("ethAddress")).then(
-      (res: MoralisType.Object) => setUserData(res)
+      (res: MoralisType.Object) => {
+        setUserData(res);
+        if (props.customSetUserData) props.customSetUserData(res);
+      }
     );
   }, [isAuthenticated]);
 
