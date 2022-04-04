@@ -155,7 +155,7 @@ export default function TasksTable(props: {
             to={
               (params.row.status as TaskStatus) == 0
                 ? `/tasker/task/${String(params.row.task_id)}`
-                : `/tasker/task-overview/${String(params.row.task_id)}`
+                : `/tasker/task-details/${String(params.row.task_id)}`
             }
           />
         </>

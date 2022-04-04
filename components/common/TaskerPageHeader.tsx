@@ -2,7 +2,7 @@ import { Box, Typography } from "@mui/material";
 
 export default function TaskerPageHeader(props: {
   title: string;
-  subtitle: string;
+  subtitle?: string;
 }) {
   return (
     <Box textAlign="center" my={3} p={2}>

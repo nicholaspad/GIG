@@ -6,10 +6,11 @@ import { Typography } from "@mui/material";
 import GrayCard from "../../../components/common/DefaultGrayCard";
 import PageHeader from "../../../components/common/PageHeader";
 import { useEffect } from "react";
-import router from "next/router";
+import { useRouter } from "next/router";
 import { useMoralis } from "react-moralis";
 
 export default function taskerForm() {
+  const router = useRouter();
   const { taskId } = router.query;
   const { isUnauthenticated } = useMoralis();
 
