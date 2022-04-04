@@ -4,7 +4,7 @@ import PrimaryButtonCTA from "../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../components/buttons/SecondaryButtonCTA";
 import { Typography } from "@mui/material";
 import GrayCard from "../../components/common/DefaultGrayCard";
-import PageTitle from "../../components/common/PageTitle";
+import PageHeader from "../../components/common/PageHeader";
 import { useState } from "react";
 
 export default function taskerForm() {
@@ -53,7 +53,7 @@ export default function taskerForm() {
 
   return (
     <>
-      <PageTitle title={"Task"} />
+      <PageHeader title={"Task"} />
       <Container maxWidth="sm">
         <GrayCard>
           <Typography variant="h4" color="primary" fontWeight={600}>
