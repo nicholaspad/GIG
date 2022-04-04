@@ -4,7 +4,7 @@ import PrimaryButtonCTA from "../components/buttons/PrimaryButtonCTA";
 import PageHeader from "../components/common/PageHeader";
 import BrowseTasksTable from "../components/tables/BrowseTasksTable";
 import { TaskData } from "../components/tables/TasksTable";
-import { getMyTasksTableData } from "../src/Database";
+import { getTaskerMyTasksTableData } from "../src/Database";
 
 export default function Tasks() {
   const { isInitialized, Moralis } = useMoralis();
@@ -13,7 +13,7 @@ export default function Tasks() {
   useEffect(() => {
     if (!isInitialized) return;
 
-    getMyTasksTableData(Moralis).then((res) => {
+    getTaskerMyTasksTableData(Moralis).then((res) => {
       let tempData: TaskData[] = [];
       for (let task_ of res) {
         let task = task_ as any;

@@ -1,9 +1,10 @@
 import MoralisType from "moralis";
+import Query from "moralis";
 
 /*
-    Creates a new user row in table Users if it doesn't already exist.
-    Uses ethAddress as the primary key. Returns the user's data as a
-    MoralisTye.Object.
+  Creates a new user row in table Users if it doesn't already exist.
+  Uses ethAddress as the primary key. Returns the user's data as a
+  MoralisTye.Object.
 */
 export async function makeOrGetNewUser(
   Moralis: MoralisType,
@@ -14,9 +15,9 @@ export async function makeOrGetNewUser(
 
   const Users = Moralis.Object.extend(tableName);
   const query = new Moralis.Query(Users);
-  const results = await query.equalTo("ethAddress", ethAddress).find();
+  const res = await query.equalTo("ethAddress", ethAddress).find();
 
-  if (results.length > 0) return results[0];
+  if (res.length > 0) return res[0];
 
   const user = new Users();
   user.set("ethAddress", ethAddress);
@@ -26,4 +27,16 @@ export async function makeOrGetNewUser(
   await user.save();
 
   return user;
+}
+
+/*
+  Retrieves data for the Tasker My Tasks table.
+  Edit this function on the Moralis Dashboard (Cloud Functions) or by
+  using the CLI and editing the cloud/cloud.js file (see the bottom
+  of the Cloud Functions popup on the Moralis Dashboard).
+*/
+export async function getTaskerMyTasksTableData(
+  Moralis: MoralisType
+): Promise<MoralisType.Object<MoralisType.Attributes>[]> {
+  return await Moralis.Cloud.run("getTaskerMyTasksTableData");
 }
