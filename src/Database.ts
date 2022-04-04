@@ -30,7 +30,19 @@ export async function makeOrGetNewUser(
 }
 
 /*
-  Retrieves data for the Tasker My Tasks table.
+  Retrieves data for the Browse Tasks table.
+  Edit this function on the Moralis Dashboard (Cloud Functions) or by
+  using the CLI and editing the cloud/cloud.js file (see the bottom
+  of the Cloud Functions popup on the Moralis Dashboard).
+*/
+export async function getBrowseTasksTableData(
+  Moralis: MoralisType
+): Promise<MoralisType.Object<MoralisType.Attributes>[]> {
+  return await Moralis.Cloud.run("getBrowseTasksTableData");
+}
+
+/*
+  Retrieves data for the My Tasks (Tasker) table.
   Edit this function on the Moralis Dashboard (Cloud Functions) or by
   using the CLI and editing the cloud/cloud.js file (see the bottom
   of the Cloud Functions popup on the Moralis Dashboard).
