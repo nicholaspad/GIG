@@ -5,6 +5,14 @@ import { Container, Modal, styled, Typography } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import { gigTheme } from "../../../src/Theme";
 import FormControl from "@mui/material/FormControl";
+import PrimaryButtonCTA from "../../../components/buttons/PrimaryButtonCTA";
+import SecondaryButtonCTA from "../../../components/buttons/SecondaryButtonCTA";
+import DefaultGrayCard from "../../../components/common/DefaultGrayCard";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
 
 export default function Form() {
   const [open, setOpen] = useState(false);
@@ -23,6 +31,7 @@ export default function Form() {
   return (
     <Container maxWidth="md">
       {/* TODO @nicholaspad replace with primary CTA */}
+      <QuestionCard title="my title" options={["hi", "bye"]}/>
       <Button
         variant="contained"
         color="secondary"
@@ -33,24 +42,42 @@ export default function Form() {
       <AddQuestionModal open={open} setOpen={setOpen} />
       {/* <TaskHeading/> */}
       {questions}
-
-      {/* <Button
-        variant="contained"
-        onClick={() => {
-          setQuestions((questions) => [
-            ...questions,
-            <QuestionSingleChoice
-              key={currIndex}
-              index={currIndex}
-              removeQuestion={removeQuestion}
-            />,
-          ]);
-          setCurrIndex(currIndex + 1);
-        }}
-      >
-        +
-      </Button> */}
     </Container>
+  );
+}
+
+
+// function generate(element: React.ReactElement) {
+//   return [0,1,2].map((value) =>
+//     React.cloneElement(element, {
+//       key: value,
+//     }),
+//   );
+// }
+
+function QuestionCard(props: { title: string, options: string[] }) {
+  const options1 = props.options
+  return (
+    <DefaultGrayCard>
+      <Typography color="primary" variant="h5" mb={1.5}>{props.title}</Typography>
+      <List>
+        {props.options.map((option) => (
+          // <div>{option}</div>
+          <ListItem>
+            <ListItemIcon>
+              <CircleOutlinedIcon
+                style={{ color: gigTheme.palette.primary.main }}
+              />
+            </ListItemIcon>
+            <ListItemText
+              primaryTypographyProps={{ fontSize: '20px' }}
+              primary={option}
+              style={{ color: gigTheme.palette.primary.main }}
+            />
+          </ListItem>
+        ))}
+      </List>
+    </DefaultGrayCard>
   );
 }
 
@@ -86,6 +113,7 @@ function AddQuestionModal(props: { open: boolean; setOpen: Function }) {
           width: 600,
           bgcolor: "background.paper",
           border: "2px solid #000",
+          borderRadius: 5,
           boxShadow: 24,
           p: 4,
         }}
@@ -99,7 +127,6 @@ function AddQuestionModal(props: { open: boolean; setOpen: Function }) {
           <CustomTextField
             label="Task Title"
             variant="outlined"
-            color="secondary"
             onChange={(e) => {
               setCurrQuestionTitle(e.target.value);
               setCurrQuestionTitleError(e.target.value.length < 10);
@@ -110,13 +137,12 @@ function AddQuestionModal(props: { open: boolean; setOpen: Function }) {
               currQuestionTitleError &&
               "Title must be longer than 10 characters!"
             }
-            sx={{ color: "primary", mb: 2 }}
+            sx={{ mb: 2 }}
           />
           {/* Answer choices field */}
           <CustomTextField
             label="Answer Choices (comma-separated)"
             variant="outlined"
-            color="secondary"
             onChange={(e) => {
               const input = e.target.value;
               const cleanedAnswerChoices = input
@@ -137,7 +163,7 @@ function AddQuestionModal(props: { open: boolean; setOpen: Function }) {
                   } answer choice(s) entered: ${currQuestionChoices.join(", ")}`
                 : null
             }
-            sx={{ color: "primary", mb: 2 }}
+            sx={{ mb: 2 }}
           />
           {/* Submit button */}
           {/* TODO @nicholaspad replace with primary CTA */}
@@ -146,7 +172,7 @@ function AddQuestionModal(props: { open: boolean; setOpen: Function }) {
             color="secondary"
             onClick={() => {
               if (currQuestionTitleError || currQuestionChoicesError) {
-                alert("Validation error");
+                alert("Please provide proper input");
                 return;
               }
               // TODO @christine-sun do something with currQuestionTitle and currQuestionChoices
