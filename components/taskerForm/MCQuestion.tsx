@@ -10,7 +10,9 @@ import {
 import GrayCard from "../common/DefaultGrayCard";
 import { mcQuestionProps } from "../../src/Types";
 
-export default function MCQuestion(props: mcQuestionProps) {
+export default function MCQuestion(
+  props: mcQuestionProps & { handleSetAnswers: Function }
+) {
   return (
     <GrayCard>
       <FormControl>
@@ -20,10 +22,10 @@ export default function MCQuestion(props: mcQuestionProps) {
           </Typography>
         </FormLabel>
         <RadioGroup aria-labelledby={props.id} name={props.id}>
-          {props.options.map((option, optionIdx) => (
+          {props.options.map((option, optionid) => (
             <FormControlLabel
-              value={optionIdx}
-              key={`${props.id}-${optionIdx}`}
+              value={optionid}
+              key={`${props.id}-${optionid}`}
               control={
                 <Radio
                   sx={{
@@ -32,6 +34,7 @@ export default function MCQuestion(props: mcQuestionProps) {
                     },
                   }}
                   required
+                  onClick={() => props.handleSetAnswers(props.id, optionid)}
                 />
               }
               label={

@@ -1,41 +1,41 @@
-import { Box, Typography } from "@mui/material";
-import TasksTable from "./TasksTable";
-import { TaskData } from "../../src/Types";
+import { Container } from "@mui/material";
+import CustomizableGrayCard from "../common/CustomizableGrayCard";
+import TaskerPageHeader from "../common/TaskerPageHeader";
+import TasksTable, { TaskData } from "./TasksTable";
+
+/*
+  0: Tasker - My Tasks table
+  1: Browse Tasks table
+  2: Requester - My Tasks table
+*/
+export type TableType = 0 | 1 | 2;
+
+const tableTitleMap = {
+  0: "My Tasks",
+  1: "Browse Tasks",
+  2: "Created Tasks",
+};
+
+const tableSubtitleMap = {
+  0: "View & continue your claimed tasks.",
+  1: "Find your next task.",
+  2: "View your created tasks here.",
+};
 
 export default function TasksTableWrapper(props: {
-  type: "Tasks" | "MyTasks";
+  type: TableType;
   data: TaskData[];
 }) {
-  // TODO @nicholaspad wrap the table in Byron's card component, center header text
   return (
-    <>
-      <Box p={2}>
-        <Typography color="primary.main" fontWeight={600} fontSize={40}>
-          {props.type === "Tasks" ? "Browse Tasks" : "My Tasks"}
-        </Typography>
-        <Typography
-          color="secondary.main"
-          fontStyle="italic"
-          fontWeight={400}
-          fontSize={20}
-          mt={1}
-        >
-          {props.type === "Tasks"
-            ? "Find your next task."
-            : "View & continue your claimed tasks."}
-        </Typography>
-      </Box>
-      <Box
-        width={1100}
-        height={800}
-        display="flex"
-        flexDirection="column"
-        p={2}
-        sx={{ backgroundColor: "background.paper" }}
-      >
+    <Container maxWidth="lg">
+      <TaskerPageHeader
+        title={tableTitleMap[props.type as TableType]}
+        subtitle={tableSubtitleMap[props.type as TableType]}
+      />
+      <CustomizableGrayCard sx={{ px: 5, py: 2.5 }}>
         {/* TODO @nicholaspad replace button links with proper routes */}
         <TasksTable type={props.type} data={props.data} />
-      </Box>
-    </>
+      </CustomizableGrayCard>
+    </Container>
   );
 }

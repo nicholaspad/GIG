@@ -6,6 +6,7 @@ import {
   PaginationItem,
   Rating,
   styled,
+  TableContainer,
   Typography,
 } from "@mui/material";
 import {
@@ -21,6 +22,7 @@ import { gigTheme } from "../../src/Theme";
 import { TaskData, TaskStatus } from "../../src/Types";
 import PrimaryButtonCTA from "../buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../buttons/SecondaryButtonCTA";
+import { TableType } from "./TasksTableWrapper";
 
 const statusMap = {
   0: "In progress",
@@ -36,49 +38,80 @@ const statusColorMap = {
   3: gigTheme.palette.error.main,
 };
 
+const createdStatusMap = {
+  0: "Draft",
+  1: "In Progress",
+  2: "Completed",
+  3: "Abandoned",
+};
+
+const createdStatusColorMap = {
+  0: gigTheme.palette.info.main,
+  1: gigTheme.palette.warning.main,
+  2: gigTheme.palette.success.main,
+  3: gigTheme.palette.error.main,
+};
+
 export default function TasksTable(props: {
-  type: "Tasks" | "MyTasks";
+  type: TableType;
   data: TaskData[];
 }) {
+  function Header(props: { children: React.ReactNode }) {
+    return (
+      <Typography variant="h5" fontWeight={500}>
+        {props.children}
+      </Typography>
+    );
+  }
+
+  function Cell(props: { color?: string; children: React.ReactNode }) {
+    return (
+      <Typography color={props.color} variant="body1">
+        {props.children}
+      </Typography>
+    );
+  }
+
   const columns: GridColDef[] = [
     {
       field: "name",
-      headerName: "Task Name",
       sortable: false,
       disableColumnMenu: true,
       type: "string",
-      minWidth: 400,
+      minWidth: 300,
+      renderHeader: () => <Header>Task Name</Header>,
+      renderCell: (params: GridValueGetterParams) => (
+        <Cell>{params.row.name}</Cell>
+      ),
     },
     {
       field: "reward",
-      headerName: "Reward",
       sortable: false,
       disableColumnMenu: true,
       type: "number",
       minWidth: 150,
       align: "left",
+      renderHeader: () => <Header>Reward</Header>,
       renderCell: (params: GridValueGetterParams) => (
-        <Typography fontSize={18}>{params.row.reward} ETH</Typography>
+        <Cell>{params.row.reward} ETH</Cell>
       ),
     },
   ];
 
-  if (props.type === "MyTasks") {
+  // My Tasks
+  if (props.type === 0) {
     columns.push({
       field: "status",
-      headerName: "Status",
       sortable: false,
       disableColumnMenu: true,
       type: "number",
       minWidth: 200,
       align: "left",
+      renderHeader: () => <Header>Status</Header>,
       renderCell: (params: GridValueGetterParams) => (
-        <Typography
-          fontSize={18}
-          color={statusColorMap[params.row.status as TaskStatus]}
-        >
+        <Cell color={statusColorMap[params.row.status as TaskStatus]}>
           {statusMap[params.row.status as TaskStatus]}
-        </Typography>
+        </Cell>
       ),
     });
     columns.push({
@@ -86,7 +119,7 @@ export default function TasksTable(props: {
       headerName: "",
       sortable: false,
       disableColumnMenu: true,
-      minWidth: 200,
+      minWidth: 290,
       flex: 1,
       align: "left",
       renderCell: (params: GridValueGetterParams) => (
@@ -110,15 +143,16 @@ export default function TasksTable(props: {
         </>
       ),
     });
-  } else if (props.type === "Tasks") {
+  } else if (props.type === 1) {
+    // Browse Tasks
     columns.push({
       field: "rating",
-      headerName: "Rating",
       sortable: false,
       disableColumnMenu: true,
       type: "number",
       minWidth: 200,
       align: "left",
+      renderHeader: () => <Header>Rating</Header>,
       renderCell: (params: GridValueGetterParams) => (
         <StyledRating
           readOnly
@@ -135,27 +169,89 @@ export default function TasksTable(props: {
       headerName: "",
       sortable: false,
       disableColumnMenu: true,
-      minWidth: 200,
+      minWidth: 130,
       flex: 1,
       align: "left",
       renderCell: () => <PrimaryButtonCTA text="Details" size="small" to="/" />,
     });
+  } else if (props.type === 2) {
+    // TODO: Use proper parameters for CreatedTasks
+    // Created Tasks
+    columns.push({
+      field: "completed",
+      sortable: false,
+      disableColumnMenu: true,
+      type: "number",
+      minWidth: 150,
+      align: "left",
+      renderHeader: () => <Header>Completed</Header>,
+      renderCell: (params: GridValueGetterParams) => (
+        <Cell>
+          {params.row.completedTasks} / {params.row.totalTasks}
+        </Cell>
+      ),
+    });
+    columns.push({
+      field: "status",
+      sortable: false,
+      disableColumnMenu: true,
+      type: "number",
+      minWidth: 150,
+      align: "left",
+      renderHeader: () => <Header>Status</Header>,
+      renderCell: (params: GridValueGetterParams) => (
+        <Cell color={createdStatusColorMap[params.row.status as TaskStatus]}>
+          {createdStatusMap[params.row.status as TaskStatus]}
+        </Cell>
+      ),
+    });
+    columns.push({
+      field: "",
+      headerName: "",
+      sortable: false,
+      disableColumnMenu: true,
+      minWidth: 290,
+      flex: 1,
+      align: "left",
+      renderCell: (params: GridValueGetterParams) => (
+        <>
+          {/* Render Abandon buttons for "In Progress" and "Pending Verification" rows */}
+          <Box
+            visibility={
+              (params.row.status as TaskStatus) >= 2 ? "hidden" : "visible"
+            }
+            mr={2}
+          >
+            <SecondaryButtonCTA text="Abandon" size="small" to="/" />
+          </Box>
+          <PrimaryButtonCTA
+            text={
+              (params.row.status as TaskStatus) == 0 ? "Continue" : "Details"
+            }
+            size="small"
+            to="/"
+          />
+        </>
+      ),
+    });
   }
 
   return (
-    <StyledTasksTable
-      disableSelectionOnClick
-      disableColumnSelector
-      disableDensitySelector
-      density="comfortable"
-      pageSize={10}
-      components={{
-        Pagination: CustomPagination,
-      }}
-      getRowId={(row) => row.task_id}
-      rows={props.data}
-      columns={columns}
-    />
+    <TableContainer sx={{ height: 600 }}>
+      <StyledTasksTable
+        disableSelectionOnClick
+        disableColumnSelector
+        disableDensitySelector
+        density="comfortable"
+        pageSize={10}
+        components={{
+          Pagination: CustomPagination,
+        }}
+        getRowId={(row) => row.task_id}
+        rows={props.data}
+        columns={columns}
+      />
+    </TableContainer>
   );
 }
 
@@ -169,7 +265,6 @@ const StyledTasksTable = styled(DataGrid)(({ theme }) => ({
   },
   "& .MuiDataGrid-columnHeaderTitleContainer": {
     color: theme.palette.primary.main,
-    fontSize: 24,
     justifyContent: "left",
     paddingLeft: "10px",
   },
@@ -188,7 +283,6 @@ const StyledTasksTable = styled(DataGrid)(({ theme }) => ({
   },
   "& .MuiDataGrid-cell": {
     color: theme.palette.primary.main,
-    fontSize: 18,
     borderBottom: 0,
   },
   "& .MuiDataGrid-footerContainer, .MuiButtonBase-root": {
@@ -222,7 +316,6 @@ const StyledRating = styled(Rating)(({ theme }) => ({
     color: theme.palette.warning.main,
   },
   "& .MuiRating-iconEmpty": {
-    // color: theme.palette.primaryCTA.secondary,
     color: theme.palette.primary.main,
     opacity: 0.3,
   },

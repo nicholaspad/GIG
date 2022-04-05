@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, SxProps, Theme, Typography } from "@mui/material";
 import Link from "next/link";
 import { gigTheme } from "../../src/Theme";
 
@@ -6,6 +6,7 @@ export default function PrimaryButtonCTA(props: {
   size: "big" | "small";
   text: string;
   to: string;
+  sx?: SxProps<Theme>;
 }) {
   const isBig = props.size === "big";
 
@@ -21,6 +22,7 @@ export default function PrimaryButtonCTA(props: {
         "&:hover": {
           transform: "scale(1.05)",
         },
+        ...props.sx,
       }}
     >
       <Link href={props.to}>
@@ -44,7 +46,7 @@ export default function PrimaryButtonCTA(props: {
           }}
         >
           <Typography
-            fontSize={isBig ? 20 : 16}
+            variant={isBig ? "h6" : "body1"}
             fontWeight={650}
             textTransform="none"
           >
