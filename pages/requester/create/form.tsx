@@ -22,6 +22,7 @@ export default function Form() {
 
   return (
     <Container maxWidth="md">
+      {/* TODO @nicholaspad replace with primary CTA */}
       <Button
         variant="contained"
         color="secondary"
@@ -61,11 +62,19 @@ function AddQuestionModal(props: { open: boolean; setOpen: Function }) {
   const [currQuestionChoicesError, setCurrQuestionChoicesError] =
     useState(false);
 
+  const handleClose = () => {
+    setCurrQuestionTitle("");
+    setCurrQuestionChoices([]);
+    setCurrQuestionTitleError(false);
+    setCurrQuestionChoicesError(false);
+    props.setOpen(false);
+  };
+
   return (
     <Modal
       open={props.open}
       onClose={() => {
-        props.setOpen(false);
+        handleClose();
       }}
     >
       <Box
@@ -83,9 +92,10 @@ function AddQuestionModal(props: { open: boolean; setOpen: Function }) {
       >
         {/* Text field for the title, answer choices as csv */}
         <Typography color="primary" variant="h5" component="h2" mb={2}>
-          Add a new question {currQuestionTitle} {currQuestionChoices}
+          Add a new question
         </Typography>
         <FormControl fullWidth>
+          {/* Task Title field */}
           <CustomTextField
             label="Task Title"
             variant="outlined"
@@ -102,6 +112,7 @@ function AddQuestionModal(props: { open: boolean; setOpen: Function }) {
             }
             sx={{ color: "primary", mb: 2 }}
           />
+          {/* Answer choices field */}
           <CustomTextField
             label="Answer Choices (comma-separated)"
             variant="outlined"
@@ -115,17 +126,37 @@ function AddQuestionModal(props: { open: boolean; setOpen: Function }) {
               setCurrQuestionChoices(cleanedAnswerChoices);
               setCurrQuestionChoicesError(cleanedAnswerChoices.length == 0);
             }}
-            placeholder="Choice 1,Choice 2,Choice 3"
+            placeholder="Choice 1, Choice 2, ..."
             error={currQuestionChoicesError}
             helperText={
               currQuestionChoicesError
                 ? "Input at least one answer choice!"
-                : `${
+                : currQuestionChoices.length > 0
+                ? `${
                     currQuestionChoices.length
                   } answer choice(s) entered: ${currQuestionChoices.join(", ")}`
+                : null
             }
             sx={{ color: "primary", mb: 2 }}
           />
+          {/* Submit button */}
+          {/* TODO @nicholaspad replace with primary CTA */}
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => {
+              if (currQuestionTitleError || currQuestionChoicesError) {
+                alert("Validation error");
+                return;
+              }
+              // TODO @christine-sun do something with currQuestionTitle and currQuestionChoices
+              console.log(currQuestionTitle);
+              console.log(currQuestionChoices);
+              handleClose();
+            }}
+          >
+            Add Question
+          </Button>
         </FormControl>
       </Box>
     </Modal>
