@@ -25,7 +25,6 @@ export default function TaskHeading() {
         variant="filled"
         fullWidth
         color="secondary"
-        font={gigTheme.typography.fontFamily}
         sx={{
           m: 1,
           color: "red",
