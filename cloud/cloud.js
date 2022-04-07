@@ -46,3 +46,28 @@ Moralis.Cloud.define("getTaskerClaimedTaskIds", async (request) => {
 
   return res;
 });
+
+Moralis.Cloud.define("getTaskOverviewData", async (request) => {
+  const taskId = request.params.taskId;
+  const tableName = "Tasks";
+
+  const Tasks = Moralis.Object.extend(tableName);
+  const query = new Moralis.Query(Tasks);
+  const res = query.aggregate([
+    { match: { _id: taskId } },
+    {
+      project: {
+        objectId: 0,
+        title: 1,
+        description: 1,
+        startDate: 1,
+        unitReward: 1,
+        estCompletionTime: 1,
+        avgRating: 1,
+        requesterId: 1,
+      },
+    },
+  ]);
+
+  return res;
+});

@@ -1,26 +1,40 @@
 import { Box } from "@mui/material";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { useMoralis } from "react-moralis";
 import PrimaryButtonCTA from "../../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../../components/buttons/SecondaryButtonCTA";
 import TaskOverviewTemplate, {
   TaskOverviewData,
 } from "../../../components/task/TaskOverview";
+import { getTaskOverviewData } from "../../../src/Database";
 
 export default function TaskDetails() {
   const router = useRouter();
-  const { taskId } = router.query;
+  const { taskid: taskId } = router.query;
+  const { isInitialized, Moralis } = useMoralis();
+  const [data, setData] = useState<TaskOverviewData>();
 
-  // TODO @nicholaspad hard-coded for now
-  const data: TaskOverviewData = {
-    task_id: "1",
-    name: "Task 1",
-    reward: 0.01343234,
-    rating: 3.5,
-    description: "Please complete my task!",
-    estimatedTime: 8,
-    requestorWallet: "0xBe09286A6F8763296066578B5E58d73b6f77b54e",
-    created: new Date(),
-  };
+  useEffect(() => {
+    if (!isInitialized || !taskId) return;
+
+    getTaskOverviewData(Moralis, taskId as string).then((res) => {
+      let res_ = res[0] as any;
+      console.log(res_);
+
+      let tempData: TaskOverviewData = {
+        task_id: taskId as string,
+        name: res_["title"],
+        reward: res_["unitReward"],
+        rating: res_["avgRating"],
+        description: res_["description"],
+        estimatedTime: res_["estCompletionTime"],
+        requestorWallet: res_["requesterId"],
+        created: res_["startDate"],
+      };
+      setData(tempData);
+    });
+  }, [isInitialized, taskId]);
 
   return (
     <TaskOverviewTemplate

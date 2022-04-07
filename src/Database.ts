@@ -1,10 +1,15 @@
 import MoralisType from "moralis";
-import Query from "moralis";
+
+/*
+  Edit the below functions on the Moralis Dashboard (Cloud Functions) or by
+  using the CLI and editing the cloud/cloud.js file (see the bottom
+  of the Cloud Functions popup on the Moralis Dashboard).
+*/
 
 /*
   Creates a new user row in table Users if it doesn't already exist.
   Uses ethAddress as the primary key. Returns the user's data as a
-  MoralisTye.Object.
+  MoralisType.Object.
 */
 export async function makeOrGetNewUser(
   Moralis: MoralisType,
@@ -31,9 +36,6 @@ export async function makeOrGetNewUser(
 
 /*
   Retrieves data for the Browse Tasks table.
-  Edit this function on the Moralis Dashboard (Cloud Functions) or by
-  using the CLI and editing the cloud/cloud.js file (see the bottom
-  of the Cloud Functions popup on the Moralis Dashboard).
 */
 export async function getBrowseTasksTableData(
   Moralis: MoralisType
@@ -43,9 +45,6 @@ export async function getBrowseTasksTableData(
 
 /*
   Retrieves data for the My Tasks (Tasker) table.
-  Edit this function on the Moralis Dashboard (Cloud Functions) or by
-  using the CLI and editing the cloud/cloud.js file (see the bottom
-  of the Cloud Functions popup on the Moralis Dashboard).
 */
 export async function getTaskerMyTasksTableData(
   Moralis: MoralisType,
@@ -56,6 +55,9 @@ export async function getTaskerMyTasksTableData(
   });
 }
 
+/*
+  Retreives the task IDs for the tasks a user has claimed.
+*/
 export async function getTaskerClaimedTaskIds(
   Moralis: MoralisType,
   ethAddress: string
@@ -63,4 +65,14 @@ export async function getTaskerClaimedTaskIds(
   return await Moralis.Cloud.run("getTaskerClaimedTaskIds", {
     ethAddress: ethAddress,
   });
+}
+
+/*
+  Retrieves data for the Task Details and Task Overview pages.
+*/
+export async function getTaskOverviewData(
+  Moralis: MoralisType,
+  taskId: string
+): Promise<MoralisType.Object<MoralisType.Attributes>[]> {
+  return await Moralis.Cloud.run("getTaskOverviewData", { taskId: taskId });
 }
