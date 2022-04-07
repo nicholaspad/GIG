@@ -56,12 +56,14 @@ export default function taskerForm() {
       <PageHeader title={"Task"} />
       <Container maxWidth="sm">
         <GrayCard>
-          <Typography variant="h4" color="primary" fontWeight={600}>
-            {formInfo.title}
-          </Typography>
-          <Typography sx={{ mt: "3%" }} variant="body2" color="primary">
-            {formInfo.description}
-          </Typography>
+          <Box sx={{ p: 3 }}>
+            <Typography variant="h4" color="primary" fontWeight={600}>
+              {formInfo.title}
+            </Typography>
+            <Typography sx={{ mt: 2 }} variant="body2" color="primary">
+              {formInfo.description}
+            </Typography>
+          </Box>
         </GrayCard>
         {formData.map((props, idx) => (
           <Question
