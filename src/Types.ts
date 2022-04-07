@@ -12,3 +12,10 @@ export type questionProps = {
   question: string;
   options?: string[];
 };
+
+export type taskProps = {
+  id?: string;
+  title: string;
+  description: string;
+  options: mcQuestionProps[];
+};

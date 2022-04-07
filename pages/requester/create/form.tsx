@@ -14,7 +14,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
-import { mcQuestionProps } from "../../../src/Types";
+import { mcQuestionProps, taskProps } from "../../../src/Types";
 
 export default function Form() {
   const [open, setOpen] = useState(false);
@@ -180,7 +180,18 @@ export default function Form() {
         Add New Question
       </Button>
       <br />
-      <Button variant="contained" color="secondary">
+      <Button
+        variant="contained"
+        color="secondary"
+        onClick={() => {
+          const newTask = {
+            title: title,
+            description: description,
+            options: questions,
+          };
+          console.log(newTask);
+        }}
+      >
         Post Task
       </Button>
 
