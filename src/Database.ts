@@ -74,5 +74,7 @@ export async function getTaskOverviewData(
   Moralis: MoralisType,
   taskId: string
 ): Promise<MoralisType.Object<MoralisType.Attributes>[]> {
+  console.log("here");
+
   return await Moralis.Cloud.run("getTaskOverviewData", { taskId: taskId });
 }

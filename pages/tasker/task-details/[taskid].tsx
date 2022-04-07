@@ -11,7 +11,7 @@ import { getTaskOverviewData } from "../../../src/Database";
 
 export default function TaskDetails() {
   const router = useRouter();
-  const { taskid: taskId } = router.query;
+  const { taskId } = router.query;
   const { isInitialized, Moralis } = useMoralis();
   const [data, setData] = useState<TaskOverviewData>();
 
@@ -20,7 +20,6 @@ export default function TaskDetails() {
 
     getTaskOverviewData(Moralis, taskId as string).then((res) => {
       let res_ = res[0] as any;
-      console.log(res_);
 
       let tempData: TaskOverviewData = {
         task_id: taskId as string,
@@ -32,6 +31,7 @@ export default function TaskDetails() {
         requestorWallet: res_["requesterId"],
         created: res_["startDate"],
       };
+
       setData(tempData);
     });
   }, [isInitialized, taskId]);
