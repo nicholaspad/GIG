@@ -33,7 +33,10 @@ export default function Tasks() {
       let tempData: TaskData[] = [];
       for (let task_ of res) {
         let task = task_ as any;
+        // skip tasks that the user has already claimed
         if (task["objectId"] in claimedTaskIds) continue;
+        // skip tasks for which the user is the requester
+        if (task["requesterId"] === userData.get("ethAddress")) continue;
         tempData.push({
           task_id: task["objectId"],
           name: task["title"],
