@@ -39,9 +39,8 @@ export default function Form() {
 
   // Errors associated with new question modal popup
   const [currQuestionTitleError, setCurrQuestionTitleError] = useState(false);
-  const [currQuestionChoicesError, setCurrQuestionChoicesError] = useState(
-    false
-  );
+  const [currQuestionChoicesError, setCurrQuestionChoicesError] =
+    useState(false);
 
   const removeQuestion = (index: number) => {
     var array = [...questions];
@@ -68,7 +67,12 @@ export default function Form() {
         alignItems="center"
         justifyContent="center"
       >
-        <Typography color="primary" variant="h4" sx={{ mt: 5, mb: 2 }}>
+        <Typography
+          color="primary"
+          variant="h4"
+          fontWeight={600}
+          sx={{ mt: 5 }}
+        >
           Create New Task
         </Typography>
       </Grid>
@@ -111,11 +115,12 @@ export default function Form() {
                 </Typography>
                 <CustomTextField
                   onChange={(e) => {
-                    if (isNaN(e.target.value) || e.target.value <= 0) {
+                    const val = Number(e.target.value);
+                    if (isNaN(val) || val <= 0) {
                       setCryptoAllocatedError(true);
                     } else {
                       setCryptoAllocatedError(false);
-                      setCryptoAllocated(e.target.value);
+                      setCryptoAllocated(val);
                     }
                   }}
                   error={cryptoAllocatedError}
@@ -125,7 +130,7 @@ export default function Form() {
                   sx={{
                     ml: 2,
                     mr: 1,
-                    width: 70,
+                    width: 100,
                     input: { textAlign: "right" },
                   }}
                 />
@@ -138,17 +143,18 @@ export default function Form() {
                 </Typography>
                 <CustomTextField
                   onChange={(e) => {
-                    if (isNaN(e.target.value) || e.target.value <= 0) {
+                    const val = Number(e.target.value);
+                    if (isNaN(val) || val <= 0) {
                       setMaxTaskersError(true);
                     } else {
                       setMaxTaskersError(false);
-                      setMaxTaskers(e.target.value);
+                      setMaxTaskers(val);
                     }
                   }}
                   error={maxTaskersError}
                   helperText={maxTaskersError && "Must be >0"}
                   size="small"
-                  sx={{ ml: 2, width: 70 }}
+                  sx={{ ml: 2, width: 100 }}
                 />
               </Box>
             </Grid>
@@ -157,7 +163,6 @@ export default function Form() {
 
         <Typography
           color="secondary"
-          variant="h7"
           align="center"
           sx={{ fontStyle: "italic", mt: 2 }}
         >
@@ -310,12 +315,12 @@ export default function Form() {
 function QuestionCard(props: { title: string; choices: string[] }) {
   return (
     <DefaultGrayCard>
-      <Typography color="primary" variant="h5" mb={1.5}>
+      <Typography color="primary" variant="h5" mb={1}>
         {props.title}
       </Typography>
       <List>
         {props.choices.map((choice) => (
-          <ListItem>
+          <ListItem sx={{ mb: -0.5 }}>
             <ListItemIcon>
               <CircleOutlinedIcon
                 style={{ color: gigTheme.palette.primary.main }}
