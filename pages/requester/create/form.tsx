@@ -106,7 +106,9 @@ export default function Form() {
           <Grid container spacing={10}>
             <Grid item xs={6}>
               <Box display="flex" alignItems="center" justifyContent="left">
-                <Typography color="primary">Total crypto allocated:</Typography>
+                <Typography color="primary" sx={{ textAlign: "right" }}>
+                  Total ETH allocated:
+                </Typography>
                 <CustomTextField
                   onChange={(e) => {
                     if (isNaN(e.target.value) || e.target.value <= 0) {
@@ -119,6 +121,7 @@ export default function Form() {
                   error={cryptoAllocatedError}
                   helperText={cryptoAllocatedError && "Must be >0"}
                   size="small"
+                  placeholder="ETH"
                   sx={{
                     ml: 2,
                     mr: 1,
@@ -126,7 +129,6 @@ export default function Form() {
                     input: { textAlign: "right" },
                   }}
                 />
-                <Typography color="primary">ETH</Typography>
               </Box>
             </Grid>
             <Grid item xs={6}>
