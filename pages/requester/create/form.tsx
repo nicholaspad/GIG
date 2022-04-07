@@ -20,9 +20,23 @@ export default function Form() {
   const [questions, setQuestions] = useState<Object[]>([]);
   const [currIndex, setCurrIndex] = useState(1);
 
+  // Task overview
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [cryptoAllocated, setCryptoAllocated] = useState(0);
+  const [maxTaskers, setMaxTaskers] = useState(0);
+
+  // Errors associated with task overvieww
+  const [titleError, setTitleError] = useState(false);
+  const [descriptionError, setDescriptionError] = useState(false);
+  const [cryptoAllocatedError, setCryptoAllocatedError] = useState(false);
+  const [maxTaskersError, setMaxTaskersError] = useState(false);
+
+  // New question from modal popup
   const [currQuestionTitle, setCurrQuestionTitle] = useState("");
   const [currQuestionChoices, setCurrQuestionChoices] = useState<string[]>([]);
 
+  // Errors associated with new question modal popup
   const [currQuestionTitleError, setCurrQuestionTitleError] = useState(false);
   const [currQuestionChoicesError, setCurrQuestionChoicesError] = useState(
     false
@@ -65,11 +79,26 @@ export default function Form() {
           <CustomTextField
             label="Task Title"
             placeholder="Ex: Consumer Research Survey"
+            onChange={(e) => {
+              setTitle(e.target.value);
+              setTitleError(e.target.value.length < 10);
+            }}
+            error={titleError}
+            helperText={titleError && "Title must be longer than 10 characters"}
             sx={{ my: 2 }}
           />
           <CustomTextField
             label="Description"
             placeholder="Ex: Answer a survey about your opinions"
+            onChange={(e) => {
+              setDescription(e.target.value);
+              setDescriptionError(e.target.value.length < 10);
+            }}
+            error={descriptionError}
+            helperText={
+              descriptionError &&
+              "Description must be longer than 10 characters"
+            }
             sx={{ mb: 2 }}
           />
 
@@ -78,6 +107,16 @@ export default function Form() {
               <Box display="flex" alignItems="center" justifyContent="left">
                 <Typography color="primary">Total crypto allocated:</Typography>
                 <CustomTextField
+                  onChange={(e) => {
+                    if (isNaN(e.target.value) || e.target.value <= 0) {
+                      setCryptoAllocatedError(true);
+                    } else {
+                      setCryptoAllocatedError(false);
+                      setCryptoAllocated(e.target.value);
+                    }
+                  }}
+                  error={cryptoAllocatedError}
+                  helperText={cryptoAllocatedError && "Must be >0"}
                   size="small"
                   sx={{
                     ml: 2,
@@ -94,7 +133,20 @@ export default function Form() {
                 <Typography color="primary" sx={{ textAlign: "right" }}>
                   Max Number of Taskers:
                 </Typography>
-                <CustomTextField size="small" sx={{ ml: 2, width: 70 }} />
+                <CustomTextField
+                  onChange={(e) => {
+                    if (isNaN(e.target.value) || e.target.value <= 0) {
+                      setMaxTaskersError(true);
+                    } else {
+                      setMaxTaskersError(false);
+                      setMaxTaskers(e.target.value);
+                    }
+                  }}
+                  error={maxTaskersError}
+                  helperText={maxTaskersError && "Must be >0"}
+                  size="small"
+                  sx={{ ml: 2, width: 70 }}
+                />
               </Box>
             </Grid>
           </Grid>
