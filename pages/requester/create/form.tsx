@@ -14,10 +14,11 @@ import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
+import { mcQuestionProps } from "../../../src/Types";
 
 export default function Form() {
   const [open, setOpen] = useState(false);
-  const [questions, setQuestions] = useState<Object[]>([]);
+  const [questions, setQuestions] = useState<mcQuestionProps[]>([]);
   const [currIndex, setCurrIndex] = useState(1);
 
   // Task overview
@@ -165,8 +166,8 @@ export default function Form() {
       {/* ===== End Task Heading ===== */}
 
       {/* Render all options in questions */}
-      {questions.map((question: []) => (
-        <QuestionCard title={question[0]} choices={question[1]} />
+      {questions.map((question: mcQuestionProps) => (
+        <QuestionCard title={question.question} choices={question.options} />
       ))}
 
       <Button
@@ -266,8 +267,13 @@ export default function Form() {
                   alert("Please provide proper input");
                   return;
                 }
-                const newQuestion = [currQuestionTitle, currQuestionChoices];
-                const newQuestions = questions.concat([newQuestion]);
+                const newQuestions = questions.concat([
+                  {
+                    idx: questions.length,
+                    question: currQuestionTitle,
+                    options: currQuestionChoices,
+                  },
+                ]);
                 setQuestions(newQuestions);
                 handleClose();
               }}

@@ -1,6 +1,6 @@
 export type mcQuestionProps = {
   idx: number;
-  id: string;
+  id?: string;
   question: string;
   options: string[];
 };
