@@ -235,13 +235,18 @@ export default function Form() {
                   .map((s) => s.trim())
                   .filter((s) => s !== "");
                 setCurrQuestionChoices(cleanedAnswerChoices);
-                setCurrQuestionChoicesError(cleanedAnswerChoices.length == 0);
+                setCurrQuestionChoicesError(
+                  cleanedAnswerChoices.length == 0 ||
+                    cleanedAnswerChoices.length > 5
+                );
               }}
               placeholder="Choice 1, Choice 2, ..."
               error={currQuestionChoicesError}
               helperText={
-                currQuestionChoicesError
+                currQuestionChoices.length == 0
                   ? "Input at least one answer choice!"
+                  : currQuestionChoices.length > 5
+                  ? "Too many answer choices - maximum is 5"
                   : currQuestionChoices.length > 0
                   ? `${
                       currQuestionChoices.length
