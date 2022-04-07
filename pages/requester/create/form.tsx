@@ -8,7 +8,6 @@ import FormControl from "@mui/material/FormControl";
 import PrimaryButtonCTA from "../../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../../components/buttons/SecondaryButtonCTA";
 import DefaultGrayCard from "../../../components/common/DefaultGrayCard";
-import TaskHeading from "../../../components/form/TaskHeading";
 import Grid from "@mui/material/Grid";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -54,14 +53,13 @@ export default function Form() {
         alignItems="center"
         justifyContent="center"
       >
-        <Typography color="secondary" variant="h4" sx={{ mt: 5, mb: 2 }}>
+        <Typography color="primary" variant="h4" sx={{ mt: 5, mb: 2 }}>
           Create New Task
         </Typography>
       </Grid>
       {/* TODO @nicholaspad replace with primary CTA */}
 
       {/* ===== Task Heading ===== */}
-      {/* <TaskHeading /> */}
       <DefaultGrayCard>
         <FormControl fullWidth>
           <CustomTextField
@@ -75,22 +73,42 @@ export default function Form() {
             sx={{ mb: 2 }}
           />
 
-          <Grid container spacing={4}>
-            <Grid item xs={7.5}>
+          <Grid container spacing={10}>
+            <Grid item xs={6}>
               <Box display="flex" alignItems="center" justifyContent="left">
-                Total crypto allocated:
-                <CustomTextField sx={{ ml: 2, mr: 1 }} />
-                ETH
+                <Typography color="primary">Total crypto allocated:</Typography>
+                <CustomTextField
+                  size="small"
+                  sx={{
+                    ml: 2,
+                    mr: 1,
+                    width: 70,
+                    input: { textAlign: "right" },
+                  }}
+                />
+                <Typography color="primary">ETH</Typography>
               </Box>
             </Grid>
-            <Grid item xs={4.5}>
+            <Grid item xs={6}>
               <Box display="flex" alignItems="center" justifyContent="right">
-                Number of Taskers:
-                <CustomTextField />
+                <Typography color="primary" sx={{ textAlign: "right" }}>
+                  Max Number of Taskers:
+                </Typography>
+                <CustomTextField size="small" sx={{ ml: 2, width: 70 }} />
               </Box>
             </Grid>
           </Grid>
         </FormControl>
+
+        <Typography
+          color="secondary"
+          variant="h7"
+          align="center"
+          sx={{ fontStyle: "italic", mt: 2 }}
+        >
+          The task will close when either the crypto allocation runs out or the
+          number of Taskers reaches the limit, whichever comes first
+        </Typography>
       </DefaultGrayCard>
       {/* ===== End Task Heading ===== */}
 
@@ -105,6 +123,10 @@ export default function Form() {
         onClick={() => setOpen(true)}
       >
         Add New Question
+      </Button>
+      <br />
+      <Button variant="contained" color="secondary">
+        Post Task
       </Button>
 
       {/* ===== Modal to add another question ===== */}
@@ -122,7 +144,7 @@ export default function Form() {
             transform: "translate(-50%, -50%)",
             width: 600,
             bgcolor: "background.paper",
-            border: "2px solid #000",
+            border: "2px solid #fafafa",
             borderRadius: 5,
             boxShadow: 24,
             p: 4,
