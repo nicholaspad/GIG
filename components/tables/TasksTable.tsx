@@ -246,14 +246,22 @@ export default function TasksTable(props: {
             }
             mr={2}
           >
-            <SecondaryButtonCTA text="Abandon" size="small" to="/" />
+            <SecondaryButtonCTA
+              text="Abandon"
+              size="small"
+              to="/requester/my-tasks"
+            />
           </Box>
           <PrimaryButtonCTA
             text={
-              (params.row.status as TaskStatus) == 0 ? "Continue" : "Details"
+              (params.row.status as TaskStatus) == 0 ? "Continue" : "Overview"
             }
             size="small"
-            to="/"
+            to={
+              (params.row.status as TaskStatus) == 0
+                ? "/requester/my-tasks" // TODO @nicholaspad do we have functionality to continue a draft task?
+                : `/tasker/task-overview/${String(params.row.task_id)}`
+            }
           />
         </>
       ),
