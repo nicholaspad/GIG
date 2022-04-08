@@ -27,6 +27,7 @@ export default function TaskOverviewTemplate(props: {
   function SectionTitle(props: { children: React.ReactNode }) {
     return (
       <Typography
+        component="div"
         color="secondary"
         fontStyle="italic"
         fontWeight={400}
@@ -40,7 +41,14 @@ export default function TaskOverviewTemplate(props: {
 
   function SectionContent(props: { children: React.ReactNode }) {
     return (
-      <Typography color="primary" fontWeight={400} fontSize={20} mt={1} mb={3}>
+      <Typography
+        component="div"
+        color="primary"
+        fontWeight={400}
+        fontSize={20}
+        mt={1}
+        mb={3}
+      >
         {props.children}
       </Typography>
     );
