@@ -3,16 +3,16 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { Container, Modal, styled, Typography } from "@mui/material";
 import TextField from "@mui/material/TextField";
-import { gigTheme } from "../../../src/Theme";
+import { gigTheme } from "../../src/Theme";
 import FormControl from "@mui/material/FormControl";
-import DefaultGrayCard from "../../../components/common/DefaultGrayCard";
+import DefaultGrayCard from "../../components/common/DefaultGrayCard";
 import Grid from "@mui/material/Grid";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
-import { SingleChoiceQuestion } from "../../../src/Types";
+import { SingleChoiceQuestion } from "../../src/Types";
 
 export default function Form() {
   const [open, setOpen] = useState(false);
