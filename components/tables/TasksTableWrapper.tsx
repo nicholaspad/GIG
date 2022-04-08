@@ -26,7 +26,7 @@ const tableSubtitleMap = {
 
 export default function TasksTableWrapper(props: {
   type: TableType;
-  data: TaskData[];
+  data?: TaskData[];
   extraColumns: GridColDef[];
 }) {
   return (

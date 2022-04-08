@@ -17,7 +17,7 @@ import { TaskData } from "../src/Types";
 
 export default function Tasks() {
   const { isInitialized, Moralis } = useMoralis();
-  const [data, setData] = useState<TaskData[]>([]);
+  const [data, setData] = useState<TaskData[]>();
   const [userData, setUserData] = useState<MoralisType.Object>();
 
   useEffect(() => {

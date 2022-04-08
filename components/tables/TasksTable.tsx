@@ -1,4 +1,6 @@
 import {
+  Box,
+  CircularProgress,
   Pagination,
   PaginationItem,
   Rating,
@@ -21,7 +23,7 @@ import { TableType } from "./TasksTableWrapper";
 
 export default function TasksTable(props: {
   type: TableType;
-  data: TaskData[];
+  data?: TaskData[];
   extraColumns: GridColDef[];
 }) {
   const columns: GridColDef[] = [
@@ -50,6 +52,21 @@ export default function TasksTable(props: {
     },
   ];
   columns.push(...props.extraColumns);
+
+  if (!props.data)
+    return (
+      <Box display="flex" flexDirection="column" alignItems="center">
+        <CircularProgress color="secondary" sx={{ mt: 2, mb: 3 }} />
+        <Typography
+          textAlign="center"
+          color="primary"
+          fontWeight={400}
+          fontSize={20}
+        >
+          Loading...
+        </Typography>
+      </Box>
+    );
 
   if (props.data.length === 0)
     return (

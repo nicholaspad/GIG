@@ -4,7 +4,7 @@ import TasksTableWrapper, { TableType } from "./TasksTableWrapper";
 
 export default function BrowseTasksTable(props: {
   type: TableType;
-  data: TaskData[];
+  data?: TaskData[];
   extraColumns: GridColDef[];
 }) {
   return (
