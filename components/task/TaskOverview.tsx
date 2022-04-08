@@ -3,6 +3,7 @@ import StarOutlineRoundedIcon from "@mui/icons-material/StarOutlineRounded";
 import StarRoundedIcon from "@mui/icons-material/StarRounded";
 import {
   Box,
+  CircularProgress,
   Container,
   Grid,
   Link,
@@ -146,7 +147,19 @@ export default function TaskOverviewTemplate(props: {
               </Grid>
             </>
           ) : (
-            <SectionContent>Loading...</SectionContent>
+            <SectionContent>
+              <Box display="flex" flexDirection="column" alignItems="center">
+                <CircularProgress color="secondary" sx={{ mt: 2, mb: 3 }} />
+                <Typography
+                  textAlign="center"
+                  color="primary"
+                  fontWeight={400}
+                  fontSize={20}
+                >
+                  Loading...
+                </Typography>
+              </Box>
+            </SectionContent>
           )}
         </Grid>
       </CustomizableGrayCard>
