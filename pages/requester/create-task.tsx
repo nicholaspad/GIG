@@ -15,6 +15,7 @@ import ListItemText from "@mui/material/ListItemText";
 import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
 import { SingleChoiceQuestion } from "../../src/Types";
 import PageHeader from "../../components/common/PageHeader";
+import PrimaryButtonCTA from "../../components/buttons/PrimaryButtonCTA";
 
 export default function Form() {
   const [userData, setUserData] = useState<MoralisType.Object>();
@@ -199,19 +200,25 @@ export default function Form() {
         </DefaultGrayCard>
         {/* ===== End Task Heading ===== */}
 
+        <Box display="flex" justifyContent="center">
+          <PrimaryButtonCTA
+            text="Add Question"
+            size="small"
+            onClick={() => {
+              setOpen(true);
+            }}
+          />
+        </Box>
+
         {/* Render all options in questions */}
-        {questions.map((question: SingleChoiceQuestion) => (
-          <QuestionCard title={question.question} choices={question.options} />
+        {questions.map((question: SingleChoiceQuestion, i: number) => (
+          <QuestionCard
+            title={question.question}
+            choices={question.options}
+            key={i}
+          />
         ))}
 
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={() => setOpen(true)}
-        >
-          Add New Question
-        </Button>
-        <br />
         <Button
           variant="contained"
           color="secondary"
@@ -229,6 +236,7 @@ export default function Form() {
 
         {/* ===== Modal to add another question ===== */}
         <Modal
+          disableAutoFocus
           open={open}
           onClose={() => {
             handleClose();
@@ -240,10 +248,9 @@ export default function Form() {
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              width: 600,
+              width: "40%",
               bgcolor: "background.paper",
-              border: "2px solid #fafafa",
-              borderRadius: 5,
+              borderRadius: 3,
               boxShadow: 24,
               p: 4,
             }}
@@ -254,6 +261,7 @@ export default function Form() {
             <FormControl fullWidth>
               {/* Question title field */}
               <CustomTextField
+                autoFocus
                 label="Question Title"
                 variant="outlined"
                 onChange={(e) => {
@@ -306,34 +314,32 @@ export default function Form() {
                 sx={{ mb: 2 }}
               />
               {/* Submit button */}
-              {/* TODO @nicholaspad replace with primary CTA */}
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={() => {
-                  if (
-                    currQuestionTitleError ||
-                    currQuestionChoicesError ||
-                    currQuestionTitle == "" ||
-                    currQuestionChoices.length == 0
-                  ) {
-                    alert("Please provide proper input");
-                    return;
-                  }
-                  const newQuestions = questions.concat([
-                    {
-                      idx: questions.length,
-                      question: currQuestionTitle,
-                      options: currQuestionChoices,
-                    },
-                  ]);
-                  setQuestions(newQuestions);
-                  handleClose();
-                }}
-                sx={{ mx: "auto" }}
-              >
-                Add Question
-              </Button>
+              <Box display="flex" justifyContent="end">
+                <PrimaryButtonCTA
+                  text="Add"
+                  size="small"
+                  onClick={() => {
+                    if (
+                      currQuestionTitleError ||
+                      currQuestionChoicesError ||
+                      currQuestionTitle == "" ||
+                      currQuestionChoices.length == 0
+                    ) {
+                      alert("Please provide accepted inputs!");
+                      return;
+                    }
+                    const newQuestions = questions.concat([
+                      {
+                        idx: questions.length,
+                        question: currQuestionTitle,
+                        options: currQuestionChoices,
+                      },
+                    ]);
+                    setQuestions(newQuestions);
+                    handleClose();
+                  }}
+                />
+              </Box>
             </FormControl>
           </Box>
         </Modal>
