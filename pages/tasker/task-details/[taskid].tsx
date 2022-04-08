@@ -21,6 +21,8 @@ export default function TaskDetails() {
 
   const handleClaimTask = async () => {
     if (!userData || !taskId) return;
+    if (!confirm(`Are you sure you want to claim task "${data?.name}"?`))
+      return;
 
     setOpenLoading(true);
 

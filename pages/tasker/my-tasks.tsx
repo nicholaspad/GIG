@@ -37,8 +37,10 @@ export default function MyTasks() {
   const [data, setData] = useState<TaskData[]>();
   const [userData, setUserData] = useState<MoralisType.Object>();
 
-  const handleAbandonTask = async (taskId: string) => {
+  const handleAbandonTask = async (taskId: string, taskName: string) => {
     if (!userData) return;
+    if (!confirm(`Are you sure you want to abandon task "${taskName}"?`))
+      return;
 
     setOpenLoading(true);
 
@@ -94,7 +96,7 @@ export default function MyTasks() {
               text="Abandon"
               size="small"
               onClick={() => {
-                handleAbandonTask(params.row.task_id);
+                handleAbandonTask(params.row.task_id, params.row.name);
               }}
             />
           </Box>
