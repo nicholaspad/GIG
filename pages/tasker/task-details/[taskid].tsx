@@ -1,9 +1,11 @@
+import MoralisType from "moralis";
 import { Box } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
 import PrimaryButtonCTA from "../../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../../components/buttons/SecondaryButtonCTA";
+import PageHeader from "../../../components/common/PageHeader";
 import TaskOverviewTemplate from "../../../components/task/TaskOverview";
 import { getTaskOverviewData } from "../../../src/Database";
 import { TaskOverviewData } from "../../../src/Types";
@@ -13,6 +15,7 @@ export default function TaskDetails() {
   const { taskId } = router.query;
   const { isInitialized, Moralis } = useMoralis();
   const [data, setData] = useState<TaskOverviewData>();
+  const [userData, setUserData] = useState<MoralisType.Object>();
 
   useEffect(() => {
     if (!isInitialized || !taskId) return;
@@ -36,15 +39,22 @@ export default function TaskDetails() {
   }, [isInitialized, taskId]);
 
   return (
-    <TaskOverviewTemplate
-      data={data}
-      title="Task Details"
-      subtitle="Confirm your task selection."
-    >
-      <Box mr={4}>
-        <SecondaryButtonCTA text="Back" size="big" to="/browse-tasks" />
-      </Box>
-      <PrimaryButtonCTA text="Claim" size="big" to={`/tasker/task/${taskId}`} />
-    </TaskOverviewTemplate>
+    <>
+      <PageHeader title="Task Details" customSetUserData={setUserData} />
+      <TaskOverviewTemplate
+        data={data}
+        title="Task Details"
+        subtitle="Confirm your task selection."
+      >
+        <Box mr={4}>
+          <SecondaryButtonCTA text="Back" size="big" to="/browse-tasks" />
+        </Box>
+        <PrimaryButtonCTA
+          text="Claim"
+          size="big"
+          to={`/tasker/task/${taskId}`}
+        />
+      </TaskOverviewTemplate>
+    </>
   );
 }
