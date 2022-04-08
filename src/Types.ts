@@ -1,11 +1,11 @@
-export type mcQuestionProps = {
+export type SingleChoiceQuestion = {
   idx: number;
   id?: string;
   question: string;
   options: string[];
 };
 
-export type questionProps = {
+export type GenericQuestion = {
   type: number;
   idx: number;
   id: string;
@@ -17,7 +17,7 @@ export type taskProps = {
   id?: string;
   title: string;
   description: string;
-  options: mcQuestionProps[];
+  options: SingleChoiceQuestion[];
 };
 
 export type TaskOverviewData = TaskData & {

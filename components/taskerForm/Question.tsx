@@ -1,9 +1,9 @@
 import MCQuestion from "./MCQuestion";
 import { Box, Typography } from "@mui/material";
-import { questionProps } from "../../src/Types";
+import { GenericQuestion } from "../../src/Types";
 
 export default function Question(
-  props: questionProps & { handleSetAnswers: Function }
+  props: GenericQuestion & { handleSetAnswers: Function }
 ) {
   if (props.options && props.type === 1) {
     return (

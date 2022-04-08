@@ -12,11 +12,11 @@ import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
-import { mcQuestionProps } from "../../../src/Types";
+import { SingleChoiceQuestion } from "../../../src/Types";
 
 export default function Form() {
   const [open, setOpen] = useState(false);
-  const [questions, setQuestions] = useState<mcQuestionProps[]>([]);
+  const [questions, setQuestions] = useState<SingleChoiceQuestion[]>([]);
   const [currIndex, setCurrIndex] = useState(1);
 
   // Task overview
@@ -171,7 +171,7 @@ export default function Form() {
       {/* ===== End Task Heading ===== */}
 
       {/* Render all options in questions */}
-      {questions.map((question: mcQuestionProps) => (
+      {questions.map((question: SingleChoiceQuestion) => (
         <QuestionCard title={question.question} choices={question.options} />
       ))}
 

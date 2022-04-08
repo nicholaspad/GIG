@@ -8,10 +8,10 @@ import {
 } from "@mui/material";
 
 import GrayCard from "../common/DefaultGrayCard";
-import { mcQuestionProps } from "../../src/Types";
+import { SingleChoiceQuestion } from "../../src/Types";
 
 export default function MCQuestion(
-  props: mcQuestionProps & { handleSetAnswers: Function }
+  props: SingleChoiceQuestion & { handleSetAnswers: Function }
 ) {
   return (
     <GrayCard>
