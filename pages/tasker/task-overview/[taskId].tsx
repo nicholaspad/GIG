@@ -2,10 +2,9 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
 import SecondaryButtonCTA from "../../../components/buttons/SecondaryButtonCTA";
-import TaskOverviewTemplate, {
-  TaskOverviewData,
-} from "../../../components/task/TaskOverview";
+import TaskOverviewTemplate from "../../../components/task/TaskOverview";
 import { getTaskOverviewData } from "../../../src/Database";
+import { TaskOverviewData } from "../../../src/Types";
 
 export default function TaskOverview() {
   const router = useRouter();

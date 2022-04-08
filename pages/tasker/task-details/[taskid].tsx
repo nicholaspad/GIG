@@ -4,10 +4,9 @@ import { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
 import PrimaryButtonCTA from "../../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../../components/buttons/SecondaryButtonCTA";
-import TaskOverviewTemplate, {
-  TaskOverviewData,
-} from "../../../components/task/TaskOverview";
+import TaskOverviewTemplate from "../../../components/task/TaskOverview";
 import { getTaskOverviewData } from "../../../src/Database";
+import { TaskOverviewData } from "../../../src/Types";
 
 export default function TaskDetails() {
   const router = useRouter();

@@ -1,14 +1,19 @@
+import StarOutlineRoundedIcon from "@mui/icons-material/StarOutlineRounded";
+import StarRoundedIcon from "@mui/icons-material/StarRounded";
+import { Rating, styled } from "@mui/material";
+import { GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 import MoralisType from "moralis";
 import { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
 import PrimaryButtonCTA from "../components/buttons/PrimaryButtonCTA";
 import PageHeader from "../components/common/PageHeader";
 import BrowseTasksTable from "../components/tables/BrowseTasksTable";
-import { TaskData } from "../components/tables/TasksTable";
+import { TableHeader } from "../components/tables/Helpers";
 import {
   getBrowseTasksTableData,
   getTaskerClaimedTaskIds,
 } from "../src/Database";
+import { TaskData } from "../src/Types";
 
 export default function Tasks() {
   const { isInitialized, Moralis } = useMoralis();
@@ -57,7 +62,55 @@ export default function Tasks() {
         to="/tasker/my-tasks"
         sx={{ mx: "auto" }}
       />
-      <BrowseTasksTable type={1} data={data} />
+      <BrowseTasksTable type={1} data={data} extraColumns={extraColumns} />
     </>
   );
 }
+
+const extraColumns: GridColDef[] = [
+  {
+    field: "rating",
+    sortable: false,
+    disableColumnMenu: true,
+    type: "number",
+    minWidth: 200,
+    align: "left",
+    renderHeader: () => <TableHeader>Rating</TableHeader>,
+    renderCell: (params: GridValueGetterParams) => (
+      <StyledRating
+        readOnly
+        value={params.row.rating}
+        size="large"
+        precision={0.5}
+        icon={<StarRoundedIcon fontSize="inherit" />}
+        emptyIcon={<StarOutlineRoundedIcon fontSize="inherit" />}
+      />
+    ),
+  },
+  {
+    field: "",
+    headerName: "",
+    sortable: false,
+    disableColumnMenu: true,
+    minWidth: 130,
+    flex: 1,
+    align: "left",
+    renderCell: (params: GridValueGetterParams) => (
+      <PrimaryButtonCTA
+        text="Details"
+        size="small"
+        to={`/tasker/task-details/${String(params.row.task_id)}`}
+      />
+    ),
+  },
+];
+
+const StyledRating = styled(Rating)(({ theme }) => ({
+  "& .MuiRating-iconFilled": {
+    color: theme.palette.warning.main,
+  },
+  "& .MuiRating-iconEmpty": {
+    color: theme.palette.primary.main,
+    opacity: 0.3,
+  },
+}));

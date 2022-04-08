@@ -11,16 +11,9 @@ import {
   Typography,
 } from "@mui/material";
 import { gigTheme } from "../../src/Theme";
+import { TaskOverviewData } from "../../src/Types";
 import CustomizableGrayCard from "../common/CustomizableGrayCard";
 import TaskerPageHeader from "../common/TaskerPageHeader";
-import { TaskData } from "../tables/TasksTable";
-
-export type TaskOverviewData = TaskData & {
-  description: string;
-  estimatedTime: number;
-  requestorWallet: string;
-  created: Date;
-};
 
 export default function TaskOverviewTemplate(props: {
   data?: TaskOverviewData;
