@@ -60,7 +60,7 @@ export default function Tasks() {
         text="My Tasks →"
         size="small"
         to="/tasker/my-tasks"
-        sx={{ mx: "auto" }}
+        sx={{ mx: "auto", mt: 2 }}
       />
       <BrowseTasksTable type={1} data={data} extraColumns={extraColumns} />
     </>

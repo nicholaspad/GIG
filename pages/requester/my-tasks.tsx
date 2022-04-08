@@ -47,6 +47,12 @@ export default function MyTasks() {
         title="Requester Created Tasks"
         customSetUserData={setUserData}
       />
+      <PrimaryButtonCTA
+        text="Create Task →"
+        size="small"
+        to="/requester/create-task"
+        sx={{ mx: "auto", mt: 2 }}
+      />
       <MyTasksTable type={2} data={data} extraColumns={extraColumns} />
     </>
   );

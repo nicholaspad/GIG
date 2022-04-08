@@ -153,7 +153,7 @@ export default function MyTasks() {
         text="Browse Tasks →"
         size="small"
         to="/browse-tasks"
-        sx={{ mx: "auto" }}
+        sx={{ mx: "auto", mt: 2 }}
       />
       <MyTasksTable type={0} data={data} extraColumns={extraColumns} />
     </>
