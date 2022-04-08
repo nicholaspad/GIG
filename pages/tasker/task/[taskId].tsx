@@ -1,11 +1,15 @@
+import MoralisType from "moralis";
 import { Container, Box } from "@mui/material";
 import Question from "../../../components/taskerForm/Question";
 import PrimaryButtonCTA from "../../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../../components/buttons/SecondaryButtonCTA";
 import { Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PageHeader from "../../../components/common/PageHeader";
 import GrayCard from "../../../components/common/CustomizableGrayCard";
+import { useRouter } from "next/router";
+import { useMoralis } from "react-moralis";
+import { checkTaskerClaimedTask } from "../../../src/Database";
 
 export default function taskerForm() {
   /* Test Data */
@@ -38,7 +42,13 @@ export default function taskerForm() {
   };
   /* End of Test Data */
 
+  const router = useRouter();
+  const { taskId } = router.query;
+  const { isInitialized, Moralis } = useMoralis();
+  const [isAllowed, setIsAllowed] = useState(false);
+  const [userData, setUserData] = useState<MoralisType.Object>();
   const [answers, setAnswers] = useState({});
+
   const handleSetAnswers = (id: string, answer: string) => {
     setAnswers({ ...answers, [id]: answer });
   };
@@ -51,9 +61,29 @@ export default function taskerForm() {
     }));
   };
 
+  useEffect(() => {
+    if (!isInitialized || !userData || !taskId) return;
+
+    const ethAddress = userData.get("ethAddress");
+    checkTaskerClaimedTask(Moralis, ethAddress, taskId as string).then(
+      (res) => {
+        if (!res) {
+          alert(`Address ${ethAddress} has not claimed task ${taskId}.`);
+          router.push("/browse-tasks");
+          return;
+        }
+
+        setIsAllowed(true);
+      }
+    );
+  }, [isInitialized, userData, taskId]);
+
+  if (!isAllowed)
+    return <PageHeader title="Verifying" customSetUserData={setUserData} />;
+
   return (
     <>
-      <PageHeader title={"Task"} />
+      <PageHeader title="Task" customSetUserData={setUserData} />
       <Container maxWidth="sm">
         <GrayCard>
           <Box sx={{ p: 3 }}>

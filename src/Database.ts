@@ -97,20 +97,14 @@ export async function taskerClaimTask(
   ethAddress: string,
   taskId: string
 ): Promise<{ success: boolean; message: string }> {
-  const tableName = "TaskUsers";
-
-  const TaskUsers = Moralis.Object.extend(tableName);
-  const query = new Moralis.Query(TaskUsers);
-  const res = await query
-    .equalTo("taskerId", ethAddress)
-    .equalTo("taskId", taskId)
-    .find();
-
-  if (res.length > 0)
+  if (await checkTaskerClaimedTask(Moralis, ethAddress, taskId))
     return {
       success: false,
       message: `Address ${ethAddress} has already claimed task ${taskId}.`,
     };
+
+  const tableName = "TaskUsers";
+  const TaskUsers = Moralis.Object.extend(tableName);
 
   const taskUser = new TaskUsers();
   taskUser.set("taskerId", ethAddress);
@@ -126,4 +120,24 @@ export async function taskerClaimTask(
     success: true,
     message: `Address ${ethAddress} successfully claimed task ${taskId}!`,
   };
+}
+
+/*
+  Check that a task is claimed by a Tasker.
+*/
+export async function checkTaskerClaimedTask(
+  Moralis: MoralisType,
+  ethAddress: string,
+  taskId: string
+): Promise<boolean> {
+  const tableName = "TaskUsers";
+
+  const TaskUsers = Moralis.Object.extend(tableName);
+  const query = new Moralis.Query(TaskUsers);
+  const res = await query
+    .equalTo("taskerId", ethAddress)
+    .equalTo("taskId", taskId)
+    .find();
+
+  return res.length > 0;
 }
