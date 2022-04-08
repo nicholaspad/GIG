@@ -9,7 +9,7 @@ import { getTaskOverviewData } from "../../../src/Database";
 
 export default function TaskOverview() {
   const router = useRouter();
-  const { taskId } = router.query;
+  const { taskId, back } = router.query;
   const { isInitialized, Moralis } = useMoralis();
   const [data, setData] = useState<TaskOverviewData>();
 
@@ -35,7 +35,7 @@ export default function TaskOverview() {
 
   return (
     <TaskOverviewTemplate data={data} title="Task Overview">
-      <SecondaryButtonCTA text="Back" size="big" to="/tasker/my-tasks" />
+      <SecondaryButtonCTA text="Back" size="big" to={back as string} />
     </TaskOverviewTemplate>
   );
 }
