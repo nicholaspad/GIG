@@ -89,9 +89,10 @@ export default function Form() {
               label="Task Title"
               placeholder="Ex: Consumer Research Survey"
               onChange={(e) => {
-                setTitle(e.target.value);
+                const title = e.target.value.trim();
+                setTitle(title);
                 setTitleError(
-                  e.target.value.length <
+                  title.length <
                     Number(process.env.NEXT_PUBLIC_MIN_TASK_DATA_CHARS)
                 );
               }}
@@ -106,9 +107,10 @@ export default function Form() {
               label="Description"
               placeholder="Ex: Answer a survey about your opinions"
               onChange={(e) => {
-                setDescription(e.target.value);
+                const description = e.target.value.trim();
+                setDescription(description);
                 setDescriptionError(
-                  e.target.value.length <
+                  description.length <
                     Number(process.env.NEXT_PUBLIC_MIN_TASK_DATA_CHARS)
                 );
               }}
@@ -246,19 +248,19 @@ export default function Form() {
               p: 4,
             }}
           >
-            {/* Text field for the title, answer choices as csv */}
             <Typography color="primary" variant="h5" component="h2" mb={2}>
-              Add a new question
+              Add Question
             </Typography>
             <FormControl fullWidth>
-              {/* Task Title field */}
+              {/* Question title field */}
               <CustomTextField
-                label="Task Title"
+                label="Question Title"
                 variant="outlined"
                 onChange={(e) => {
-                  setCurrQuestionTitle(e.target.value);
+                  const title = e.target.value.trim();
+                  setCurrQuestionTitle(title);
                   setCurrQuestionTitleError(
-                    e.target.value.length <
+                    title.length <
                       Number(process.env.NEXT_PUBLIC_MIN_TASK_DATA_CHARS)
                   );
                 }}
@@ -286,7 +288,7 @@ export default function Form() {
                       cleanedAnswerChoices.length > 5
                   );
                 }}
-                placeholder="Choice 1, Choice 2, ..."
+                placeholder="Option 1, Option 2, ..."
                 error={currQuestionChoicesError}
                 helperText={
                   currQuestionChoices.length == 0
