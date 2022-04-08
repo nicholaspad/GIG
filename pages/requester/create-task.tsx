@@ -90,11 +90,15 @@ export default function Form() {
               placeholder="Ex: Consumer Research Survey"
               onChange={(e) => {
                 setTitle(e.target.value);
-                setTitleError(e.target.value.length < 10);
+                setTitleError(
+                  e.target.value.length <
+                    Number(process.env.NEXT_PUBLIC_MIN_TASK_DATA_CHARS)
+                );
               }}
               error={titleError}
               helperText={
-                titleError && "Title must be longer than 10 characters"
+                titleError &&
+                `Title must be longer than ${process.env.NEXT_PUBLIC_MIN_TASK_DATA_CHARS} characters`
               }
               sx={{ my: 2 }}
             />
@@ -103,12 +107,15 @@ export default function Form() {
               placeholder="Ex: Answer a survey about your opinions"
               onChange={(e) => {
                 setDescription(e.target.value);
-                setDescriptionError(e.target.value.length < 10);
+                setDescriptionError(
+                  e.target.value.length <
+                    Number(process.env.NEXT_PUBLIC_MIN_TASK_DATA_CHARS)
+                );
               }}
               error={descriptionError}
               helperText={
                 descriptionError &&
-                "Description must be longer than 10 characters"
+                `Description must be longer than ${process.env.NEXT_PUBLIC_MIN_TASK_DATA_CHARS} characters`
               }
               sx={{ mb: 2 }}
             />
@@ -250,13 +257,16 @@ export default function Form() {
                 variant="outlined"
                 onChange={(e) => {
                   setCurrQuestionTitle(e.target.value);
-                  setCurrQuestionTitleError(e.target.value.length < 10);
+                  setCurrQuestionTitleError(
+                    e.target.value.length <
+                      Number(process.env.NEXT_PUBLIC_MIN_TASK_DATA_CHARS)
+                  );
                 }}
                 placeholder="Interesting Task Title"
                 error={currQuestionTitleError}
                 helperText={
                   currQuestionTitleError &&
-                  "Title must be longer than 10 characters!"
+                  `Title must be longer than ${process.env.NEXT_PUBLIC_MIN_TASK_DATA_CHARS} characters!`
                 }
                 sx={{ mb: 2 }}
               />
