@@ -141,3 +141,50 @@ export async function checkTaskerClaimedTask(
 
   return res.length > 0;
 }
+
+/*
+  Abandons a task (Tasker functionality).
+*/
+export async function taskerAbandonTask(
+  Moralis: MoralisType,
+  ethAddress: string,
+  taskId: string
+): Promise<{ success: boolean; message: string }> {
+  if (!(await checkTaskerClaimedTask(Moralis, ethAddress, taskId)))
+    return {
+      success: false,
+      message: `Address ${ethAddress} has not claimed task ${taskId}.`,
+    };
+
+  const tableName = "TaskUsers";
+  const TaskUsers = Moralis.Object.extend(tableName);
+
+  const query = new Moralis.Query(TaskUsers);
+  const res = await query
+    .equalTo("taskerId", ethAddress)
+    .equalTo("taskId", taskId)
+    .first();
+
+  console.log(taskId);
+
+  if (!res)
+    return {
+      success: false,
+      message: `Address ${ethAddress} failed to abandon task ${taskId}.`,
+    };
+
+  return res.destroy().then(
+    () => {
+      return {
+        success: true,
+        message: `Address ${ethAddress} successfully abandoned task ${taskId}!`,
+      };
+    },
+    (error) => {
+      return {
+        success: false,
+        message: `Address ${ethAddress} failed to abandon task ${taskId}: ${error}`,
+      };
+    }
+  );
+}
