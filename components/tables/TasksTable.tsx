@@ -24,12 +24,12 @@ import SecondaryButtonCTA from "../buttons/SecondaryButtonCTA";
 import { TableType } from "./TasksTableWrapper";
 
 export type TaskStatus = 0 | 1 | 2 | 3;
-
+export type CreatedTaskStatus = 0 | 1 | 2;
 export type TaskData = {
   task_id: string;
   name: string;
   rating?: number;
-  status?: TaskStatus;
+  status?: TaskStatus | CreatedTaskStatus;
   reward: number;
 };
 
@@ -48,17 +48,15 @@ const statusColorMap = {
 };
 
 const createdStatusMap = {
-  0: "Draft",
-  1: "In Progress",
-  2: "Completed",
-  3: "Abandoned",
+  0: "In Progress",
+  1: "Completed",
+  2: "Abandoned",
 };
 
 const createdStatusColorMap = {
-  0: gigTheme.palette.info.main,
-  1: gigTheme.palette.warning.main,
-  2: gigTheme.palette.success.main,
-  3: gigTheme.palette.error.main,
+  0: gigTheme.palette.warning.main,
+  1: gigTheme.palette.success.main,
+  2: gigTheme.palette.error.main,
 };
 
 export default function TasksTable(props: {
@@ -224,8 +222,10 @@ export default function TasksTable(props: {
       align: "left",
       renderHeader: () => <Header>Status</Header>,
       renderCell: (params: GridValueGetterParams) => (
-        <Cell color={createdStatusColorMap[params.row.status as TaskStatus]}>
-          {createdStatusMap[params.row.status as TaskStatus]}
+        <Cell
+          color={createdStatusColorMap[params.row.status as CreatedTaskStatus]}
+        >
+          {createdStatusMap[params.row.status as CreatedTaskStatus]}
         </Cell>
       ),
     });
