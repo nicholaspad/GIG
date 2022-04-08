@@ -3,6 +3,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { Container, Modal, styled, Typography } from "@mui/material";
 import TextField from "@mui/material/TextField";
+import MoralisType from "moralis";
 import { gigTheme } from "../../src/Theme";
 import FormControl from "@mui/material/FormControl";
 import DefaultGrayCard from "../../components/common/DefaultGrayCard";
@@ -13,8 +14,11 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
 import { SingleChoiceQuestion } from "../../src/Types";
+import PageHeader from "../../components/common/PageHeader";
 
 export default function Form() {
+  const [userData, setUserData] = useState<MoralisType.Object>();
+
   const [open, setOpen] = useState(false);
   const [questions, setQuestions] = useState<SingleChoiceQuestion[]>([]);
   const [currIndex, setCurrIndex] = useState(1);
@@ -57,256 +61,273 @@ export default function Form() {
   };
 
   return (
-    <Container maxWidth="md">
-      <Grid
-        container
-        spacing={0}
-        direction="column"
-        alignItems="center"
-        justifyContent="center"
-      >
-        <Typography
-          color="primary"
-          variant="h4"
-          fontWeight={600}
-          sx={{ mt: 5 }}
+    <>
+      <PageHeader title="My Tasks" customSetUserData={setUserData} />
+      <Container maxWidth="md">
+        <Grid
+          container
+          spacing={0}
+          direction="column"
+          alignItems="center"
+          justifyContent="center"
         >
-          Create New Task
-        </Typography>
-      </Grid>
-      {/* TODO @nicholaspad replace with primary CTA */}
-
-      {/* ===== Task Heading ===== */}
-      <DefaultGrayCard>
-        <FormControl fullWidth>
-          <CustomTextField
-            label="Task Title"
-            placeholder="Ex: Consumer Research Survey"
-            onChange={(e) => {
-              setTitle(e.target.value);
-              setTitleError(e.target.value.length < 10);
-            }}
-            error={titleError}
-            helperText={titleError && "Title must be longer than 10 characters"}
-            sx={{ my: 2 }}
-          />
-          <CustomTextField
-            label="Description"
-            placeholder="Ex: Answer a survey about your opinions"
-            onChange={(e) => {
-              setDescription(e.target.value);
-              setDescriptionError(e.target.value.length < 10);
-            }}
-            error={descriptionError}
-            helperText={
-              descriptionError &&
-              "Description must be longer than 10 characters"
-            }
-            sx={{ mb: 2 }}
-          />
-
-          <Grid container spacing={10}>
-            <Grid item xs={6}>
-              <Box display="flex" alignItems="center" justifyContent="left">
-                <Typography color="primary" sx={{ textAlign: "right" }}>
-                  Total ETH allocated:
-                </Typography>
-                <CustomTextField
-                  onChange={(e) => {
-                    const val = Number(e.target.value);
-                    if (isNaN(val) || val <= 0) {
-                      setCryptoAllocatedError(true);
-                    } else {
-                      setCryptoAllocatedError(false);
-                      setCryptoAllocated(val);
-                    }
-                  }}
-                  error={cryptoAllocatedError}
-                  helperText={cryptoAllocatedError && "Must be >0"}
-                  size="small"
-                  placeholder="ETH"
-                  sx={{
-                    ml: 2,
-                    mr: 1,
-                    width: 100,
-                    input: { textAlign: "right" },
-                  }}
-                />
-              </Box>
-            </Grid>
-            <Grid item xs={6}>
-              <Box display="flex" alignItems="center" justifyContent="right">
-                <Typography color="primary" sx={{ textAlign: "right" }}>
-                  Max Number of Taskers:
-                </Typography>
-                <CustomTextField
-                  onChange={(e) => {
-                    const val = Number(e.target.value);
-                    if (isNaN(val) || val <= 0) {
-                      setMaxTaskersError(true);
-                    } else {
-                      setMaxTaskersError(false);
-                      setMaxTaskers(val);
-                    }
-                  }}
-                  error={maxTaskersError}
-                  helperText={maxTaskersError && "Must be >0"}
-                  size="small"
-                  sx={{ ml: 2, width: 100 }}
-                />
-              </Box>
-            </Grid>
-          </Grid>
-        </FormControl>
-
-        <Typography
-          color="secondary"
-          align="center"
-          sx={{ fontStyle: "italic", mt: 2 }}
-        >
-          The task will close when either the crypto allocation runs out or the
-          number of Taskers reaches the limit, whichever comes first
-        </Typography>
-      </DefaultGrayCard>
-      {/* ===== End Task Heading ===== */}
-
-      {/* Render all options in questions */}
-      {questions.map((question: SingleChoiceQuestion) => (
-        <QuestionCard title={question.question} choices={question.options} />
-      ))}
-
-      <Button
-        variant="contained"
-        color="secondary"
-        onClick={() => setOpen(true)}
-      >
-        Add New Question
-      </Button>
-      <br />
-      <Button
-        variant="contained"
-        color="secondary"
-        onClick={() => {
-          const newTask = {
-            title: title,
-            description: description,
-            options: questions,
-          };
-          console.log(newTask);
-        }}
-      >
-        Post Task
-      </Button>
-
-      {/* ===== Modal to add another question ===== */}
-      <Modal
-        open={open}
-        onClose={() => {
-          handleClose();
-        }}
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 600,
-            bgcolor: "background.paper",
-            border: "2px solid #fafafa",
-            borderRadius: 5,
-            boxShadow: 24,
-            p: 4,
-          }}
-        >
-          {/* Text field for the title, answer choices as csv */}
-          <Typography color="primary" variant="h5" component="h2" mb={2}>
-            Add a new question
+          <Typography
+            color="primary"
+            variant="h4"
+            fontWeight={600}
+            sx={{ mt: 2 }}
+          >
+            Create New Task
           </Typography>
+        </Grid>
+        {/* TODO @nicholaspad replace with primary CTA */}
+
+        {/* ===== Task Heading ===== */}
+        <DefaultGrayCard>
           <FormControl fullWidth>
-            {/* Task Title field */}
             <CustomTextField
               label="Task Title"
-              variant="outlined"
+              placeholder="Ex: Consumer Research Survey"
               onChange={(e) => {
-                setCurrQuestionTitle(e.target.value);
-                setCurrQuestionTitleError(e.target.value.length < 10);
+                setTitle(e.target.value);
+                setTitleError(e.target.value.length < 10);
               }}
-              placeholder="Interesting Task Title"
-              error={currQuestionTitleError}
+              error={titleError}
               helperText={
-                currQuestionTitleError &&
-                "Title must be longer than 10 characters!"
+                titleError && "Title must be longer than 10 characters"
               }
-              sx={{ mb: 2 }}
+              sx={{ my: 2 }}
             />
-            {/* Answer choices field */}
             <CustomTextField
-              label="Answer Choices (comma-separated)"
-              variant="outlined"
+              label="Description"
+              placeholder="Ex: Answer a survey about your opinions"
               onChange={(e) => {
-                const input = e.target.value;
-                const cleanedAnswerChoices = input
-                  .split(",")
-                  .map((s) => s.trim())
-                  .filter((s) => s !== "");
-                setCurrQuestionChoices(cleanedAnswerChoices);
-                setCurrQuestionChoicesError(
-                  cleanedAnswerChoices.length == 0 ||
-                    cleanedAnswerChoices.length > 5
-                );
+                setDescription(e.target.value);
+                setDescriptionError(e.target.value.length < 10);
               }}
-              placeholder="Choice 1, Choice 2, ..."
-              error={currQuestionChoicesError}
+              error={descriptionError}
               helperText={
-                currQuestionChoices.length == 0
-                  ? "Input at least one answer choice!"
-                  : currQuestionChoices.length > 5
-                  ? "Too many answer choices - maximum is 5"
-                  : currQuestionChoices.length > 0
-                  ? `${
-                      currQuestionChoices.length
-                    } answer choice(s) entered: ${currQuestionChoices.join(
-                      ", "
-                    )}`
-                  : null
+                descriptionError &&
+                "Description must be longer than 10 characters"
               }
               sx={{ mb: 2 }}
             />
-            {/* Submit button */}
-            {/* TODO @nicholaspad replace with primary CTA */}
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={() => {
-                if (
-                  currQuestionTitleError ||
-                  currQuestionChoicesError ||
-                  currQuestionTitle == "" ||
-                  currQuestionChoices.length == 0
-                ) {
-                  alert("Please provide proper input");
-                  return;
-                }
-                const newQuestions = questions.concat([
-                  {
-                    idx: questions.length,
-                    question: currQuestionTitle,
-                    options: currQuestionChoices,
-                  },
-                ]);
-                setQuestions(newQuestions);
-                handleClose();
-              }}
-              sx={{ mx: "auto" }}
-            >
-              Add Question
-            </Button>
+
+            <Grid container spacing={10}>
+              <Grid item xs={6}>
+                <Box display="flex" alignItems="center" justifyContent="left">
+                  <Typography color="primary" sx={{ textAlign: "right" }}>
+                    Total ETH allocated:
+                  </Typography>
+                  <CustomTextField
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      if (
+                        isNaN(val) ||
+                        val < Number(process.env.NEXT_PUBLIC_MIN_ETH)
+                      ) {
+                        setCryptoAllocatedError(true);
+                      } else {
+                        setCryptoAllocatedError(false);
+                        setCryptoAllocated(val);
+                      }
+                    }}
+                    error={cryptoAllocatedError}
+                    helperText={
+                      cryptoAllocatedError &&
+                      `Must be ≥${process.env.NEXT_PUBLIC_MIN_ETH}`
+                    }
+                    size="small"
+                    placeholder="ETH"
+                    sx={{
+                      ml: 2,
+                      mr: 1,
+                      width: 100,
+                      input: { textAlign: "right" },
+                    }}
+                  />
+                </Box>
+              </Grid>
+              <Grid item xs={6}>
+                <Box display="flex" alignItems="center" justifyContent="right">
+                  <Typography color="primary" sx={{ textAlign: "right" }}>
+                    Max Number of Taskers:
+                  </Typography>
+                  <CustomTextField
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      if (
+                        isNaN(val) ||
+                        val < Number(process.env.NEXT_PUBLIC_MIN_TASKERS)
+                      ) {
+                        setMaxTaskersError(true);
+                      } else {
+                        setMaxTaskersError(false);
+                        setMaxTaskers(val);
+                      }
+                    }}
+                    error={maxTaskersError}
+                    helperText={
+                      maxTaskersError &&
+                      `Must be ≥${process.env.NEXT_PUBLIC_MIN_TASKERS}`
+                    }
+                    size="small"
+                    sx={{ ml: 2, width: 100 }}
+                  />
+                </Box>
+              </Grid>
+            </Grid>
           </FormControl>
-        </Box>
-      </Modal>
-      {/* ===== End Modal to add another question ===== */}
-    </Container>
+
+          <Typography
+            color="secondary"
+            align="center"
+            sx={{ fontStyle: "italic", mt: 2 }}
+          >
+            The task will close when either the crypto allocation runs out or
+            the number of Taskers reaches the limit, whichever comes first
+          </Typography>
+        </DefaultGrayCard>
+        {/* ===== End Task Heading ===== */}
+
+        {/* Render all options in questions */}
+        {questions.map((question: SingleChoiceQuestion) => (
+          <QuestionCard title={question.question} choices={question.options} />
+        ))}
+
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={() => setOpen(true)}
+        >
+          Add New Question
+        </Button>
+        <br />
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={() => {
+            const newTask = {
+              title: title,
+              description: description,
+              options: questions,
+            };
+            console.log(newTask);
+          }}
+        >
+          Post Task
+        </Button>
+
+        {/* ===== Modal to add another question ===== */}
+        <Modal
+          open={open}
+          onClose={() => {
+            handleClose();
+          }}
+        >
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 600,
+              bgcolor: "background.paper",
+              border: "2px solid #fafafa",
+              borderRadius: 5,
+              boxShadow: 24,
+              p: 4,
+            }}
+          >
+            {/* Text field for the title, answer choices as csv */}
+            <Typography color="primary" variant="h5" component="h2" mb={2}>
+              Add a new question
+            </Typography>
+            <FormControl fullWidth>
+              {/* Task Title field */}
+              <CustomTextField
+                label="Task Title"
+                variant="outlined"
+                onChange={(e) => {
+                  setCurrQuestionTitle(e.target.value);
+                  setCurrQuestionTitleError(e.target.value.length < 10);
+                }}
+                placeholder="Interesting Task Title"
+                error={currQuestionTitleError}
+                helperText={
+                  currQuestionTitleError &&
+                  "Title must be longer than 10 characters!"
+                }
+                sx={{ mb: 2 }}
+              />
+              {/* Answer choices field */}
+              <CustomTextField
+                label="Answer Choices (comma-separated)"
+                variant="outlined"
+                onChange={(e) => {
+                  const input = e.target.value;
+                  const cleanedAnswerChoices = input
+                    .split(",")
+                    .map((s) => s.trim())
+                    .filter((s) => s !== "");
+                  setCurrQuestionChoices(cleanedAnswerChoices);
+                  setCurrQuestionChoicesError(
+                    cleanedAnswerChoices.length == 0 ||
+                      cleanedAnswerChoices.length > 5
+                  );
+                }}
+                placeholder="Choice 1, Choice 2, ..."
+                error={currQuestionChoicesError}
+                helperText={
+                  currQuestionChoices.length == 0
+                    ? "Input at least one answer choice!"
+                    : currQuestionChoices.length > 5
+                    ? "Too many answer choices - maximum is 5"
+                    : currQuestionChoices.length > 0
+                    ? `${
+                        currQuestionChoices.length
+                      } answer choice(s) entered: ${currQuestionChoices.join(
+                        ", "
+                      )}`
+                    : null
+                }
+                sx={{ mb: 2 }}
+              />
+              {/* Submit button */}
+              {/* TODO @nicholaspad replace with primary CTA */}
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => {
+                  if (
+                    currQuestionTitleError ||
+                    currQuestionChoicesError ||
+                    currQuestionTitle == "" ||
+                    currQuestionChoices.length == 0
+                  ) {
+                    alert("Please provide proper input");
+                    return;
+                  }
+                  const newQuestions = questions.concat([
+                    {
+                      idx: questions.length,
+                      question: currQuestionTitle,
+                      options: currQuestionChoices,
+                    },
+                  ]);
+                  setQuestions(newQuestions);
+                  handleClose();
+                }}
+                sx={{ mx: "auto" }}
+              >
+                Add Question
+              </Button>
+            </FormControl>
+          </Box>
+        </Modal>
+        {/* ===== End Modal to add another question ===== */}
+      </Container>
+    </>
   );
 }
 
