@@ -8,16 +8,11 @@ import {
 } from "@mui/material";
 
 import GrayCard from "../common/DefaultGrayCard";
+import { mcQuestionProps } from "../../src/Types";
 
-export interface mcQuestionProps {
-  idx: number;
-  id: string;
-  question: string;
-  options: string[];
-  handleSetAnswers: Function;
-}
-
-export default function MCQuestion(props: mcQuestionProps) {
+export default function MCQuestion(
+  props: mcQuestionProps & { handleSetAnswers: Function }
+) {
   return (
     <GrayCard>
       <FormControl>

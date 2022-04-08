@@ -88,7 +88,6 @@ const StyledRating = styled(Rating)(({ theme }) => ({
     color: theme.palette.warning.main,
   },
   "& .MuiRating-iconEmpty": {
-    // color: theme.palette.primaryCTA.secondary,
     color: theme.palette.primary.main,
     opacity: 0.3,
   },

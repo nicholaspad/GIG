@@ -10,7 +10,7 @@ export default function GrayCard(props: { children: React.ReactNode }) {
         alignItems: "flex-start",
         py: "3%",
         px: "5%",
-        my: "3%",
+        my: 5,
         bgcolor: "background.paper",
         borderRadius: 3,
         boxShadow: shadows[8],
