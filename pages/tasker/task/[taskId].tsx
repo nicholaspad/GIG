@@ -1,5 +1,5 @@
 import MoralisType from "moralis";
-import { Container, Box } from "@mui/material";
+import { Container, Box, Backdrop, CircularProgress } from "@mui/material";
 import Question from "../../../components/taskerForm/Question";
 import PrimaryButtonCTA from "../../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../../components/buttons/SecondaryButtonCTA";
@@ -9,7 +9,10 @@ import PageHeader from "../../../components/common/PageHeader";
 import GrayCard from "../../../components/common/CustomizableGrayCard";
 import { useRouter } from "next/router";
 import { useMoralis } from "react-moralis";
-import { checkTaskerClaimedTask } from "../../../src/Database";
+import {
+  checkTaskerClaimedTask,
+  taskerAbandonTask,
+} from "../../../src/Database";
 
 export default function taskerForm() {
   /* Test Data */
@@ -45,9 +48,33 @@ export default function taskerForm() {
   const router = useRouter();
   const { taskId } = router.query;
   const { isInitialized, Moralis } = useMoralis();
+  const [openLoading, setOpenLoading] = useState(false);
   const [isAllowed, setIsAllowed] = useState(false);
   const [userData, setUserData] = useState<MoralisType.Object>();
   const [answers, setAnswers] = useState({});
+
+  const handleAbandonTask = async (taskName: string) => {
+    if (!userData || !taskId) return;
+    if (!confirm(`Are you sure you want to abandon task "${taskName}"?`))
+      return;
+
+    setOpenLoading(true);
+
+    const res = await taskerAbandonTask(
+      Moralis,
+      userData.get("ethAddress"),
+      taskId as string
+    );
+
+    if (!res.success) {
+      setOpenLoading(false);
+      alert(res.message);
+      return;
+    }
+
+    alert(res.message);
+    router.push("/browse-tasks");
+  };
 
   const handleSetAnswers = (id: string, answer: string) => {
     setAnswers({ ...answers, [id]: answer });
@@ -84,6 +111,12 @@ export default function taskerForm() {
   return (
     <>
       <PageHeader title="Task" customSetUserData={setUserData} />
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={openLoading}
+      >
+        <CircularProgress color="secondary" />
+      </Backdrop>
       <Container maxWidth="sm">
         <GrayCard>
           <Box sx={{ p: 3 }}>
@@ -114,7 +147,13 @@ export default function taskerForm() {
             flexDirection: "row",
           }}
         >
-          <SecondaryButtonCTA size="small" text="Abandon" to="/browse-tasks" />
+          <SecondaryButtonCTA
+            size="small"
+            text="Abandon"
+            onClick={() => {
+              handleAbandonTask(formInfo.title);
+            }}
+          />
           <Box>
             <Typography
               variant="body1"
