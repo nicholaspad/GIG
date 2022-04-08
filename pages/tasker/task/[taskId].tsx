@@ -106,7 +106,22 @@ export default function taskerForm() {
   }, [isInitialized, userData, taskId]);
 
   if (!isAllowed)
-    return <PageHeader title="Verifying" customSetUserData={setUserData} />;
+    return (
+      <>
+        <PageHeader title="Verifying" customSetUserData={setUserData} />
+        <Box display="flex" flexDirection="column" alignItems="center">
+          <CircularProgress color="secondary" sx={{ mt: 2, mb: 3 }} />
+          <Typography
+            textAlign="center"
+            color="primary"
+            fontWeight={400}
+            fontSize={20}
+          >
+            Verifying...
+          </Typography>
+        </Box>
+      </>
+    );
 
   return (
     <>
@@ -118,7 +133,7 @@ export default function taskerForm() {
         <CircularProgress color="secondary" />
       </Backdrop>
       <Container maxWidth="sm">
-        <GrayCard>
+        <GrayCard sx={{ mt: 2 }}>
           <Box sx={{ p: 3 }}>
             <Typography variant="h4" color="primary" fontWeight={600}>
               {formInfo.title}
