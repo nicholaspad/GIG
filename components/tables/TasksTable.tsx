@@ -243,11 +243,17 @@ export default function TasksTable(props: {
             />
           </Box>
           <PrimaryButtonCTA
-            text="Overview"
+            text={
+              (params.row.status as TaskStatus) === 0 ? "Approvals" : "Overview"
+            }
             size="small"
-            to={`/tasker/task-overview/${String(
-              params.row.task_id
-            )}?back=/requester/my-tasks`}
+            to={
+              (params.row.status as TaskStatus) === 0
+                ? "/requester/my-tasks" // TODO @nicholaspad @bzzbbz replace with link to page to approve pending tasks
+                : `/tasker/task-overview/${String(
+                    params.row.task_id
+                  )}?back=/requester/my-tasks`
+            }
           />
         </>
       ),
