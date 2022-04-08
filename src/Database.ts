@@ -88,3 +88,42 @@ export async function getTaskOverviewData(
 ): Promise<MoralisType.Object<MoralisType.Attributes>[]> {
   return await Moralis.Cloud.run("getTaskOverviewData", { taskId: taskId });
 }
+
+/*
+  Claims a task (Tasker functionality).
+*/
+export async function taskerClaimTask(
+  Moralis: MoralisType,
+  ethAddress: string,
+  taskId: string
+): Promise<{ success: boolean; message: string }> {
+  const tableName = "TaskUsers";
+
+  const TaskUsers = Moralis.Object.extend(tableName);
+  const query = new Moralis.Query(TaskUsers);
+  const res = await query
+    .equalTo("taskerId", ethAddress)
+    .equalTo("taskId", taskId)
+    .find();
+
+  if (res.length > 0)
+    return {
+      success: false,
+      message: `Address ${ethAddress} has already claimed task ${taskId}.`,
+    };
+
+  const taskUser = new TaskUsers();
+  taskUser.set("taskerId", ethAddress);
+  taskUser.set("taskId", taskId);
+  taskUser.set("startDate", new Date());
+  taskUser.set("completedDate", null);
+  taskUser.set("taskerRating", null);
+  taskUser.set("status", 0);
+  taskUser.set("hasRated", false);
+  await taskUser.save();
+
+  return {
+    success: true,
+    message: `Address ${ethAddress} successfully claimed task ${taskId}!`,
+  };
+}
