@@ -31,6 +31,9 @@ export type TaskData = {
   rating?: number;
   status?: TaskStatus | CreatedTaskStatus;
   reward: number;
+  maxReward?: number;
+  numResponses?: number;
+  maxResponses?: number;
 };
 
 const statusMap = {
