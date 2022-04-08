@@ -68,7 +68,7 @@ export default function TasksTable(props: {
 }) {
   function Header(props: { children: React.ReactNode }) {
     return (
-      <Typography variant="h5" fontWeight={500}>
+      <Typography variant="h6" fontWeight={500}>
         {props.children}
       </Typography>
     );
@@ -156,7 +156,9 @@ export default function TasksTable(props: {
             to={
               (params.row.status as TaskStatus) == 0
                 ? `/tasker/task/${String(params.row.task_id)}`
-                : `/tasker/task-overview/${String(params.row.task_id)}`
+                : `/tasker/task-overview/${String(
+                    params.row.task_id
+                  )}?back=/tasker/my-tasks`
             }
           />
         </>
@@ -200,28 +202,13 @@ export default function TasksTable(props: {
       ),
     });
   } else if (props.type === 2) {
-    // TODO: Use proper parameters for CreatedTasks
     // Created Tasks
-    columns.push({
-      field: "completed",
-      sortable: false,
-      disableColumnMenu: true,
-      type: "number",
-      minWidth: 150,
-      align: "left",
-      renderHeader: () => <Header>Completed</Header>,
-      renderCell: (params: GridValueGetterParams) => (
-        <Cell>
-          {params.row.completedTasks} / {params.row.totalTasks}
-        </Cell>
-      ),
-    });
     columns.push({
       field: "status",
       sortable: false,
       disableColumnMenu: true,
-      type: "number",
-      minWidth: 150,
+      type: "string",
+      minWidth: 120,
       align: "left",
       renderHeader: () => <Header>Status</Header>,
       renderCell: (params: GridValueGetterParams) => (
@@ -242,10 +229,10 @@ export default function TasksTable(props: {
       align: "left",
       renderCell: (params: GridValueGetterParams) => (
         <>
-          {/* Render Abandon buttons for "In Progress" and "Pending Verification" rows */}
+          {/* Render Abandon buttons for "In Progress" rows */}
           <Box
             visibility={
-              (params.row.status as TaskStatus) >= 2 ? "hidden" : "visible"
+              (params.row.status as TaskStatus) >= 1 ? "hidden" : "visible"
             }
             mr={2}
           >
@@ -256,17 +243,41 @@ export default function TasksTable(props: {
             />
           </Box>
           <PrimaryButtonCTA
-            text={
-              (params.row.status as TaskStatus) == 0 ? "Continue" : "Overview"
-            }
+            text="Overview"
             size="small"
-            to={
-              (params.row.status as TaskStatus) == 0
-                ? "/requester/my-tasks" // TODO @nicholaspad do we have functionality to continue a draft task?
-                : `/tasker/task-overview/${String(params.row.task_id)}`
-            }
+            to={`/tasker/task-overview/${String(
+              params.row.task_id
+            )}?back=/requester/my-tasks`}
           />
         </>
+      ),
+    });
+    columns.push({
+      field: "maxReward",
+      sortable: false,
+      disableColumnMenu: true,
+      type: "number",
+      minWidth: 180,
+      align: "left",
+      renderHeader: () => <Header>ETH Used / Max</Header>,
+      renderCell: (params: GridValueGetterParams) => (
+        <Cell>
+          {params.row.numResponses * params.row.reward} / {params.row.maxReward}
+        </Cell>
+      ),
+    });
+    columns.push({
+      field: "numResponses",
+      sortable: false,
+      disableColumnMenu: true,
+      type: "number",
+      minWidth: 220,
+      align: "left",
+      renderHeader: () => <Header># Completed / Max</Header>,
+      renderCell: (params: GridValueGetterParams) => (
+        <Cell>
+          {params.row.numResponses} / {params.row.maxResponses}
+        </Cell>
       ),
     });
   }
