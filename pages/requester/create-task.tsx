@@ -77,7 +77,7 @@ export default function Form() {
             color="primary"
             variant="h4"
             fontWeight={600}
-            sx={{ mt: 2 }}
+            sx={{ my: 2 }}
           >
             Create New Task
           </Typography>
@@ -371,8 +371,8 @@ function QuestionCard(props: { title: string; choices: string[] }) {
         {props.title}
       </Typography>
       <List>
-        {props.choices.map((choice) => (
-          <ListItem sx={{ mb: -0.5 }}>
+        {props.choices.map((choice, i: number) => (
+          <ListItem sx={{ mb: -0.5 }} key={i}>
             <ListItemIcon>
               <CircleOutlinedIcon
                 style={{ color: gigTheme.palette.primary.main }}
