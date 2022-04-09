@@ -30,7 +30,7 @@ export default function PrimaryButtonCTA(props: {
         ...props.sx,
       }}
     >
-      {props.to && (
+      {props.to ? (
         <Link href={props.to}>
           <Box
             display="flex"
@@ -60,8 +60,8 @@ export default function PrimaryButtonCTA(props: {
             </Typography>
           </Box>
         </Link>
-      )}
-      {props.onClick && (
+      ) : null}
+      {props.onClick ? (
         <a
           onClick={() => {
             (props.onClick as Function)();
@@ -95,7 +95,7 @@ export default function PrimaryButtonCTA(props: {
             </Typography>
           </Box>
         </a>
-      )}
+      ) : null}
     </Box>
   );
 }
