@@ -13,15 +13,16 @@ import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
-import { SingleChoiceQuestion } from "../../src/Types";
+import { GenericQuestion, QuestionType, TaskProps } from "../../src/Types";
 import PageHeader from "../../components/common/PageHeader";
 import PrimaryButtonCTA from "../../components/buttons/PrimaryButtonCTA";
+import SecondaryButtonCTA from "../../components/buttons/SecondaryButtonCTA";
 
 export default function Form() {
   const [userData, setUserData] = useState<MoralisType.Object>();
 
   const [open, setOpen] = useState(false);
-  const [questions, setQuestions] = useState<SingleChoiceQuestion[]>([]);
+  const [questions, setQuestions] = useState<GenericQuestion[]>([]);
   const [currIndex, setCurrIndex] = useState(1);
 
   // Task overview
@@ -80,8 +81,35 @@ export default function Form() {
           >
             Create New Task
           </Typography>
+          <Box display="flex" justifyContent="center" mt={2}>
+            <SecondaryButtonCTA
+              text="Cancel"
+              size="big"
+              to="/requester/my-tasks"
+            />
+            <PrimaryButtonCTA
+              text="Post Task"
+              size="big"
+              sx={{ ml: 4 }}
+              onClick={() => {
+                const newTask: TaskProps = {
+                  title: title,
+                  description: description,
+                  options: questions,
+                };
+                console.log(
+                  titleError ||
+                    descriptionError ||
+                    cryptoAllocatedError ||
+                    maxTaskersError ||
+                    currQuestionTitleError ||
+                    currQuestionChoicesError
+                );
+                console.log(newTask);
+              }}
+            />
+          </Box>
         </Grid>
-        {/* TODO @nicholaspad replace with primary CTA */}
 
         {/* ===== Task Heading ===== */}
         <DefaultGrayCard>
@@ -211,28 +239,13 @@ export default function Form() {
         </Box>
 
         {/* Render all options in questions */}
-        {questions.map((question: SingleChoiceQuestion, i: number) => (
+        {questions.map((question: GenericQuestion, i: number) => (
           <QuestionCard
             title={question.question}
             choices={question.options}
             key={i}
           />
         ))}
-
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={() => {
-            const newTask = {
-              title: title,
-              description: description,
-              options: questions,
-            };
-            console.log(newTask);
-          }}
-        >
-          Post Task
-        </Button>
 
         {/* ===== Modal to add another question ===== */}
         <Modal
@@ -313,7 +326,7 @@ export default function Form() {
                 }
                 sx={{ mb: 2 }}
               />
-              {/* Submit button */}
+              {/* Add button */}
               <Box display="flex" justifyContent="end">
                 <PrimaryButtonCTA
                   text="Add"
@@ -325,12 +338,14 @@ export default function Form() {
                       currQuestionTitle == "" ||
                       currQuestionChoices.length == 0
                     ) {
-                      alert("Please provide accepted inputs!");
+                      alert("Please provide valid inputs!");
                       return;
                     }
+
                     const newQuestions = questions.concat([
                       {
                         idx: questions.length,
+                        type: QuestionType.SINGLE_CHOICE,
                         question: currQuestionTitle,
                         options: currQuestionChoices,
                       },

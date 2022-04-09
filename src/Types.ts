@@ -1,3 +1,7 @@
+export enum QuestionType {
+  SINGLE_CHOICE,
+}
+
 export type SingleChoiceQuestion = {
   idx: number;
   id?: string;
@@ -8,16 +12,16 @@ export type SingleChoiceQuestion = {
 export type GenericQuestion = {
   type: number;
   idx: number;
-  id: string;
+  id?: string;
   question: string;
-  options?: string[];
+  options: string[];
 };
 
-export type taskProps = {
+export type TaskProps = {
   id?: string;
   title: string;
   description: string;
-  options: SingleChoiceQuestion[];
+  options: GenericQuestion[];
 };
 
 export type TaskOverviewData = TaskData & {
