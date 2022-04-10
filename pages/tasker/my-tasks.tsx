@@ -35,10 +35,8 @@ export default function MyTasks() {
   const { isInitialized, Moralis } = useMoralis();
   const [openLoading, setOpenLoading] = useState(false);
   const [data, setData] = useState<TaskData[]>();
-  const [userData, setUserData] = useState<MoralisType.Object>();
 
   const handleAbandonTask = async (taskId: string, taskName: string) => {
-    if (!userData) return;
     if (!confirm(`Are you sure you want to abandon task "${taskName}"?`))
       return;
 
@@ -116,7 +114,7 @@ export default function MyTasks() {
   ];
 
   useEffect(() => {
-    if (!isInitialized || !userData) return;
+    if (!isInitialized) return;
 
     getTaskerMyTasksTableData(Moralis).then((res) => {
       let tempData: TaskData[] = [];
@@ -132,11 +130,11 @@ export default function MyTasks() {
       }
       setData(tempData);
     });
-  }, [isInitialized, userData]);
+  }, [isInitialized]);
 
   return (
     <>
-      <PageHeader title="My Tasks" customSetUserData={setUserData} />
+      <PageHeader title="My Tasks" />
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={openLoading}

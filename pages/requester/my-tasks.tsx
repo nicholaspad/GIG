@@ -15,10 +15,9 @@ import { CreatedTaskStatus, TaskData, TaskStatus } from "../../src/Types";
 export default function MyTasks() {
   const { isInitialized, Moralis } = useMoralis();
   const [data, setData] = useState<TaskData[]>();
-  const [userData, setUserData] = useState<MoralisType.Object>();
 
   useEffect(() => {
-    if (!isInitialized || !userData) return;
+    if (!isInitialized) return;
 
     getRequesterCreatedTasksTableData(Moralis).then((res) => {
       let tempData: TaskData[] = [];
@@ -37,14 +36,11 @@ export default function MyTasks() {
       }
       setData(tempData);
     });
-  }, [isInitialized, userData]);
+  }, [isInitialized]);
 
   return (
     <>
-      <PageHeader
-        title="Requester Created Tasks"
-        customSetUserData={setUserData}
-      />
+      <PageHeader title="Requester Created Tasks" />
       <PrimaryButtonCTA
         text="Create Task →"
         size="small"

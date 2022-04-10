@@ -17,10 +17,9 @@ export default function TaskDetails() {
   const [openLoading, setOpenLoading] = useState(false);
   const [showClaimCTA, setShowClaimCTA] = useState(true);
   const [data, setData] = useState<TaskOverviewData>();
-  const [userData, setUserData] = useState<MoralisType.Object>();
 
   const handleClaimTask = async () => {
-    if (!userData || !taskId) return;
+    if (!taskId) return;
     if (!confirm(`Are you sure you want to claim task "${data?.name}"?`))
       return;
 
@@ -63,7 +62,7 @@ export default function TaskDetails() {
 
   return (
     <>
-      <PageHeader title="Task Details" customSetUserData={setUserData} />
+      <PageHeader title="Task Details" />
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={openLoading}

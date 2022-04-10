@@ -16,12 +16,11 @@ import {
 import { TaskData } from "../src/Types";
 
 export default function Tasks() {
-  const { isInitialized, Moralis } = useMoralis();
+  const { isInitialized, Moralis, user } = useMoralis();
   const [data, setData] = useState<TaskData[]>();
-  const [userData, setUserData] = useState<MoralisType.Object>();
 
   useEffect(() => {
-    if (!isInitialized || !userData) return;
+    if (!isInitialized || !user) return;
 
     getBrowseTasksTableData(Moralis).then(async (res) => {
       const res_ = await getTaskerClaimedTaskIds(Moralis);
@@ -38,7 +37,7 @@ export default function Tasks() {
         // skip tasks that the user has already claimed
         if (task["objectId"] in claimedTaskIds) continue;
         // skip tasks for which the user is the requester
-        if (task["requesterId"] === userData.get("ethAddress")) continue;
+        if (task["requesterId"] === user.get("ethAddress")) continue;
         tempData.push({
           task_id: task["objectId"],
           name: task["title"],
@@ -48,11 +47,11 @@ export default function Tasks() {
       }
       setData(tempData);
     });
-  }, [isInitialized, userData]);
+  }, [isInitialized, user]);
 
   return (
     <>
-      <PageHeader title="Browse Tasks" customSetUserData={setUserData} />
+      <PageHeader title="Browse Tasks" />
       <PrimaryButtonCTA
         text="My Tasks →"
         size="small"

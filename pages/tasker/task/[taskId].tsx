@@ -47,14 +47,13 @@ export default function taskerForm() {
 
   const router = useRouter();
   const { taskId } = router.query;
-  const { isInitialized, Moralis } = useMoralis();
+  const { isInitialized, Moralis, user } = useMoralis();
   const [openLoading, setOpenLoading] = useState(false);
   const [isAllowed, setIsAllowed] = useState(false);
-  const [userData, setUserData] = useState<MoralisType.Object>();
   const [answers, setAnswers] = useState({});
 
   const handleAbandonTask = async (taskName: string) => {
-    if (!userData || !taskId) return;
+    if (!taskId) return;
     if (!confirm(`Are you sure you want to abandon task "${taskName}"?`))
       return;
 
@@ -85,9 +84,9 @@ export default function taskerForm() {
   };
 
   useEffect(() => {
-    if (!isInitialized || !userData || !taskId) return;
+    if (!isInitialized || !user || !taskId) return;
 
-    const ethAddress = userData.get("ethAddress");
+    const ethAddress = user.get("ethAddress");
     checkTaskerClaimedTask(Moralis, taskId as string).then((res) => {
       if (!res) {
         alert(`Address ${ethAddress} has not claimed task ${taskId}.`);
@@ -97,12 +96,12 @@ export default function taskerForm() {
 
       setIsAllowed(true);
     });
-  }, [isInitialized, userData, taskId]);
+  }, [isInitialized, taskId]);
 
   if (!isAllowed)
     return (
       <>
-        <PageHeader title="Verifying" customSetUserData={setUserData} />
+        <PageHeader title="Verifying" />
         <Box display="flex" flexDirection="column" alignItems="center">
           <CircularProgress color="secondary" sx={{ mt: 2, mb: 3 }} />
           <Typography
@@ -119,7 +118,7 @@ export default function taskerForm() {
 
   return (
     <>
-      <PageHeader title="Task" customSetUserData={setUserData} />
+      <PageHeader title="Task" />
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={openLoading}

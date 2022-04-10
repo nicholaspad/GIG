@@ -34,7 +34,7 @@ export default function PageHeader(props: {
         <title>{props.title} | GIG</title>
       </Head>
       <Navbar
-        walletAddress={userData?.get("ethAddress")}
+        walletAddress={user?.get("ethAddress")}
         isConnected={isAuthenticated}
         username={userData?.get("displayName")}
       />
