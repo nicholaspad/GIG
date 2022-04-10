@@ -1,5 +1,5 @@
 import MoralisType from "moralis";
-import { Container, Box, Backdrop, CircularProgress } from "@mui/material";
+import { Container, Box, CircularProgress } from "@mui/material";
 import Question from "../../../components/taskerForm/Question";
 import PrimaryButtonCTA from "../../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../../components/buttons/SecondaryButtonCTA";
@@ -13,6 +13,7 @@ import {
   checkTaskerClaimedTask,
   taskerAbandonTask,
 } from "../../../src/Database";
+import LoadingOverlay from "../../../components/common/LoadingOverlay";
 
 export default function taskerForm() {
   /* Test Data */
@@ -119,12 +120,7 @@ export default function taskerForm() {
   return (
     <>
       <PageHeader title="Task" />
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={openLoading}
-      >
-        <CircularProgress color="secondary" />
-      </Backdrop>
+      <LoadingOverlay open={openLoading} />
       <Container maxWidth="sm">
         <GrayCard sx={{ mt: 2 }}>
           <Box sx={{ p: 3 }}>
