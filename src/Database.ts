@@ -6,6 +6,13 @@ import MoralisType from "moralis";
   of the Cloud Functions popup on the Moralis Dashboard).
 */
 
+export async function checkTaskerClaimedTask(
+  Moralis: MoralisType,
+  taskId: string
+): Promise<boolean> {
+  return await Moralis.Cloud.run("checkTaskerClaimedTask", { taskId: taskId });
+}
+
 /*
   Creates a new user row in table Users if it doesn't already exist.
   Uses ethAddress as the primary key. Returns the user's data as a

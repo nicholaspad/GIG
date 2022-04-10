@@ -14,6 +14,12 @@ async function checkTaskerClaimedTask(ethAddress, taskId) {
   return res.length > 0;
 }
 
+Moralis.Cloud.define("checkTaskerClaimedTask", async (request) => {
+  const ethAddress = request.user.get("ethAddress");
+  const taskId = request.params.taskId;
+  return await checkTaskerClaimedTask(ethAddress, taskId);
+});
+
 /* ------------------------------------------------------------------- */
 
 Moralis.Cloud.define("makeOrGetNewUser", async (request) => {
