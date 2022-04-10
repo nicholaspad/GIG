@@ -26,11 +26,7 @@ export default function TaskDetails() {
 
     setOpenLoading(true);
 
-    const res = await taskerClaimTask(
-      Moralis,
-      userData.get("ethAddress"),
-      taskId as string
-    );
+    const res = await taskerClaimTask(Moralis, taskId as string);
 
     setOpenLoading(false);
 

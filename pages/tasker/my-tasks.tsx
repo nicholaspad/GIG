@@ -44,11 +44,7 @@ export default function MyTasks() {
 
     setOpenLoading(true);
 
-    const res = await taskerAbandonTask(
-      Moralis,
-      userData.get("ethAddress"),
-      taskId as string
-    );
+    const res = await taskerAbandonTask(Moralis, taskId as string);
 
     if (!res.success) {
       setOpenLoading(false);
@@ -122,22 +118,20 @@ export default function MyTasks() {
   useEffect(() => {
     if (!isInitialized || !userData) return;
 
-    getTaskerMyTasksTableData(Moralis, userData.get("ethAddress")).then(
-      (res) => {
-        let tempData: TaskData[] = [];
-        for (let task_ of res) {
-          let task = task_ as any;
-          if (task["tasks"].length < 1) continue;
-          tempData.push({
-            task_id: task["taskId"],
-            name: task["tasks"][0]["title"],
-            reward: task["tasks"][0]["unitReward"],
-            status: task["status"] as TaskStatus,
-          });
-        }
-        setData(tempData);
+    getTaskerMyTasksTableData(Moralis).then((res) => {
+      let tempData: TaskData[] = [];
+      for (let task_ of res) {
+        let task = task_ as any;
+        if (task["tasks"].length < 1) continue;
+        tempData.push({
+          task_id: task["taskId"],
+          name: task["tasks"][0]["title"],
+          reward: task["tasks"][0]["unitReward"],
+          status: task["status"] as TaskStatus,
+        });
       }
-    );
+      setData(tempData);
+    });
   }, [isInitialized, userData]);
 
   return (

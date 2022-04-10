@@ -20,25 +20,23 @@ export default function MyTasks() {
   useEffect(() => {
     if (!isInitialized || !userData) return;
 
-    getRequesterCreatedTasksTableData(Moralis, userData.get("ethAddress")).then(
-      (res) => {
-        let tempData: TaskData[] = [];
+    getRequesterCreatedTasksTableData(Moralis).then((res) => {
+      let tempData: TaskData[] = [];
 
-        for (let task_ of res) {
-          let task = task_ as any;
-          tempData.push({
-            task_id: task["objectId"],
-            name: task["title"],
-            reward: task["unitReward"],
-            maxReward: task["maxReward"],
-            numResponses: task["numResponses"],
-            maxResponses: task["maxResponses"],
-            status: task["status"] as CreatedTaskStatus,
-          });
-        }
-        setData(tempData);
+      for (let task_ of res) {
+        let task = task_ as any;
+        tempData.push({
+          task_id: task["objectId"],
+          name: task["title"],
+          reward: task["unitReward"],
+          maxReward: task["maxReward"],
+          numResponses: task["numResponses"],
+          maxResponses: task["maxResponses"],
+          status: task["status"] as CreatedTaskStatus,
+        });
       }
-    );
+      setData(tempData);
+    });
   }, [isInitialized, userData]);
 
   return (

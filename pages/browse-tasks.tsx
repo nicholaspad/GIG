@@ -24,10 +24,7 @@ export default function Tasks() {
     if (!isInitialized || !userData) return;
 
     getBrowseTasksTableData(Moralis).then(async (res) => {
-      const res_ = await getTaskerClaimedTaskIds(
-        Moralis,
-        userData.get("ethAddress")
-      );
+      const res_ = await getTaskerClaimedTaskIds(Moralis);
 
       // filter out tasks the users has claimed
       const claimedTaskIds: { [key: string]: number } = {};

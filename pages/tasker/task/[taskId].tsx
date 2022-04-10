@@ -60,11 +60,7 @@ export default function taskerForm() {
 
     setOpenLoading(true);
 
-    const res = await taskerAbandonTask(
-      Moralis,
-      userData.get("ethAddress"),
-      taskId as string
-    );
+    const res = await taskerAbandonTask(Moralis, taskId as string);
 
     if (!res.success) {
       setOpenLoading(false);
@@ -92,17 +88,15 @@ export default function taskerForm() {
     if (!isInitialized || !userData || !taskId) return;
 
     const ethAddress = userData.get("ethAddress");
-    checkTaskerClaimedTask(Moralis, ethAddress, taskId as string).then(
-      (res) => {
-        if (!res) {
-          alert(`Address ${ethAddress} has not claimed task ${taskId}.`);
-          router.push("/browse-tasks");
-          return;
-        }
-
-        setIsAllowed(true);
+    checkTaskerClaimedTask(Moralis, taskId as string).then((res) => {
+      if (!res) {
+        alert(`Address ${ethAddress} has not claimed task ${taskId}.`);
+        router.push("/browse-tasks");
+        return;
       }
-    );
+
+      setIsAllowed(true);
+    });
   }, [isInitialized, userData, taskId]);
 
   if (!isAllowed)
