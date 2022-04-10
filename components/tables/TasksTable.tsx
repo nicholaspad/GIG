@@ -26,7 +26,7 @@ import { TableType } from "./TasksTableWrapper";
 export type TaskStatus = 0 | 1 | 2 | 3;
 
 export type TaskData = {
-  task_id: number;
+  task_id: string;
   name: string;
   rating?: number;
   status?: TaskStatus;
@@ -107,8 +107,8 @@ export default function TasksTable(props: {
     },
   ];
 
-  // My Tasks
   if (props.type === 0) {
+    // My Tasks
     columns.push({
       field: "status",
       sortable: false,
@@ -140,14 +140,23 @@ export default function TasksTable(props: {
             }
             mr={2}
           >
-            <SecondaryButtonCTA text="Abandon" size="small" to="/" />
+            <SecondaryButtonCTA
+              text="Abandon"
+              size="small"
+              to="/tasker/my-tasks"
+            />
           </Box>
           <PrimaryButtonCTA
             text={
-              (params.row.status as TaskStatus) == 0 ? "Continue" : "Details"
+              (params.row.status as TaskStatus) == 0 ? "Continue" : "Overview"
             }
             size="small"
-            to="/"
+            // TODO @nicholaspad replace second link with route to task completed page
+            to={
+              (params.row.status as TaskStatus) == 0
+                ? `/tasker/task/${String(params.row.task_id)}`
+                : `/tasker/task-overview/${String(params.row.task_id)}`
+            }
           />
         </>
       ),
@@ -181,7 +190,13 @@ export default function TasksTable(props: {
       minWidth: 130,
       flex: 1,
       align: "left",
-      renderCell: () => <PrimaryButtonCTA text="Details" size="small" to="/" />,
+      renderCell: (params: GridValueGetterParams) => (
+        <PrimaryButtonCTA
+          text="Details"
+          size="small"
+          to={`/tasker/task-details/${String(params.row.task_id)}`}
+        />
+      ),
     });
   } else if (props.type === 2) {
     // TODO: Use proper parameters for CreatedTasks
@@ -231,19 +246,39 @@ export default function TasksTable(props: {
             }
             mr={2}
           >
-            <SecondaryButtonCTA text="Abandon" size="small" to="/" />
+            <SecondaryButtonCTA
+              text="Abandon"
+              size="small"
+              to="/requester/my-tasks"
+            />
           </Box>
           <PrimaryButtonCTA
             text={
-              (params.row.status as TaskStatus) == 0 ? "Continue" : "Details"
+              (params.row.status as TaskStatus) == 0 ? "Continue" : "Overview"
             }
             size="small"
-            to="/"
+            to={
+              (params.row.status as TaskStatus) == 0
+                ? "/requester/my-tasks" // TODO @nicholaspad do we have functionality to continue a draft task?
+                : `/tasker/task-overview/${String(params.row.task_id)}`
+            }
           />
         </>
       ),
     });
   }
+
+  if (props.data.length === 0)
+    return (
+      <Typography
+        textAlign="center"
+        color="primary"
+        fontWeight={400}
+        fontSize={20}
+      >
+        No Tasks to display &#128532;
+      </Typography>
+    );
 
   return (
     <TableContainer sx={{ height: 600 }}>
@@ -297,6 +332,9 @@ const StyledTasksTable = styled(DataGrid)(({ theme }) => ({
   "& .MuiDataGrid-footerContainer, .MuiButtonBase-root": {
     color: theme.palette.primary.main,
     fontSize: 16,
+  },
+  "& .MuiDataGrid-overlay": {
+    display: "none",
   },
 }));
 

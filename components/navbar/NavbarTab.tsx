@@ -1,5 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import Link from "next/link";
+import router from "next/router";
 import { gigTheme } from "../../src/Theme";
 
 export default function NavbarTab(props: {
@@ -9,8 +10,14 @@ export default function NavbarTab(props: {
   isSelected: boolean;
   tabName: string;
 }) {
+  const getTabRoute = (): string => {
+    if (!props.tabIsTasker) return "/requester/my-tasks";
+    if (router.pathname === "/tasker/my-tasks") return "/tasker/my-tasks";
+    return "/browse-tasks";
+  };
+
   return (
-    <Link href={props.tabIsTasker ? "/tasker/my-tasks" : "/requester/my-tasks"}>
+    <Link href={getTabRoute()}>
       <Box
         sx={{
           background: props.isSelected ? gigTheme.palette.secondary.main : null,

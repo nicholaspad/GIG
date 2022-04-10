@@ -1,11 +1,11 @@
 import { Container, Box } from "@mui/material";
-import Question from "../../components/taskerForm/Question";
-import PrimaryButtonCTA from "../../components/buttons/PrimaryButtonCTA";
-import SecondaryButtonCTA from "../../components/buttons/SecondaryButtonCTA";
+import Question from "../../../components/taskerForm/Question";
+import PrimaryButtonCTA from "../../../components/buttons/PrimaryButtonCTA";
+import SecondaryButtonCTA from "../../../components/buttons/SecondaryButtonCTA";
 import { Typography } from "@mui/material";
-import GrayCard from "../../components/common/DefaultGrayCard";
-import PageHeader from "../../components/common/PageHeader";
 import { useState } from "react";
+import PageHeader from "../../../components/common/PageHeader";
+import GrayCard from "../../../components/common/CustomizableGrayCard";
 
 export default function taskerForm() {
   /* Test Data */
@@ -56,12 +56,14 @@ export default function taskerForm() {
       <PageHeader title={"Task"} />
       <Container maxWidth="sm">
         <GrayCard>
-          <Typography variant="h4" color="primary" fontWeight={600}>
-            {formInfo.title}
-          </Typography>
-          <Typography sx={{ mt: "3%" }} variant="body2" color="primary">
-            {formInfo.description}
-          </Typography>
+          <Box sx={{ p: 3 }}>
+            <Typography variant="h4" color="primary" fontWeight={600}>
+              {formInfo.title}
+            </Typography>
+            <Typography sx={{ mt: 2 }} variant="body2" color="primary">
+              {formInfo.description}
+            </Typography>
+          </Box>
         </GrayCard>
         {formData.map((props, idx) => (
           <Question
@@ -76,13 +78,13 @@ export default function taskerForm() {
         ))}
         <Box
           sx={{
-            mb: "15%",
+            mb: 5,
             display: "flex",
             justifyContent: "space-between",
             flexDirection: "row",
           }}
         >
-          <SecondaryButtonCTA size="small" text="Abandon" to="/" />
+          <SecondaryButtonCTA size="small" text="Abandon" to="/browse-tasks" />
           <Box>
             <Typography
               variant="body1"

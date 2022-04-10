@@ -28,6 +28,14 @@ export default function Navbar(props: {
   const { logout, isAuthenticated } = useMoralis();
   const [currentTask, setCurrentTask] = useState(true);
 
+  const shouldShowToggle = (): boolean => {
+    return (
+      router.pathname === "/tasker/my-tasks" ||
+      router.pathname === "/browse-tasks" ||
+      router.pathname === "/requester/my-tasks"
+    );
+  };
+
   return (
     <AppBar
       elevation={0}
@@ -37,9 +45,8 @@ export default function Navbar(props: {
       }}
     >
       <Toolbar>
-        <Box sx={{ flexGrow: isAuthenticated ? 0 : 1 }}>
-          <Link href="/">
-            {/* INSERT LOGO HERE */}
+        <Box sx={{ flexGrow: isAuthenticated && shouldShowToggle() ? 0 : 1 }}>
+          <Link href="/browse-tasks">
             <Typography
               variant="h4"
               fontWeight={700}
@@ -57,11 +64,11 @@ export default function Navbar(props: {
             </Typography>
           </Link>
         </Box>
-        {isAuthenticated && (
+        {isAuthenticated && shouldShowToggle() ? (
           <Stack
             direction="row"
             spacing={1}
-            ml={5}
+            mx={5}
             sx={{
               flexGrow: 1,
             }}
@@ -70,7 +77,10 @@ export default function Navbar(props: {
               tabIsTasker={true}
               currentTask={currentTask}
               setCurrentTask={setCurrentTask}
-              isSelected={router.pathname === "/tasker/my-tasks"}
+              isSelected={
+                router.pathname === "/tasker/my-tasks" ||
+                router.pathname === "/browse-tasks"
+              }
               tabName="Tasker"
             />
             <NavbarTab
@@ -81,7 +91,7 @@ export default function Navbar(props: {
               tabName="Requester"
             />
           </Stack>
-        )}
+        ) : null}
         <Stack
           color={gigTheme.palette.primary.main}
           direction="row"
@@ -99,7 +109,10 @@ export default function Navbar(props: {
             }}
           >
             <Typography fontWeight="bold">{props.username}</Typography>
-            <Typography color={connectionColorMap[props.isConnected ? 0 : 1]}>
+            <Typography
+              component="div"
+              color={connectionColorMap[props.isConnected ? 0 : 1]}
+            >
               {connectionMap[props.isConnected ? 0 : 1]}
               {props.walletAddress ? (
                 <Typography display="inline" color="primary.main">

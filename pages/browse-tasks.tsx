@@ -1,24 +1,56 @@
+import MoralisType from "moralis";
+import { useEffect, useState } from "react";
+import { useMoralis } from "react-moralis";
 import PrimaryButtonCTA from "../components/buttons/PrimaryButtonCTA";
 import PageHeader from "../components/common/PageHeader";
 import BrowseTasksTable from "../components/tables/BrowseTasksTable";
 import { TaskData } from "../components/tables/TasksTable";
+import {
+  getBrowseTasksTableData,
+  getTaskerClaimedTaskIds,
+} from "../src/Database";
 
 export default function Tasks() {
-  // TODO @nicholaspad hard-coded for now
-  const data: TaskData[] = [1.5, 2.5, 3, 4.5, 5, 6.5, 7, 8.5, 9, 10, 10.5].map(
-    (e, i) => {
-      return {
-        task_id: e,
-        name: `Task ${i + 1}`,
-        rating: e % 6,
-        reward: e,
-      };
-    }
-  );
+  const { isInitialized, Moralis } = useMoralis();
+  const [data, setData] = useState<TaskData[]>([]);
+  const [userData, setUserData] = useState<MoralisType.Object>();
+
+  useEffect(() => {
+    if (!isInitialized || !userData) return;
+
+    getBrowseTasksTableData(Moralis).then(async (res) => {
+      const res_ = await getTaskerClaimedTaskIds(
+        Moralis,
+        userData.get("ethAddress")
+      );
+
+      // filter out tasks the users has claimed
+      const claimedTaskIds: { [key: string]: number } = {};
+      res_.map((task) => {
+        claimedTaskIds[(task as any)["taskId"]] = 1;
+      });
+
+      let tempData: TaskData[] = [];
+      for (let task_ of res) {
+        let task = task_ as any;
+        // skip tasks that the user has already claimed
+        if (task["objectId"] in claimedTaskIds) continue;
+        // skip tasks for which the user is the requester
+        if (task["requesterId"] === userData.get("ethAddress")) continue;
+        tempData.push({
+          task_id: task["objectId"],
+          name: task["title"],
+          reward: task["unitReward"],
+          rating: task["avgRating"],
+        });
+      }
+      setData(tempData);
+    });
+  }, [isInitialized, userData]);
 
   return (
     <>
-      <PageHeader title="Browse Tasks" />
+      <PageHeader title="Browse Tasks" customSetUserData={setUserData} />
       <PrimaryButtonCTA
         text="My Tasks →"
         size="small"
