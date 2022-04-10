@@ -56,6 +56,18 @@ export async function getTaskerMyTasksTableData(
 }
 
 /*
+  Retrieves data for the Created Tasks (Requester) table.
+*/
+export async function getRequesterCreatedTasksTableData(
+  Moralis: MoralisType,
+  ethAddress: string
+): Promise<MoralisType.Object<MoralisType.Attributes>[]> {
+  return await Moralis.Cloud.run("getRequesterCreatedTasksTableData", {
+    ethAddress: ethAddress,
+  });
+}
+
+/*
   Retreives the task IDs for the tasks a user has claimed.
 */
 export async function getTaskerClaimedTaskIds(
@@ -75,4 +87,107 @@ export async function getTaskOverviewData(
   taskId: string
 ): Promise<MoralisType.Object<MoralisType.Attributes>[]> {
   return await Moralis.Cloud.run("getTaskOverviewData", { taskId: taskId });
+}
+
+/*
+  Claims a task (Tasker functionality).
+*/
+export async function taskerClaimTask(
+  Moralis: MoralisType,
+  ethAddress: string,
+  taskId: string
+): Promise<{ success: boolean; message: string }> {
+  if (await checkTaskerClaimedTask(Moralis, ethAddress, taskId))
+    return {
+      success: false,
+      message: `Address ${ethAddress} has already claimed task ${taskId}.`,
+    };
+
+  const tableName = "TaskUsers";
+  const TaskUsers = Moralis.Object.extend(tableName);
+
+  const taskUser = new TaskUsers();
+  taskUser.set("taskerId", ethAddress);
+  taskUser.set("taskId", taskId);
+  taskUser.set("startDate", new Date());
+  taskUser.set("completedDate", null);
+  taskUser.set("taskerRating", null);
+  taskUser.set("status", 0);
+  taskUser.set("hasRated", false);
+  await taskUser.save();
+
+  return {
+    success: true,
+    message: `Address ${ethAddress} successfully claimed task ${taskId}!`,
+  };
+}
+
+/*
+  Check that a task is claimed by a Tasker.
+*/
+export async function checkTaskerClaimedTask(
+  Moralis: MoralisType,
+  ethAddress: string,
+  taskId: string
+): Promise<boolean> {
+  const tableName = "TaskUsers";
+
+  const TaskUsers = Moralis.Object.extend(tableName);
+  const query = new Moralis.Query(TaskUsers);
+  const res = await query
+    .equalTo("taskerId", ethAddress)
+    .equalTo("taskId", taskId)
+    .find();
+
+  return res.length > 0;
+}
+
+/*
+  Abandons a task (Tasker functionality).
+  @nicholaspad Do we want abandoned tasks to return to Browse Tasks?
+    Or do we want them to be marked as "Abandoned" in My Tasks and not
+    let the Tasker claim them again?
+*/
+export async function taskerAbandonTask(
+  Moralis: MoralisType,
+  ethAddress: string,
+  taskId: string
+): Promise<{ success: boolean; message: string }> {
+  if (!(await checkTaskerClaimedTask(Moralis, ethAddress, taskId)))
+    return {
+      success: false,
+      message: `Address ${ethAddress} has not claimed task ${taskId}.`,
+    };
+
+  const tableName = "TaskUsers";
+  const TaskUsers = Moralis.Object.extend(tableName);
+
+  const query = new Moralis.Query(TaskUsers);
+  const res = await query
+    .equalTo("taskerId", ethAddress)
+    .equalTo("taskId", taskId)
+    .first();
+
+  console.log(taskId);
+
+  if (!res)
+    return {
+      success: false,
+      message: `Address ${ethAddress} failed to abandon task ${taskId}.`,
+    };
+
+  return res.destroy().then(
+    () => {
+      return {
+        success: true,
+        message: `Address ${ethAddress} successfully abandoned task ${taskId}!`,
+      };
+    },
+    (error) => {
+      return {
+        success: false,
+        message: `Address ${ethAddress} failed to abandon task ${taskId}: ${error}`,
+      };
+    }
+  );
 }

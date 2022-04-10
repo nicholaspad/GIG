@@ -1,9 +1,17 @@
-import { TaskData } from "./TasksTable";
+import { GridColDef } from "@mui/x-data-grid";
+import { TaskData } from "../../src/Types";
 import TasksTableWrapper, { TableType } from "./TasksTableWrapper";
 
 export default function BrowseTasksTable(props: {
   type: TableType;
-  data: TaskData[];
+  data?: TaskData[];
+  extraColumns: GridColDef[];
 }) {
-  return <TasksTableWrapper type={props.type} data={props.data} />;
+  return (
+    <TasksTableWrapper
+      type={props.type}
+      data={props.data}
+      extraColumns={props.extraColumns}
+    />
+  );
 }

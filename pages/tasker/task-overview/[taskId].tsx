@@ -1,17 +1,19 @@
+import MoralisType from "moralis";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
 import SecondaryButtonCTA from "../../../components/buttons/SecondaryButtonCTA";
-import TaskOverviewTemplate, {
-  TaskOverviewData,
-} from "../../../components/task/TaskOverview";
+import PageHeader from "../../../components/common/PageHeader";
+import TaskOverviewTemplate from "../../../components/task/TaskOverview";
 import { getTaskOverviewData } from "../../../src/Database";
+import { TaskOverviewData } from "../../../src/Types";
 
 export default function TaskOverview() {
   const router = useRouter();
-  const { taskId } = router.query;
+  const { taskId, back } = router.query;
   const { isInitialized, Moralis } = useMoralis();
   const [data, setData] = useState<TaskOverviewData>();
+  const [userData, setUserData] = useState<MoralisType.Object>();
 
   useEffect(() => {
     if (!isInitialized || !taskId) return;
@@ -34,8 +36,11 @@ export default function TaskOverview() {
   }, [isInitialized, taskId]);
 
   return (
-    <TaskOverviewTemplate data={data} title="Task Overview">
-      <SecondaryButtonCTA text="Back" size="big" to="/tasker/my-tasks" />
-    </TaskOverviewTemplate>
+    <>
+      <PageHeader title="Task Overview" customSetUserData={setUserData} />
+      <TaskOverviewTemplate data={data} title="Task Overview">
+        <SecondaryButtonCTA text="Back" size="big" to={back as string} />
+      </TaskOverviewTemplate>
+    </>
   );
 }

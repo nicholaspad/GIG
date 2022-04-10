@@ -1,7 +1,9 @@
 import { Container } from "@mui/material";
+import { GridColDef } from "@mui/x-data-grid";
+import { TaskData } from "../../src/Types";
 import CustomizableGrayCard from "../common/CustomizableGrayCard";
 import TaskerPageHeader from "../common/TaskerPageHeader";
-import TasksTable, { TaskData } from "./TasksTable";
+import TasksTable from "./TasksTable";
 
 /*
   0: Tasker - My Tasks table
@@ -24,7 +26,8 @@ const tableSubtitleMap = {
 
 export default function TasksTableWrapper(props: {
   type: TableType;
-  data: TaskData[];
+  data?: TaskData[];
+  extraColumns: GridColDef[];
 }) {
   return (
     <Container maxWidth="lg">
@@ -34,7 +37,11 @@ export default function TasksTableWrapper(props: {
       />
       <CustomizableGrayCard sx={{ px: 5, py: 2.5, mb: 5 }}>
         {/* TODO @nicholaspad replace button links with proper routes */}
-        <TasksTable type={props.type} data={props.data} />
+        <TasksTable
+          type={props.type}
+          data={props.data}
+          extraColumns={props.extraColumns}
+        />
       </CustomizableGrayCard>
     </Container>
   );

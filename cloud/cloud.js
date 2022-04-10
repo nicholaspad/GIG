@@ -7,7 +7,7 @@ Moralis.Cloud.define("getBrowseTasksTableData", async () => {
     { sort: { unitReward: -1 } },
     {
       project: {
-        objectId: 1,
+        objectId: 1, // taskId
         title: 1,
         avgRating: 1,
         unitReward: 1,
@@ -32,8 +32,33 @@ Moralis.Cloud.define("getTaskerMyTasksTableData", async (request) => {
       lookup: {
         from: "Tasks",
         localField: "taskId",
-        foreignField: "_id",
+        foreignField: "_id", // taskId
         as: "tasks",
+      },
+    },
+  ]);
+
+  return res;
+});
+
+Moralis.Cloud.define("getRequesterCreatedTasksTableData", async (request) => {
+  const ethAddress = request.params.ethAddress;
+  const tableName = "Tasks";
+
+  const Tasks = Moralis.Object.extend(tableName);
+  const query = new Moralis.Query(Tasks);
+  const res = query.aggregate([
+    { match: { requesterId: ethAddress } },
+    { sort: { status: 1 } },
+    {
+      project: {
+        objectId: 1, // taskId
+        title: 1,
+        unitReward: 1,
+        maxReward: 1,
+        status: 1,
+        numResponses: 1,
+        maxResponses: 1,
       },
     },
   ]);
