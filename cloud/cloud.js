@@ -1,3 +1,44 @@
+/*
+  Check that a task is claimed by a Tasker.
+*/
+async function checkTaskerClaimedTask(ethAddress, taskId) {
+  const tableName = "TaskUsers";
+
+  const TaskUsers = Moralis.Object.extend(tableName);
+  const query = new Moralis.Query(TaskUsers);
+  const res = await query
+    .equalTo("taskerId", ethAddress)
+    .equalTo("taskId", taskId)
+    .find();
+
+  return res.length > 0;
+}
+
+/* ------------------------------------------------------------------- */
+
+Moralis.Cloud.define("makeOrGetNewUser", async (request) => {
+  const ethAddress = request.user.get("ethAddress");
+  const tableName = "Users";
+  const defaultDisplayName = "GIG User";
+
+  const Users = Moralis.Object.extend(tableName);
+  const query = new Moralis.Query(Users);
+  const res = await query.equalTo("ethAddress", ethAddress).find();
+
+  if (res.length > 0) return res[0];
+
+  const user = new Users();
+  user.set("ethAddress", ethAddress);
+  user.set("displayName", defaultDisplayName);
+  user.set("email", null);
+  user.set("requesterRating", null);
+  await user.save();
+
+  return user;
+});
+
+/* ------------------------------------------------------------------- */
+
 Moralis.Cloud.define("getBrowseTasksTableData", async () => {
   const tableName = "Tasks";
 
@@ -18,6 +59,8 @@ Moralis.Cloud.define("getBrowseTasksTableData", async () => {
 
   return res;
 });
+
+/* ------------------------------------------------------------------- */
 
 Moralis.Cloud.define("getTaskerMyTasksTableData", async (request) => {
   const ethAddress = request.user.get("ethAddress");
@@ -40,6 +83,8 @@ Moralis.Cloud.define("getTaskerMyTasksTableData", async (request) => {
 
   return res;
 });
+
+/* ------------------------------------------------------------------- */
 
 Moralis.Cloud.define("getRequesterCreatedTasksTableData", async (request) => {
   const ethAddress = request.user.get("ethAddress");
@@ -66,6 +111,8 @@ Moralis.Cloud.define("getRequesterCreatedTasksTableData", async (request) => {
   return res;
 });
 
+/* ------------------------------------------------------------------- */
+
 Moralis.Cloud.define("getTaskerClaimedTaskIds", async (request) => {
   const ethAddress = request.user.get("ethAddress");
   const tableName = "TaskUsers";
@@ -79,6 +126,8 @@ Moralis.Cloud.define("getTaskerClaimedTaskIds", async (request) => {
 
   return res;
 });
+
+/* ------------------------------------------------------------------- */
 
 Moralis.Cloud.define("getTaskOverviewData", async (request) => {
   const taskId = request.params.taskId;
@@ -104,3 +153,81 @@ Moralis.Cloud.define("getTaskOverviewData", async (request) => {
 
   return res;
 });
+
+/* ------------------------------------------------------------------- */
+
+Moralis.Cloud.define("taskerClaimTask", async (request) => {
+  const ethAddress = request.user.get("ethAddress");
+  const taskId = request.params.taskId;
+
+  if (await checkTaskerClaimedTask(ethAddress, taskId))
+    return {
+      success: false,
+      message: `Address ${ethAddress} has already claimed task ${taskId}.`,
+    };
+
+  const tableName = "TaskUsers";
+  const TaskUsers = Moralis.Object.extend(tableName);
+
+  const taskUser = new TaskUsers();
+  taskUser.set("taskerId", ethAddress);
+  taskUser.set("taskId", taskId);
+  taskUser.set("startDate", new Date());
+  taskUser.set("completedDate", null);
+  taskUser.set("taskerRating", null);
+  taskUser.set("status", 0);
+  taskUser.set("hasRated", false);
+  await taskUser.save();
+
+  return {
+    success: true,
+    message: `Address ${ethAddress} successfully claimed task ${taskId}!`,
+  };
+});
+
+/* ------------------------------------------------------------------- */
+
+Moralis.Cloud.define("taskerAbandonTask", async (request) => {
+  const ethAddress = request.user.get("ethAddress");
+  const taskId = request.params.taskId;
+
+  if (!(await checkTaskerClaimedTask(ethAddress, taskId)))
+    return {
+      success: false,
+      message: `Address ${ethAddress} has not claimed task ${taskId}.`,
+    };
+
+  const tableName = "TaskUsers";
+  const TaskUsers = Moralis.Object.extend(tableName);
+
+  const query = new Moralis.Query(TaskUsers);
+  const res = await query
+    .equalTo("taskerId", ethAddress)
+    .equalTo("taskId", taskId)
+    .first();
+
+  console.log(taskId);
+
+  if (!res)
+    return {
+      success: false,
+      message: `Address ${ethAddress} failed to abandon task ${taskId}.`,
+    };
+
+  return res.destroy().then(
+    () => {
+      return {
+        success: true,
+        message: `Address ${ethAddress} successfully abandoned task ${taskId}!`,
+      };
+    },
+    (error) => {
+      return {
+        success: false,
+        message: `Address ${ethAddress} failed to abandon task ${taskId}: ${error}`,
+      };
+    }
+  );
+});
+
+/* ------------------------------------------------------------------- */

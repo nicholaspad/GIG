@@ -22,9 +22,9 @@ export default function PageHeader(props: {
   useEffect(() => {
     if (props.disableAuthFunc || !isAuthenticated || authError || !user) return;
 
-    makeOrGetNewUser(Moralis).then((res: MoralisType.Object) => {
       setUserData(res);
       if (props.customSetUserData) props.customSetUserData(res);
+    makeOrGetNewUser(Moralis).then((res) => {
     });
   }, [isAuthenticated]);
 
