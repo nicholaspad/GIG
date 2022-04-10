@@ -144,6 +144,9 @@ export async function checkTaskerClaimedTask(
 
 /*
   Abandons a task (Tasker functionality).
+  @nicholaspad Do we want abandoned tasks to return to Browse Tasks?
+    Or do we want them to be marked as "Abandoned" in My Tasks and not
+    let the Tasker claim them again?
 */
 export async function taskerAbandonTask(
   Moralis: MoralisType,
