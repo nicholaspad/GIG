@@ -20,7 +20,7 @@ Moralis.Cloud.define("getBrowseTasksTableData", async () => {
 });
 
 Moralis.Cloud.define("getTaskerMyTasksTableData", async (request) => {
-  const ethAddress = request.params.ethAddress;
+  const ethAddress = request.user.get("ethAddress");
   const tableName = "TaskUsers";
 
   const TaskUsers = Moralis.Object.extend(tableName);
@@ -42,7 +42,7 @@ Moralis.Cloud.define("getTaskerMyTasksTableData", async (request) => {
 });
 
 Moralis.Cloud.define("getRequesterCreatedTasksTableData", async (request) => {
-  const ethAddress = request.params.ethAddress;
+  const ethAddress = request.user.get("ethAddress");
   const tableName = "Tasks";
 
   const Tasks = Moralis.Object.extend(tableName);
@@ -67,7 +67,7 @@ Moralis.Cloud.define("getRequesterCreatedTasksTableData", async (request) => {
 });
 
 Moralis.Cloud.define("getTaskerClaimedTaskIds", async (request) => {
-  const ethAddress = request.params.ethAddress;
+  const ethAddress = request.user.get("ethAddress");
   const tableName = "TaskUsers";
 
   const TaskUsers = Moralis.Object.extend(tableName);
