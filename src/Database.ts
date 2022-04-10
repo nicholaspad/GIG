@@ -12,8 +12,7 @@ import MoralisType from "moralis";
   MoralisType.Object.
 */
 export async function makeOrGetNewUser(
-  Moralis: MoralisType,
-  ethAddress: string
+  Moralis: MoralisType
 ): Promise<MoralisType.Object> {
   const tableName = "Users";
   const defaultDisplayName = "GIG User";
@@ -47,36 +46,27 @@ export async function getBrowseTasksTableData(
   Retrieves data for the My Tasks (Tasker) table.
 */
 export async function getTaskerMyTasksTableData(
-  Moralis: MoralisType,
-  ethAddress: string
+  Moralis: MoralisType
 ): Promise<MoralisType.Object<MoralisType.Attributes>[]> {
-  return await Moralis.Cloud.run("getTaskerMyTasksTableData", {
-    ethAddress: ethAddress,
-  });
+  return await Moralis.Cloud.run("getTaskerMyTasksTableData");
 }
 
 /*
   Retrieves data for the Created Tasks (Requester) table.
 */
 export async function getRequesterCreatedTasksTableData(
-  Moralis: MoralisType,
-  ethAddress: string
+  Moralis: MoralisType
 ): Promise<MoralisType.Object<MoralisType.Attributes>[]> {
-  return await Moralis.Cloud.run("getRequesterCreatedTasksTableData", {
-    ethAddress: ethAddress,
-  });
+  return await Moralis.Cloud.run("getRequesterCreatedTasksTableData");
 }
 
 /*
   Retreives the task IDs for the tasks a user has claimed.
 */
 export async function getTaskerClaimedTaskIds(
-  Moralis: MoralisType,
-  ethAddress: string
+  Moralis: MoralisType
 ): Promise<MoralisType.Object<MoralisType.Attributes>[]> {
-  return await Moralis.Cloud.run("getTaskerClaimedTaskIds", {
-    ethAddress: ethAddress,
-  });
+  return await Moralis.Cloud.run("getTaskerClaimedTaskIds");
 }
 
 /*
@@ -94,7 +84,6 @@ export async function getTaskOverviewData(
 */
 export async function taskerClaimTask(
   Moralis: MoralisType,
-  ethAddress: string,
   taskId: string
 ): Promise<{ success: boolean; message: string }> {
   if (await checkTaskerClaimedTask(Moralis, ethAddress, taskId))
@@ -150,7 +139,6 @@ export async function checkTaskerClaimedTask(
 */
 export async function taskerAbandonTask(
   Moralis: MoralisType,
-  ethAddress: string,
   taskId: string
 ): Promise<{ success: boolean; message: string }> {
   if (!(await checkTaskerClaimedTask(Moralis, ethAddress, taskId)))
