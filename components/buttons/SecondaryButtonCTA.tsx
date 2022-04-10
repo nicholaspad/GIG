@@ -27,7 +27,7 @@ export default function SecondaryButtonCTA(props: {
         },
       }}
     >
-      {props.to && (
+      {props.to ? (
         <Link href={props.to}>
           <Box
             display="flex"
@@ -56,8 +56,8 @@ export default function SecondaryButtonCTA(props: {
             </Typography>
           </Box>
         </Link>
-      )}
-      {props.onClick && (
+      ) : null}
+      {props.onClick ? (
         <a
           onClick={() => {
             (props.onClick as Function)();
@@ -90,7 +90,7 @@ export default function SecondaryButtonCTA(props: {
             </Typography>
           </Box>
         </a>
-      )}
+      ) : null}
     </Box>
   );
 }

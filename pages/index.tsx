@@ -91,7 +91,7 @@ export default function Landing() {
               authenticate({ signingMessage: "GIG Authentication" });
             }}
           />
-          {isAuthenticating && (
+          {isAuthenticating ? (
             <>
               <CircularProgress color="secondary" sx={{ mt: 6 }} />
               <Typography
@@ -111,8 +111,8 @@ export default function Landing() {
                 Logging in...
               </Typography>
             </>
-          )}
-          {authError && (
+          ) : null}
+          {authError ? (
             <Typography
               color="error"
               textAlign="center"
@@ -129,7 +129,7 @@ export default function Landing() {
             >
               {authError.message}
             </Typography>
-          )}
+          ) : null}
         </Box>
       </Container>
     </>

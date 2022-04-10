@@ -80,6 +80,18 @@ export default function TasksTable(props: {
       </Typography>
     );
 
+  if (props.data.length === 0)
+    return (
+      <Typography
+        textAlign="center"
+        color="primary"
+        fontWeight={400}
+        fontSize={20}
+      >
+        No Tasks to display &#128532;
+      </Typography>
+    );
+
   return (
     <TableContainer sx={{ height: 600 }}>
       <StyledTasksTable

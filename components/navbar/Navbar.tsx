@@ -64,7 +64,7 @@ export default function Navbar(props: {
             </Typography>
           </Link>
         </Box>
-        {isAuthenticated && shouldShowToggle() && (
+        {isAuthenticated && shouldShowToggle() ? (
           <Stack
             direction="row"
             spacing={1}
@@ -91,7 +91,7 @@ export default function Navbar(props: {
               tabName="Requester"
             />
           </Stack>
-        )}
+        ) : null}
         <Stack
           color={gigTheme.palette.primary.main}
           direction="row"
