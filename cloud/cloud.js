@@ -202,8 +202,61 @@ Moralis.Cloud.define("getTaskOverviewData", async (request) => {
 /* ------------------------------------------------------------------- */
 
 Moralis.Cloud.define("taskerClaimTask", async (request) => {
+  const ClaimCheckOutcome = {
+    GOOD: "GOOD",
+    OTHER: "OTHER",
+    BOTH: "BOTH",
+    RESPONSES: "RESPONSES",
+    ETH: "ETH",
+  };
+
+  async function checkClaimAvailability(taskId) {
+    const tableName = "Tasks";
+
+    const Tasks = Moralis.Object.extend(tableName);
+    const query = new Moralis.Query(Tasks);
+    const res = await query.equalTo("objectId", taskId).find();
+
+    if (res.length !== 1) return ClaimCheckOutcome.OTHER;
+
+    const task = res[0];
+    const blameResponses = task.get("numResponses") >= task.get("maxResponses");
+    const blameETH =
+      task.get("maxReward") -
+        (task.get("numResponses") + 1) * task.get("unitReward") <
+      0;
+
+    if (blameResponses && blameETH) return ClaimCheckOutcome.BOTH;
+    if (blameResponses) return ClaimCheckOutcome.RESPONSES;
+    if (blameETH) return ClaimCheckOutcome.ETH;
+
+    return ClaimCheckOutcome.GOOD;
+  }
+
   const ethAddress = request.user.get("ethAddress");
   const taskId = request.params.taskId;
+
+  const check = await checkClaimAvailability(taskId);
+  if (check === ClaimCheckOutcome.OTHER)
+    return {
+      success: false,
+      message: `Address ${ethAddress} failed to claim task ${taskId}: reason unknown`,
+    };
+  if (check === ClaimCheckOutcome.BOTH)
+    return {
+      success: false,
+      message: `Address ${ethAddress} failed to claim task ${taskId}: Tasker limit and ETH allocation both exceeded`,
+    };
+  if (check === ClaimCheckOutcome.RESPONSES)
+    return {
+      success: false,
+      message: `Address ${ethAddress} failed to claim task ${taskId}: Tasker limit exceeded`,
+    };
+  if (check === ClaimCheckOutcome.ETH)
+    return {
+      success: false,
+      message: `Address ${ethAddress} failed to claim task ${taskId}: ETH allocation exceeded`,
+    };
 
   if (await checkTaskerClaimedTask(ethAddress, taskId))
     return {
