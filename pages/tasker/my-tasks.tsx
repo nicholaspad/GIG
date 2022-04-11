@@ -35,6 +35,7 @@ export default function MyTasks() {
   const { isInitialized, Moralis } = useMoralis();
   const [openLoading, setOpenLoading] = useState(false);
   const [data, setData] = useState<TaskData[]>();
+  const [refreshTable, setRefreshTable] = useState(false);
 
   const handleAbandonTask = async (taskId: string, taskName: string) => {
     if (!confirm(`Are you sure you want to abandon task "${taskName}"?`))
@@ -51,7 +52,8 @@ export default function MyTasks() {
     }
 
     alert(res.message);
-    router.reload();
+    setRefreshTable(!refreshTable);
+    setOpenLoading(false);
   };
 
   const extraColumns: GridColDef[] = [
@@ -130,7 +132,7 @@ export default function MyTasks() {
       }
       setData(tempData);
     });
-  }, [isInitialized]);
+  }, [isInitialized, refreshTable]);
 
   return (
     <>
