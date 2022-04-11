@@ -77,7 +77,10 @@ Moralis.Cloud.define("getBrowseTasksTableData", async (request) => {
         title: 1,
         avgRating: 1,
         unitReward: 1,
+        maxReward: 1,
         requesterId: 1,
+        numResponses: 1,
+        maxResponses: 1,
       },
     },
   ]);
@@ -87,7 +90,19 @@ Moralis.Cloud.define("getBrowseTasksTableData", async (request) => {
     claimedTaskIds[task["taskId"]] = 1;
   });
 
-  return res.filter((task) => !(task["objectId"] in claimedTaskIds));
+  /*
+    Filters:
+      1. Remove tasks already claimed by the user
+      2. Remove tasks that have reached the claim limit
+      3. Remove tasks that, upon claiming, would go over the ETH allocation
+  */
+  return res.filter((task) => {
+    return (
+      !(task["objectId"] in claimedTaskIds) &&
+      task["numResponses"] < task["maxResponses"] &&
+      task["maxReward"] - (task["numResponses"] + 1) * task["unitReward"] >= 0
+    );
+  });
 });
 
 /* ------------------------------------------------------------------- */
