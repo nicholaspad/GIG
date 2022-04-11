@@ -49,8 +49,8 @@ Moralis.Cloud.define("makeOrGetNewUser", async (request) => {
 
 Moralis.Cloud.define("getBrowseTasksTableData", async (request) => {
   /*
-  Retreives the task IDs for the tasks a user has claimed.
-*/
+    Retreives the task IDs for the tasks a user has claimed.
+  */
   async function getTaskerClaimedTaskIds(ethAddress) {
     const tableName = "TaskUsers";
 
@@ -81,6 +81,7 @@ Moralis.Cloud.define("getBrowseTasksTableData", async (request) => {
         requesterId: 1,
         numResponses: 1,
         maxResponses: 1,
+        status: 1,
       },
     },
   ]);
@@ -95,12 +96,15 @@ Moralis.Cloud.define("getBrowseTasksTableData", async (request) => {
       1. Remove tasks already claimed by the user
       2. Remove tasks that have reached the claim limit
       3. Remove tasks that, upon claiming, would go over the ETH allocation
+      4. Remove tasks that are not in progress
   */
   return res.filter((task) => {
     return (
       !(task["objectId"] in claimedTaskIds) &&
       task["numResponses"] < task["maxResponses"] &&
-      task["maxReward"] - (task["numResponses"] + 1) * task["unitReward"] >= 0
+      task["maxReward"] - (task["numResponses"] + 1) * task["unitReward"] >=
+        0 &&
+      task["status"] === 0
     );
   });
 });
@@ -334,7 +338,8 @@ Moralis.Cloud.define("taskerAbandonTask", async (request) => {
     };
 
   return res.destroy().then(
-    () => {
+    async () => {
+      await decrementNumTaskers(taskId);
       return {
         success: true,
         message: `Address ${ethAddress} successfully abandoned task ${taskId}!`,
