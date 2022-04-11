@@ -117,7 +117,7 @@ Moralis.Cloud.define("getTaskerMyTasksTableData", async (request) => {
 
   const TaskUsers = Moralis.Object.extend(tableName);
   const query = new Moralis.Query(TaskUsers);
-  const res = query.aggregate([
+  const res = await query.aggregate([
     { match: { taskerId: ethAddress } },
     { project: { objectId: 0, taskId: 1, status: 1 } },
     {
@@ -130,7 +130,15 @@ Moralis.Cloud.define("getTaskerMyTasksTableData", async (request) => {
     },
   ]);
 
-  return res;
+  /*
+    Filters:
+      1. Remove tasks claims that are in progress, but the task is not in progress
+  */
+  return res.filter((task) => {
+    if (task["tasks"].length !== 1) return false;
+    if (task["status"] === 0 && task["tasks"][0]["status"] !== 0) return false;
+    return true;
+  });
 });
 
 /* ------------------------------------------------------------------- */
