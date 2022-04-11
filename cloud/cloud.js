@@ -208,6 +208,7 @@ Moralis.Cloud.define("taskerClaimTask", async (request) => {
     BOTH: "BOTH",
     RESPONSES: "RESPONSES",
     ETH: "ETH",
+    BAD_STATUS: "BAD_STATUS",
   };
 
   async function incrementNumTaskers(taskId) {
@@ -236,10 +237,12 @@ Moralis.Cloud.define("taskerClaimTask", async (request) => {
       task.get("maxReward") -
         (task.get("numResponses") + 1) * task.get("unitReward") <
       0;
+    const blameStatus = task.get("status") !== 0;
 
     if (blameResponses && blameETH) return ClaimCheckOutcome.BOTH;
     if (blameResponses) return ClaimCheckOutcome.RESPONSES;
     if (blameETH) return ClaimCheckOutcome.ETH;
+    if (blameStatus) return ClaimCheckOutcome.BAD_STATUS;
 
     return ClaimCheckOutcome.GOOD;
   }
@@ -267,6 +270,11 @@ Moralis.Cloud.define("taskerClaimTask", async (request) => {
     return {
       success: false,
       message: `Address ${ethAddress} failed to claim task ${taskId}: ETH allocation exceeded`,
+    };
+  if (check === ClaimCheckOutcome.BAD_STATUS)
+    return {
+      success: false,
+      message: `Address ${ethAddress} failed to claim task ${taskId}: task is no longer in progress`,
     };
 
   if (await checkTaskerClaimedTask(ethAddress, taskId))
@@ -318,8 +326,6 @@ Moralis.Cloud.define("taskerAbandonTask", async (request) => {
     .equalTo("taskerId", ethAddress)
     .equalTo("taskId", taskId)
     .first();
-
-  console.log(taskId);
 
   if (!res)
     return {
