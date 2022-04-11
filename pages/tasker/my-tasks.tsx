@@ -81,10 +81,10 @@ export default function MyTasks() {
       align: "left",
       renderCell: (params: GridValueGetterParams) => (
         <>
-          {/* Render Abandon buttons for "In Progress" and "Pending Verification" rows */}
+          {/* Render Abandon buttons for "In Progress" rows only */}
           <Box
             visibility={
-              (params.row.status as TaskStatus) >= 2 ? "hidden" : "visible"
+              (params.row.status as TaskStatus) == 0 ? "visible" : "hidden"
             }
             mr={2}
           >
