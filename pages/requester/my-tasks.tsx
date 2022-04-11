@@ -73,13 +73,13 @@ const extraColumns: GridColDef[] = [
     headerName: "",
     sortable: false,
     disableColumnMenu: true,
-    minWidth: 290,
+    minWidth: 165,
     flex: 1,
     align: "left",
     renderCell: (params: GridValueGetterParams) => (
       <>
         {/* Render Abandon buttons for "In Progress" rows */}
-        <Box
+        {/* <Box
           visibility={
             (params.row.status as TaskStatus) >= 1 ? "hidden" : "visible"
           }
@@ -90,7 +90,7 @@ const extraColumns: GridColDef[] = [
             size="small"
             to="/requester/my-tasks"
           />
-        </Box>
+        </Box> */}
         <PrimaryButtonCTA
           text={
             (params.row.status as TaskStatus) === 0 ? "Approvals" : "Overview"
