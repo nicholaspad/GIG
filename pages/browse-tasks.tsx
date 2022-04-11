@@ -8,10 +8,7 @@ import PrimaryButtonCTA from "../components/buttons/PrimaryButtonCTA";
 import PageHeader from "../components/common/PageHeader";
 import BrowseTasksTable from "../components/tables/BrowseTasksTable";
 import { TableHeader } from "../components/tables/Helpers";
-import {
-  getBrowseTasksTableData,
-  getTaskerClaimedTaskIds,
-} from "../src/Database";
+import { getBrowseTasksTableData } from "../src/Database";
 import { TaskData } from "../src/Types";
 
 export default function Tasks() {
@@ -22,19 +19,9 @@ export default function Tasks() {
     if (!isInitialized || !user) return;
 
     getBrowseTasksTableData(Moralis).then(async (res) => {
-      const res_ = await getTaskerClaimedTaskIds(Moralis);
-
-      // filter out tasks the users has claimed
-      const claimedTaskIds: { [key: string]: number } = {};
-      res_.map((task) => {
-        claimedTaskIds[(task as any)["taskId"]] = 1;
-      });
-
       let tempData: TaskData[] = [];
       for (let task_ of res) {
         let task = task_ as any;
-        // skip tasks that the user has already claimed
-        if (task["objectId"] in claimedTaskIds) continue;
         // skip tasks for which the user is the requester
         if (task["requesterId"] === user.get("ethAddress")) continue;
         tempData.push({

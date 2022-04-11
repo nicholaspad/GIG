@@ -52,15 +52,6 @@ export async function getRequesterCreatedTasksTableData(
 }
 
 /*
-  Retreives the task IDs for the tasks a user has claimed.
-*/
-export async function getTaskerClaimedTaskIds(
-  Moralis: MoralisType
-): Promise<MoralisType.Object<MoralisType.Attributes>[]> {
-  return await Moralis.Cloud.run("getTaskerClaimedTaskIds");
-}
-
-/*
   Retrieves data for the Task Details and Task Overview pages.
 */
 export async function getTaskOverviewData(

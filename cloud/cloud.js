@@ -14,6 +14,8 @@ async function checkTaskerClaimedTask(ethAddress, taskId) {
   return res.length > 0;
 }
 
+/* ------------------------------------------------------------------- */
+
 Moralis.Cloud.define("checkTaskerClaimedTask", async (request) => {
   const ethAddress = request.user.get("ethAddress");
   const taskId = request.params.taskId;
@@ -45,12 +47,29 @@ Moralis.Cloud.define("makeOrGetNewUser", async (request) => {
 
 /* ------------------------------------------------------------------- */
 
-Moralis.Cloud.define("getBrowseTasksTableData", async () => {
+Moralis.Cloud.define("getBrowseTasksTableData", async (request) => {
+  /*
+  Retreives the task IDs for the tasks a user has claimed.
+*/
+  async function getTaskerClaimedTaskIds(ethAddress) {
+    const tableName = "TaskUsers";
+
+    const TaskUsers = Moralis.Object.extend(tableName);
+    const query = new Moralis.Query(TaskUsers);
+    const res = query.aggregate([
+      { match: { taskerId: ethAddress } },
+      { project: { objectId: 0, taskId: 1 } },
+    ]);
+
+    return res;
+  }
+
+  const ethAddress = request.user.get("ethAddress");
   const tableName = "Tasks";
 
   const Tasks = Moralis.Object.extend(tableName);
   const query = new Moralis.Query(Tasks);
-  const res = query.aggregate([
+  const res = await query.aggregate([
     { sort: { unitReward: -1 } },
     {
       project: {
@@ -63,7 +82,12 @@ Moralis.Cloud.define("getBrowseTasksTableData", async () => {
     },
   ]);
 
-  return res;
+  const claimedTaskIds = {};
+  (await getTaskerClaimedTaskIds(ethAddress)).forEach((task) => {
+    claimedTaskIds[task["taskId"]] = 1;
+  });
+
+  return res.filter((task) => !(task["objectId"] in claimedTaskIds));
 });
 
 /* ------------------------------------------------------------------- */
