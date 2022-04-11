@@ -313,6 +313,23 @@ Moralis.Cloud.define("taskerClaimTask", async (request) => {
 /* ------------------------------------------------------------------- */
 
 Moralis.Cloud.define("taskerAbandonTask", async (request) => {
+  async function decrementNumTaskers(taskId) {
+    const tableName = "Tasks";
+
+    const Tasks = Moralis.Object.extend(tableName);
+    const query = new Moralis.Query(Tasks);
+    const res = await query.equalTo("objectId", taskId).first();
+
+    // Handles case where Requester has abandoned task, so query result is null
+    if (!res) return;
+
+    // Do not affect numResponses count if task is no longer in progress
+    if (res.get("status") !== 0) return;
+
+    res.set("numResponses", res.get("numResponses") - 1);
+    await res.save();
+  }
+
   const ethAddress = request.user.get("ethAddress");
   const taskId = request.params.taskId;
 
