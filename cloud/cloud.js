@@ -210,6 +210,17 @@ Moralis.Cloud.define("taskerClaimTask", async (request) => {
     ETH: "ETH",
   };
 
+  async function incrementNumTaskers(taskId) {
+    const tableName = "Tasks";
+
+    const Tasks = Moralis.Object.extend(tableName);
+    const query = new Moralis.Query(Tasks);
+    const res = await query.equalTo("objectId", taskId).first();
+
+    res.set("numResponses", res.get("numResponses") + 1);
+    await res.save();
+  }
+
   async function checkClaimAvailability(taskId) {
     const tableName = "Tasks";
 
@@ -263,6 +274,10 @@ Moralis.Cloud.define("taskerClaimTask", async (request) => {
       success: false,
       message: `Address ${ethAddress} has already claimed task ${taskId}.`,
     };
+
+  // At this point, it is safe to proceed with the task claim operation
+
+  await incrementNumTaskers(taskId);
 
   const tableName = "TaskUsers";
   const TaskUsers = Moralis.Object.extend(tableName);
