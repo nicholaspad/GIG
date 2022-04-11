@@ -351,7 +351,7 @@ Moralis.Cloud.define("taskerAbandonTask", async (request) => {
   if (!res)
     return {
       success: false,
-      message: `Address ${ethAddress} failed to abandon task ${taskId}.`,
+      message: `Address ${ethAddress} failed to abandon task ${taskId}: task is not claimed`,
     };
 
   return res.destroy().then(
