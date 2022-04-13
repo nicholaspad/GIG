@@ -10,12 +10,12 @@ export default function LoadingOverlay(props: {
       open={props.open}
       transitionDuration={0}
     >
+      <CircularProgress color="secondary" />
       {props.text ? (
-        <Typography fontSize={20} mr={2}>
+        <Typography fontSize={20} ml={2}>
           {props.text}
         </Typography>
       ) : null}
-      <CircularProgress color="secondary" />
     </Backdrop>
   );
 }
