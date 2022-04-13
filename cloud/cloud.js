@@ -394,6 +394,7 @@ Moralis.Cloud.define("createTask", async (request) => {
   const maxReward = request.params.maxReward;
   const maxResponses = request.params.maxResponses;
   const tableName = "Tasks";
+  const config = await Moralis.Config.get({ useMasterKey: true });
 
   const Tasks = Moralis.Object.extend(tableName);
 
@@ -410,7 +411,7 @@ Moralis.Cloud.define("createTask", async (request) => {
   task.set("avgRating", -1);
   task.set("numResponses", 0);
   task.set("maxResponses", maxResponses);
-  task.set("unitReward", 0.00001); // how should we set this value? @bzzbbz @christine-sun @jennsun @nicholaspad
+  task.set("unitReward", config.get("NEXT_PUBLIC_UNIT_ETH_REWARD")); // currently 0.00001 @bzzbbz @christine-sun @jennsun @nicholaspad
   task.set("maxReward", maxReward);
   await task.save();
 
