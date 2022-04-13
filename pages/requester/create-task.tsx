@@ -88,19 +88,22 @@ export default function Form() {
               size="big"
               sx={{ ml: 4 }}
               onClick={() => {
+                const v = (c: boolean | undefined) =>
+                  c === undefined || c === true;
                 const newTask: TaskProps = {
                   title: title,
                   description: description,
                   options: questions,
                 };
-                console.log(
-                  titleError ||
-                    descriptionError ||
-                    cryptoAllocatedError ||
-                    maxTaskersError ||
-                    currQuestionTitleError ||
-                    currQuestionChoicesError
-                );
+                const hasError =
+                  v(titleError) ||
+                  v(descriptionError) ||
+                  v(cryptoAllocatedError) ||
+                  v(maxTaskersError) ||
+                  v(currQuestionTitleError) ||
+                  v(currQuestionChoicesError);
+
+                console.log(hasError);
                 console.log(newTask);
               }}
             />
