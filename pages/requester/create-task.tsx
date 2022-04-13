@@ -249,14 +249,18 @@ export default function Form() {
               </Grid>
             </Grid>
           </FormControl>
-
+          <Typography color="primary" mt={2} mx="auto">
+            Taskers will earn {process.env.NEXT_PUBLIC_UNIT_ETH_REWARD} ETH per
+            completed task. This reward is subject to change.
+          </Typography>
           <Typography
             color="secondary"
             align="center"
-            sx={{ fontStyle: "italic", mt: 2 }}
+            fontStyle="italic"
+            mt={2}
           >
-            The task will close when either the crypto allocation runs out or
-            the number of Taskers reaches the limit, whichever comes first
+            Your task will close when either the crypto allocation runs out or
+            the number of Taskers reaches the limit, whichever comes first.
           </Typography>
         </DefaultGrayCard>
         {/* ===== End Task Heading ===== */}
