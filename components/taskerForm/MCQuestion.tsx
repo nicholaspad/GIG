@@ -17,7 +17,13 @@ export default function MCQuestion(
     <GrayCard>
       <FormControl>
         <FormLabel id={props.id}>
-          <Typography variant="body1" fontStyle="bold" color="primary.main">
+          <Typography
+            variant="body1"
+            fontWeight="medium"
+            color="primary.main"
+            mt={1}
+            mb={2}
+          >
             {`${props.idx + 1}. ${props.question}`}
           </Typography>
         </FormLabel>

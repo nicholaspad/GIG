@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Box from "@mui/material/Box";
 import { Container, Modal, styled, Typography } from "@mui/material";
 import TextField from "@mui/material/TextField";
@@ -6,15 +6,16 @@ import { gigTheme } from "../../src/Theme";
 import FormControl from "@mui/material/FormControl";
 import DefaultGrayCard from "../../components/common/DefaultGrayCard";
 import Grid from "@mui/material/Grid";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
-import { GenericQuestion, QuestionType, TaskProps } from "../../src/Types";
+import {
+  GenericQuestion,
+  QuestionType,
+  SingleChoiceQuestion,
+  TaskProps,
+} from "../../src/Types";
 import PageHeader from "../../components/common/PageHeader";
 import PrimaryButtonCTA from "../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../components/buttons/SecondaryButtonCTA";
+import MCQuestion from "../../components/taskerForm/MCQuestion";
 
 export default function Form() {
   const [open, setOpen] = useState(false);
@@ -28,19 +29,20 @@ export default function Form() {
   const [maxTaskers, setMaxTaskers] = useState(0);
 
   // Errors associated with task overvieww
-  const [titleError, setTitleError] = useState(false);
-  const [descriptionError, setDescriptionError] = useState(false);
-  const [cryptoAllocatedError, setCryptoAllocatedError] = useState(false);
-  const [maxTaskersError, setMaxTaskersError] = useState(false);
+  const [titleError, setTitleError] = useState<boolean>();
+  const [descriptionError, setDescriptionError] = useState<boolean>();
+  const [cryptoAllocatedError, setCryptoAllocatedError] = useState<boolean>();
+  const [maxTaskersError, setMaxTaskersError] = useState<boolean>();
 
   // New question from modal popup
   const [currQuestionTitle, setCurrQuestionTitle] = useState("");
   const [currQuestionChoices, setCurrQuestionChoices] = useState<string[]>([]);
 
   // Errors associated with new question modal popup
-  const [currQuestionTitleError, setCurrQuestionTitleError] = useState(false);
+  const [currQuestionTitleError, setCurrQuestionTitleError] =
+    useState<boolean>();
   const [currQuestionChoicesError, setCurrQuestionChoicesError] =
-    useState(false);
+    useState<boolean>();
 
   const removeQuestion = (index: number) => {
     var array = [...questions];
@@ -239,10 +241,12 @@ export default function Form() {
 
         {/* Render all options in questions */}
         {questions.map((question: GenericQuestion, i: number) => (
-          <QuestionCard
-            title={question.question}
-            choices={question.options}
+          <MCQuestion
             key={i}
+            idx={i}
+            question={question.question}
+            options={question.options}
+            handleSetAnswers={() => {}}
           />
         ))}
 
@@ -360,32 +364,6 @@ export default function Form() {
         {/* ===== End Modal to add another question ===== */}
       </Container>
     </>
-  );
-}
-
-function QuestionCard(props: { title: string; choices: string[] }) {
-  return (
-    <DefaultGrayCard>
-      <Typography color="primary" variant="h5" mb={1}>
-        {props.title}
-      </Typography>
-      <List>
-        {props.choices.map((choice, i: number) => (
-          <ListItem sx={{ mb: -0.5 }} key={i}>
-            <ListItemIcon>
-              <CircleOutlinedIcon
-                style={{ color: gigTheme.palette.primary.main }}
-              />
-            </ListItemIcon>
-            <ListItemText
-              primaryTypographyProps={{ fontSize: "20px" }}
-              primary={choice}
-              style={{ color: gigTheme.palette.primary.main }}
-            />
-          </ListItem>
-        ))}
-      </List>
-    </DefaultGrayCard>
   );
 }
 
