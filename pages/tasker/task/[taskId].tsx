@@ -54,7 +54,10 @@ export default function taskerForm() {
 
   const handleAbandonTask = async (taskName: string) => {
     if (!taskId) return;
-    if (!confirm(`Are you sure you want to abandon task "${taskName}"?`))
+    if (
+      !isInitialized ||
+      !confirm(`Are you sure you want to abandon task "${taskName}"?`)
+    )
       return;
 
     setOpenLoading(true);

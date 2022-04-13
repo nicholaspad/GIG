@@ -36,7 +36,10 @@ export default function MyTasks() {
   const [refreshTable, setRefreshTable] = useState(false);
 
   const handleAbandonTask = async (taskId: string, taskName: string) => {
-    if (!confirm(`Are you sure you want to abandon task "${taskName}"?`))
+    if (
+      !isInitialized ||
+      !confirm(`Are you sure you want to abandon task "${taskName}"?`)
+    )
       return;
 
     setOpenLoading(true);

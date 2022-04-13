@@ -16,7 +16,7 @@ import { createTask } from "../../src/Database";
 import { useMoralis } from "react-moralis";
 
 export default function Form() {
-  const { Moralis } = useMoralis();
+  const { isInitialized, Moralis } = useMoralis();
   const [open, setOpen] = useState(false);
   const [openPosting, setOpenPosting] = useState(false);
   const [questions, setQuestions] = useState<GenericQuestion[]>([]);
@@ -62,6 +62,7 @@ export default function Form() {
 
   const handleCreateTask = async (newTask: TaskProps) => {
     if (
+      !isInitialized ||
       !confirm(
         `Are you sure you want to create task "${newTask.title}" with ${newTask.options.length} questions?`
       )
