@@ -6,19 +6,19 @@ import { gigTheme } from "../../src/Theme";
 import FormControl from "@mui/material/FormControl";
 import DefaultGrayCard from "../../components/common/DefaultGrayCard";
 import Grid from "@mui/material/Grid";
-import {
-  GenericQuestion,
-  QuestionType,
-  SingleChoiceQuestion,
-  TaskProps,
-} from "../../src/Types";
+import { GenericQuestion, QuestionType, TaskProps } from "../../src/Types";
 import PageHeader from "../../components/common/PageHeader";
 import PrimaryButtonCTA from "../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../components/buttons/SecondaryButtonCTA";
 import MCQuestion from "../../components/taskerForm/MCQuestion";
+import LoadingOverlay from "../../components/common/LoadingOverlay";
+import { createTask } from "../../src/Database";
+import { useMoralis } from "react-moralis";
 
 export default function Form() {
+  const { Moralis } = useMoralis();
   const [open, setOpen] = useState(false);
+  const [openPosting, setOpenPosting] = useState(false);
   const [questions, setQuestions] = useState<GenericQuestion[]>([]);
   const [currIndex, setCurrIndex] = useState(1);
 
@@ -60,9 +60,26 @@ export default function Form() {
     setOpen(false);
   };
 
+  const handleCreateTask = async (newTask: TaskProps) => {
+    if (
+      !confirm(
+        `Are you sure you want to create task "${newTask.title}" with ${newTask.options.length} questions?`
+      )
+    )
+      return;
+
+    setOpenPosting(true);
+
+    const res = await createTask(Moralis, newTask);
+    console.log(res);
+
+    setOpenPosting(false);
+  };
+
   return (
     <>
       <PageHeader title="My Tasks" />
+      <LoadingOverlay open={openPosting} />
       <Container maxWidth="md">
         <Grid
           container
@@ -105,7 +122,11 @@ export default function Form() {
                   v(currQuestionTitleError) ||
                   v(currQuestionChoicesError);
 
-                console.log(hasError);
+                if (hasError) {
+                  alert("Please provide valid inputs!");
+                  return;
+                }
+
                 console.log(newTask);
               }}
             />

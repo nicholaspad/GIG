@@ -387,3 +387,7 @@ Moralis.Cloud.define("taskerAbandonTask", async (request) => {
 });
 
 /* ------------------------------------------------------------------- */
+
+Moralis.Cloud.define("createTask", async (request) => {
+  return { success: true, message: "test" };
+});

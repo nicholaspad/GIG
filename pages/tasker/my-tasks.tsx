@@ -1,6 +1,5 @@
 import { Box } from "@mui/material";
 import { GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
 import PrimaryButtonCTA from "../../components/buttons/PrimaryButtonCTA";
@@ -31,7 +30,6 @@ const statusColorMap = {
 };
 
 export default function MyTasks() {
-  const router = useRouter();
   const { isInitialized, Moralis } = useMoralis();
   const [openLoading, setOpenLoading] = useState(false);
   const [data, setData] = useState<TaskData[]>();
