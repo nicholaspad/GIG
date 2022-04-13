@@ -60,11 +60,16 @@ export default function Form() {
     setOpen(false);
   };
 
-  const handleCreateTask = async (newTask: TaskProps) => {
+  const handleCreateTask = async (
+    newTask: TaskProps,
+    cryptoAllocated: number,
+    maxTaskers: number
+  ) => {
     if (
       !isInitialized ||
       !confirm(
-        `Are you sure you want to create task "${newTask.title}" with ${newTask.options.length} questions?`
+        `Are you sure you want to create task "${newTask.title}" with ${newTask.options.length} question(s) ` +
+          `and ${maxTaskers} maximum responses? You will be required to stake ${cryptoAllocated} ETH.`
       )
     )
       return;
@@ -129,6 +134,7 @@ export default function Form() {
                 }
 
                 console.log(newTask);
+                handleCreateTask(newTask, cryptoAllocated, maxTaskers);
               }}
             />
           </Box>
