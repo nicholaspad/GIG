@@ -112,14 +112,18 @@ export default function TaskOverviewTemplate(props: {
               <Grid item sm={6}>
                 <SectionTitle>Requester rating</SectionTitle>
                 <SectionContent>
-                  <StyledRating
-                    readOnly
-                    value={data.rating}
-                    size="large"
-                    precision={0.5}
-                    icon={<StarRoundedIcon fontSize="inherit" />}
-                    emptyIcon={<StarOutlineRoundedIcon fontSize="inherit" />}
-                  />
+                  {data.rating !== undefined && data.rating >= 0 ? (
+                    <StyledRating
+                      readOnly
+                      value={data.rating}
+                      size="large"
+                      precision={0.5}
+                      icon={<StarRoundedIcon fontSize="inherit" />}
+                      emptyIcon={<StarOutlineRoundedIcon fontSize="inherit" />}
+                    />
+                  ) : (
+                    <SectionContent>No ratings yet!</SectionContent>
+                  )}
                 </SectionContent>
                 <SectionTitle>Requester wallet</SectionTitle>
                 <Grid
