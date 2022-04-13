@@ -85,7 +85,7 @@ export default function Form() {
   return (
     <>
       <PageHeader title="My Tasks" />
-      <LoadingOverlay open={openPosting} />
+      <LoadingOverlay open={openPosting} text={"Creating Task..."} />
       <Container maxWidth="md">
         <Grid
           container
