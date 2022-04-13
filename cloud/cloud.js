@@ -362,6 +362,13 @@ Moralis.Cloud.define("taskerAbandonTask", async (request) => {
       message: `Address ${ethAddress} failed to abandon task ${taskId}: task is not claimed`,
     };
 
+  // Do not allow task abandonment if its status is not in progress
+  if (res.get("status") !== 0)
+    return {
+      success: false,
+      message: `Address ${ethAddress} failed to abandon task ${taskId}: task is not in progress`,
+    };
+
   return res.destroy().then(
     async () => {
       await decrementNumTaskers(taskId);
