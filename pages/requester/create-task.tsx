@@ -126,7 +126,8 @@ export default function Form() {
                   v(cryptoAllocatedError) ||
                   v(maxTaskersError) ||
                   v(currQuestionTitleError) ||
-                  v(currQuestionChoicesError);
+                  v(currQuestionChoicesError) ||
+                  newTask.options.length < 1;
 
                 if (hasError) {
                   alert("Please provide valid inputs!");
