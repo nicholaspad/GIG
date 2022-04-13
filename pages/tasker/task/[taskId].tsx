@@ -122,7 +122,7 @@ export default function taskerForm() {
   return (
     <>
       <PageHeader title="Task" />
-      <LoadingOverlay open={openLoading} />
+      <LoadingOverlay open={openLoading} text="Abandoning Task..." />
       <Container maxWidth="sm">
         <GrayCard sx={{ mt: 2 }}>
           <Box sx={{ p: 3 }}>

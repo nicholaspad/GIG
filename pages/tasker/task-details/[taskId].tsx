@@ -66,7 +66,7 @@ export default function TaskDetails() {
   return (
     <>
       <PageHeader title="Task Details" />
-      <LoadingOverlay open={openLoading} />
+      <LoadingOverlay open={openLoading} text="Claiming Task..." />
       <TaskOverviewTemplate
         data={data}
         title="Task Details"

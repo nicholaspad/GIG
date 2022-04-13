@@ -138,7 +138,7 @@ export default function MyTasks() {
   return (
     <>
       <PageHeader title="My Tasks" />
-      <LoadingOverlay open={openLoading} />
+      <LoadingOverlay open={openLoading} text="Abandoning Task..." />
       <PrimaryButtonCTA
         text="Browse Tasks →"
         size="small"

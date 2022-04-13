@@ -40,7 +40,7 @@ export default function Navbar(props: {
 
   return (
     <>
-      <LoadingOverlay open={openLoading} />
+      <LoadingOverlay open={openLoading} text="Logging out..." />
       <AppBar
         elevation={0}
         position="sticky"
