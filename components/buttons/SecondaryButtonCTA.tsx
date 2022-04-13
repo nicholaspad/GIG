@@ -28,7 +28,7 @@ export default function SecondaryButtonCTA(props: {
       }}
     >
       {props.to ? (
-        <Link href={props.to}>
+        <Link href={props.to} passHref>
           <Box
             display="flex"
             flexDirection="column"

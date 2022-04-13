@@ -30,14 +30,14 @@ const statusColorMap = {
 };
 
 export default function MyTasks() {
-  const { isInitialized, Moralis } = useMoralis();
+  const { Moralis } = useMoralis();
   const [openLoading, setOpenLoading] = useState(false);
   const [data, setData] = useState<TaskData[]>();
   const [refreshTable, setRefreshTable] = useState(false);
 
   const handleAbandonTask = async (taskId: string, taskName: string) => {
     if (
-      !isInitialized ||
+      !Moralis ||
       !confirm(`Are you sure you want to abandon task "${taskName}"?`)
     )
       return;
@@ -117,7 +117,7 @@ export default function MyTasks() {
   ];
 
   useEffect(() => {
-    if (!isInitialized) return;
+    if (!Moralis) return;
 
     getTaskerMyTasksTableData(Moralis).then((res) => {
       let tempData: TaskData[] = [];
@@ -133,7 +133,7 @@ export default function MyTasks() {
       }
       setData(tempData);
     });
-  }, [isInitialized, refreshTable]);
+  }, [Moralis, refreshTable]);
 
   return (
     <>

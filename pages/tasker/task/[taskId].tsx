@@ -14,7 +14,7 @@ import {
 } from "../../../src/Database";
 import LoadingOverlay from "../../../components/common/LoadingOverlay";
 
-export default function taskerForm() {
+export default function TaskerForm() {
   /* Test Data */
   const q1 = {
     id: "00001",
@@ -47,7 +47,7 @@ export default function taskerForm() {
 
   const router = useRouter();
   const { taskId } = router.query;
-  const { isInitialized, Moralis, user } = useMoralis();
+  const { Moralis, user } = useMoralis();
   const [openLoading, setOpenLoading] = useState(false);
   const [isAllowed, setIsAllowed] = useState(false);
   const [answers, setAnswers] = useState({});
@@ -55,7 +55,7 @@ export default function taskerForm() {
   const handleAbandonTask = async (taskName: string) => {
     if (!taskId) return;
     if (
-      !isInitialized ||
+      !Moralis ||
       !confirm(`Are you sure you want to abandon task "${taskName}"?`)
     )
       return;
@@ -87,7 +87,7 @@ export default function taskerForm() {
   };
 
   useEffect(() => {
-    if (!isInitialized || !user || !taskId) return;
+    if (!Moralis || !user || !taskId || !router || !user) return;
 
     const ethAddress = user.get("ethAddress");
     checkTaskerClaimedTask(Moralis, taskId as string).then((res) => {
@@ -99,7 +99,7 @@ export default function taskerForm() {
 
       setIsAllowed(true);
     });
-  }, [isInitialized, taskId]);
+  }, [Moralis, taskId, router, user]);
 
   if (!isAllowed)
     return (

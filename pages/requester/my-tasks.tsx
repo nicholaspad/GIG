@@ -12,11 +12,11 @@ import { gigTheme } from "../../src/Theme";
 import { CreatedTaskStatus, TaskData, TaskStatus } from "../../src/Types";
 
 export default function MyTasks() {
-  const { isInitialized, Moralis } = useMoralis();
+  const { Moralis } = useMoralis();
   const [data, setData] = useState<TaskData[]>();
 
   useEffect(() => {
-    if (!isInitialized) return;
+    if (!Moralis) return;
 
     getRequesterCreatedTasksTableData(Moralis).then((res) => {
       let tempData: TaskData[] = [];
@@ -35,7 +35,7 @@ export default function MyTasks() {
       }
       setData(tempData);
     });
-  }, [isInitialized]);
+  }, [Moralis]);
 
   return (
     <>

@@ -50,7 +50,7 @@ export default function Navbar(props: {
       >
         <Toolbar>
           <Box sx={{ flexGrow: isAuthenticated && shouldShowToggle() ? 0 : 1 }}>
-            <Link href="/browse-tasks">
+            <Link href="/browse-tasks" passHref>
               <Typography
                 variant="h4"
                 fontWeight={700}

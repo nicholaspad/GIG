@@ -13,7 +13,7 @@ import LoadingOverlay from "../../../components/common/LoadingOverlay";
 export default function TaskDetails() {
   const router = useRouter();
   const { taskId } = router.query;
-  const { isInitialized, Moralis } = useMoralis();
+  const { Moralis } = useMoralis();
   const [openLoading, setOpenLoading] = useState(false);
   const [showClaimCTA, setShowClaimCTA] = useState(true);
   const [data, setData] = useState<TaskOverviewData>();
@@ -21,7 +21,7 @@ export default function TaskDetails() {
   const handleClaimTask = async () => {
     if (!taskId) return;
     if (
-      !isInitialized ||
+      !Moralis ||
       !confirm(`Are you sure you want to claim task "${data?.name}"?`)
     )
       return;
@@ -43,7 +43,7 @@ export default function TaskDetails() {
   };
 
   useEffect(() => {
-    if (!isInitialized || !taskId) return;
+    if (!Moralis || !taskId) return;
 
     getTaskOverviewData(Moralis, taskId as string).then((res) => {
       let res_ = res[0] as any;
@@ -61,7 +61,7 @@ export default function TaskDetails() {
 
       setData(tempData);
     });
-  }, [isInitialized, taskId]);
+  }, [Moralis, taskId]);
 
   return (
     <>
