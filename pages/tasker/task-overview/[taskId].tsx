@@ -1,4 +1,3 @@
-import MoralisType from "moralis";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
@@ -13,7 +12,6 @@ export default function TaskOverview() {
   const { taskId, back } = router.query;
   const { isInitialized, Moralis } = useMoralis();
   const [data, setData] = useState<TaskOverviewData>();
-  const [userData, setUserData] = useState<MoralisType.Object>();
 
   useEffect(() => {
     if (!isInitialized || !taskId) return;
@@ -37,7 +35,7 @@ export default function TaskOverview() {
 
   return (
     <>
-      <PageHeader title="Task Overview" customSetUserData={setUserData} />
+      <PageHeader title="Task Overview" />
       <TaskOverviewTemplate data={data} title="Task Overview">
         <SecondaryButtonCTA text="Back" size="big" to={back as string} />
       </TaskOverviewTemplate>

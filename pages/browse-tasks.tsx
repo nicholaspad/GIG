@@ -2,46 +2,28 @@ import StarOutlineRoundedIcon from "@mui/icons-material/StarOutlineRounded";
 import StarRoundedIcon from "@mui/icons-material/StarRounded";
 import { Rating, styled } from "@mui/material";
 import { GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
-import MoralisType from "moralis";
 import { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
 import PrimaryButtonCTA from "../components/buttons/PrimaryButtonCTA";
 import PageHeader from "../components/common/PageHeader";
 import BrowseTasksTable from "../components/tables/BrowseTasksTable";
 import { TableHeader } from "../components/tables/Helpers";
-import {
-  getBrowseTasksTableData,
-  getTaskerClaimedTaskIds,
-} from "../src/Database";
+import { getBrowseTasksTableData } from "../src/Database";
 import { TaskData } from "../src/Types";
 
 export default function Tasks() {
-  const { isInitialized, Moralis } = useMoralis();
+  const { isInitialized, Moralis, user } = useMoralis();
   const [data, setData] = useState<TaskData[]>();
-  const [userData, setUserData] = useState<MoralisType.Object>();
 
   useEffect(() => {
-    if (!isInitialized || !userData) return;
+    if (!isInitialized || !user) return;
 
     getBrowseTasksTableData(Moralis).then(async (res) => {
-      const res_ = await getTaskerClaimedTaskIds(
-        Moralis,
-        userData.get("ethAddress")
-      );
-
-      // filter out tasks the users has claimed
-      const claimedTaskIds: { [key: string]: number } = {};
-      res_.map((task) => {
-        claimedTaskIds[(task as any)["taskId"]] = 1;
-      });
-
       let tempData: TaskData[] = [];
       for (let task_ of res) {
         let task = task_ as any;
-        // skip tasks that the user has already claimed
-        if (task["objectId"] in claimedTaskIds) continue;
         // skip tasks for which the user is the requester
-        if (task["requesterId"] === userData.get("ethAddress")) continue;
+        if (task["requesterId"] === user.get("ethAddress")) continue;
         tempData.push({
           task_id: task["objectId"],
           name: task["title"],
@@ -51,11 +33,11 @@ export default function Tasks() {
       }
       setData(tempData);
     });
-  }, [isInitialized, userData]);
+  }, [isInitialized, user]);
 
   return (
     <>
-      <PageHeader title="Browse Tasks" customSetUserData={setUserData} />
+      <PageHeader title="Browse Tasks" />
       <PrimaryButtonCTA
         text="My Tasks →"
         size="small"

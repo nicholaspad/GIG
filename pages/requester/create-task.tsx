@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import { Container, Modal, styled, Typography } from "@mui/material";
 import TextField from "@mui/material/TextField";
-import MoralisType from "moralis";
 import { gigTheme } from "../../src/Theme";
 import FormControl from "@mui/material/FormControl";
 import DefaultGrayCard from "../../components/common/DefaultGrayCard";
@@ -19,8 +17,6 @@ import PrimaryButtonCTA from "../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../components/buttons/SecondaryButtonCTA";
 
 export default function Form() {
-  const [userData, setUserData] = useState<MoralisType.Object>();
-
   const [open, setOpen] = useState(false);
   const [questions, setQuestions] = useState<GenericQuestion[]>([]);
   const [currIndex, setCurrIndex] = useState(1);
@@ -64,7 +60,7 @@ export default function Form() {
 
   return (
     <>
-      <PageHeader title="My Tasks" customSetUserData={setUserData} />
+      <PageHeader title="My Tasks" />
       <Container maxWidth="md">
         <Grid
           container

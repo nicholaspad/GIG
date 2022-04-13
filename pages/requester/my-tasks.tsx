@@ -1,6 +1,5 @@
 import { Box } from "@mui/material";
 import { GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
-import MoralisType from "moralis";
 import { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
 import PrimaryButtonCTA from "../../components/buttons/PrimaryButtonCTA";
@@ -15,38 +14,32 @@ import { CreatedTaskStatus, TaskData, TaskStatus } from "../../src/Types";
 export default function MyTasks() {
   const { isInitialized, Moralis } = useMoralis();
   const [data, setData] = useState<TaskData[]>();
-  const [userData, setUserData] = useState<MoralisType.Object>();
 
   useEffect(() => {
-    if (!isInitialized || !userData) return;
+    if (!isInitialized) return;
 
-    getRequesterCreatedTasksTableData(Moralis, userData.get("ethAddress")).then(
-      (res) => {
-        let tempData: TaskData[] = [];
+    getRequesterCreatedTasksTableData(Moralis).then((res) => {
+      let tempData: TaskData[] = [];
 
-        for (let task_ of res) {
-          let task = task_ as any;
-          tempData.push({
-            task_id: task["objectId"],
-            name: task["title"],
-            reward: task["unitReward"],
-            maxReward: task["maxReward"],
-            numResponses: task["numResponses"],
-            maxResponses: task["maxResponses"],
-            status: task["status"] as CreatedTaskStatus,
-          });
-        }
-        setData(tempData);
+      for (let task_ of res) {
+        let task = task_ as any;
+        tempData.push({
+          task_id: task["objectId"],
+          name: task["title"],
+          reward: task["unitReward"],
+          maxReward: task["maxReward"],
+          numResponses: task["numResponses"],
+          maxResponses: task["maxResponses"],
+          status: task["status"] as CreatedTaskStatus,
+        });
       }
-    );
-  }, [isInitialized, userData]);
+      setData(tempData);
+    });
+  }, [isInitialized]);
 
   return (
     <>
-      <PageHeader
-        title="Requester Created Tasks"
-        customSetUserData={setUserData}
-      />
+      <PageHeader title="Requester Created Tasks" />
       <PrimaryButtonCTA
         text="Create Task →"
         size="small"
@@ -80,13 +73,13 @@ const extraColumns: GridColDef[] = [
     headerName: "",
     sortable: false,
     disableColumnMenu: true,
-    minWidth: 290,
+    minWidth: 165,
     flex: 1,
     align: "left",
     renderCell: (params: GridValueGetterParams) => (
       <>
         {/* Render Abandon buttons for "In Progress" rows */}
-        <Box
+        {/* <Box
           visibility={
             (params.row.status as TaskStatus) >= 1 ? "hidden" : "visible"
           }
@@ -97,7 +90,7 @@ const extraColumns: GridColDef[] = [
             size="small"
             to="/requester/my-tasks"
           />
-        </Box>
+        </Box> */}
         <PrimaryButtonCTA
           text={
             (params.row.status as TaskStatus) === 0 ? "Approvals" : "Overview"

@@ -1,11 +1,11 @@
-import { Backdrop, Box, CircularProgress } from "@mui/material";
+import { Box } from "@mui/material";
 import { GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
-import MoralisType from "moralis";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
 import PrimaryButtonCTA from "../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../components/buttons/SecondaryButtonCTA";
+import LoadingOverlay from "../../components/common/LoadingOverlay";
 import PageHeader from "../../components/common/PageHeader";
 import { TableCell, TableHeader } from "../../components/tables/Helpers";
 import MyTasksTable from "../../components/tables/MyTasksTable";
@@ -35,20 +35,15 @@ export default function MyTasks() {
   const { isInitialized, Moralis } = useMoralis();
   const [openLoading, setOpenLoading] = useState(false);
   const [data, setData] = useState<TaskData[]>();
-  const [userData, setUserData] = useState<MoralisType.Object>();
+  const [refreshTable, setRefreshTable] = useState(false);
 
   const handleAbandonTask = async (taskId: string, taskName: string) => {
-    if (!userData) return;
     if (!confirm(`Are you sure you want to abandon task "${taskName}"?`))
       return;
 
     setOpenLoading(true);
 
-    const res = await taskerAbandonTask(
-      Moralis,
-      userData.get("ethAddress"),
-      taskId as string
-    );
+    const res = await taskerAbandonTask(Moralis, taskId as string);
 
     if (!res.success) {
       setOpenLoading(false);
@@ -57,7 +52,8 @@ export default function MyTasks() {
     }
 
     alert(res.message);
-    router.reload();
+    setRefreshTable(!refreshTable);
+    setOpenLoading(false);
   };
 
   const extraColumns: GridColDef[] = [
@@ -85,10 +81,10 @@ export default function MyTasks() {
       align: "left",
       renderCell: (params: GridValueGetterParams) => (
         <>
-          {/* Render Abandon buttons for "In Progress" and "Pending Verification" rows */}
+          {/* Render Abandon buttons for "In Progress" rows only */}
           <Box
             visibility={
-              (params.row.status as TaskStatus) >= 2 ? "hidden" : "visible"
+              (params.row.status as TaskStatus) == 0 ? "visible" : "hidden"
             }
             mr={2}
           >
@@ -120,35 +116,28 @@ export default function MyTasks() {
   ];
 
   useEffect(() => {
-    if (!isInitialized || !userData) return;
+    if (!isInitialized) return;
 
-    getTaskerMyTasksTableData(Moralis, userData.get("ethAddress")).then(
-      (res) => {
-        let tempData: TaskData[] = [];
-        for (let task_ of res) {
-          let task = task_ as any;
-          if (task["tasks"].length < 1) continue;
-          tempData.push({
-            task_id: task["taskId"],
-            name: task["tasks"][0]["title"],
-            reward: task["tasks"][0]["unitReward"],
-            status: task["status"] as TaskStatus,
-          });
-        }
-        setData(tempData);
+    getTaskerMyTasksTableData(Moralis).then((res) => {
+      let tempData: TaskData[] = [];
+      for (let task_ of res) {
+        let task = task_ as any;
+        if (task["tasks"].length < 1) continue;
+        tempData.push({
+          task_id: task["taskId"],
+          name: task["tasks"][0]["title"],
+          reward: task["tasks"][0]["unitReward"],
+          status: task["status"] as TaskStatus,
+        });
       }
-    );
-  }, [isInitialized, userData]);
+      setData(tempData);
+    });
+  }, [isInitialized, refreshTable]);
 
   return (
     <>
-      <PageHeader title="My Tasks" customSetUserData={setUserData} />
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={openLoading}
-      >
-        <CircularProgress color="secondary" />
-      </Backdrop>
+      <PageHeader title="My Tasks" />
+      <LoadingOverlay open={openLoading} />
       <PrimaryButtonCTA
         text="Browse Tasks →"
         size="small"

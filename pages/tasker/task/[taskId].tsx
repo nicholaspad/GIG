@@ -1,5 +1,5 @@
 import MoralisType from "moralis";
-import { Container, Box, Backdrop, CircularProgress } from "@mui/material";
+import { Container, Box, CircularProgress } from "@mui/material";
 import Question from "../../../components/taskerForm/Question";
 import PrimaryButtonCTA from "../../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../../components/buttons/SecondaryButtonCTA";
@@ -13,6 +13,7 @@ import {
   checkTaskerClaimedTask,
   taskerAbandonTask,
 } from "../../../src/Database";
+import LoadingOverlay from "../../../components/common/LoadingOverlay";
 
 export default function taskerForm() {
   /* Test Data */
@@ -47,24 +48,19 @@ export default function taskerForm() {
 
   const router = useRouter();
   const { taskId } = router.query;
-  const { isInitialized, Moralis } = useMoralis();
+  const { isInitialized, Moralis, user } = useMoralis();
   const [openLoading, setOpenLoading] = useState(false);
   const [isAllowed, setIsAllowed] = useState(false);
-  const [userData, setUserData] = useState<MoralisType.Object>();
   const [answers, setAnswers] = useState({});
 
   const handleAbandonTask = async (taskName: string) => {
-    if (!userData || !taskId) return;
+    if (!taskId) return;
     if (!confirm(`Are you sure you want to abandon task "${taskName}"?`))
       return;
 
     setOpenLoading(true);
 
-    const res = await taskerAbandonTask(
-      Moralis,
-      userData.get("ethAddress"),
-      taskId as string
-    );
+    const res = await taskerAbandonTask(Moralis, taskId as string);
 
     if (!res.success) {
       setOpenLoading(false);
@@ -89,26 +85,24 @@ export default function taskerForm() {
   };
 
   useEffect(() => {
-    if (!isInitialized || !userData || !taskId) return;
+    if (!isInitialized || !user || !taskId) return;
 
-    const ethAddress = userData.get("ethAddress");
-    checkTaskerClaimedTask(Moralis, ethAddress, taskId as string).then(
-      (res) => {
-        if (!res) {
-          alert(`Address ${ethAddress} has not claimed task ${taskId}.`);
-          router.push("/browse-tasks");
-          return;
-        }
-
-        setIsAllowed(true);
+    const ethAddress = user.get("ethAddress");
+    checkTaskerClaimedTask(Moralis, taskId as string).then((res) => {
+      if (!res) {
+        alert(`Address ${ethAddress} has not claimed task ${taskId}.`);
+        router.push("/browse-tasks");
+        return;
       }
-    );
-  }, [isInitialized, userData, taskId]);
+
+      setIsAllowed(true);
+    });
+  }, [isInitialized, taskId]);
 
   if (!isAllowed)
     return (
       <>
-        <PageHeader title="Verifying" customSetUserData={setUserData} />
+        <PageHeader title="Verifying" />
         <Box display="flex" flexDirection="column" alignItems="center">
           <CircularProgress color="secondary" sx={{ mt: 2, mb: 3 }} />
           <Typography
@@ -125,13 +119,8 @@ export default function taskerForm() {
 
   return (
     <>
-      <PageHeader title="Task" customSetUserData={setUserData} />
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={openLoading}
-      >
-        <CircularProgress color="secondary" />
-      </Backdrop>
+      <PageHeader title="Task" />
+      <LoadingOverlay open={openLoading} />
       <Container maxWidth="sm">
         <GrayCard sx={{ mt: 2 }}>
           <Box sx={{ p: 3 }}>

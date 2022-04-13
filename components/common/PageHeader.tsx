@@ -22,12 +22,10 @@ export default function PageHeader(props: {
   useEffect(() => {
     if (props.disableAuthFunc || !isAuthenticated || authError || !user) return;
 
-    makeOrGetNewUser(Moralis, user.get("ethAddress")).then(
-      (res: MoralisType.Object) => {
-        setUserData(res);
-        if (props.customSetUserData) props.customSetUserData(res);
-      }
-    );
+    makeOrGetNewUser(Moralis).then((res) => {
+      setUserData(res);
+      if (props.customSetUserData) props.customSetUserData(res);
+    });
   }, [isAuthenticated]);
 
   return (
@@ -36,7 +34,7 @@ export default function PageHeader(props: {
         <title>{props.title} | GIG</title>
       </Head>
       <Navbar
-        walletAddress={userData?.get("ethAddress")}
+        walletAddress={user?.get("ethAddress")}
         isConnected={isAuthenticated}
         username={userData?.get("displayName")}
       />
