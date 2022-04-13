@@ -200,15 +200,11 @@ export default function Form() {
                   <CustomTextField
                     onChange={(e) => {
                       const val = Number(e.target.value);
-                      if (
+                      setCryptoAllocatedError(
                         isNaN(val) ||
-                        val < Number(process.env.NEXT_PUBLIC_MIN_ETH)
-                      ) {
-                        setCryptoAllocatedError(true);
-                      } else {
-                        setCryptoAllocatedError(false);
-                        setCryptoAllocated(val);
-                      }
+                          val < Number(process.env.NEXT_PUBLIC_MIN_ETH)
+                      );
+                      setCryptoAllocated(val);
                     }}
                     error={cryptoAllocatedError}
                     helperText={
@@ -234,20 +230,17 @@ export default function Form() {
                   <CustomTextField
                     onChange={(e) => {
                       const val = Number(e.target.value);
-                      if (
+                      setMaxTaskersError(
                         isNaN(val) ||
-                        val < Number(process.env.NEXT_PUBLIC_MIN_TASKERS)
-                      ) {
-                        setMaxTaskersError(true);
-                      } else {
-                        setMaxTaskersError(false);
-                        setMaxTaskers(val);
-                      }
+                          val < Number(process.env.NEXT_PUBLIC_MIN_TASKERS) ||
+                          !Number.isInteger(val)
+                      );
+                      setMaxTaskers(val);
                     }}
                     error={maxTaskersError}
                     helperText={
                       maxTaskersError &&
-                      `Must be ≥${process.env.NEXT_PUBLIC_MIN_TASKERS}`
+                      `Must be integer ≥${process.env.NEXT_PUBLIC_MIN_TASKERS}`
                     }
                     size="small"
                     sx={{ ml: 2, width: 100 }}
@@ -327,7 +320,6 @@ export default function Form() {
                       Number(process.env.NEXT_PUBLIC_MIN_TASK_DATA_CHARS)
                   );
                 }}
-                placeholder="Interesting Task Title"
                 error={currQuestionTitleError}
                 helperText={
                   currQuestionTitleError &&

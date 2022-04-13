@@ -389,12 +389,57 @@ Moralis.Cloud.define("taskerAbandonTask", async (request) => {
 /* ------------------------------------------------------------------- */
 
 Moralis.Cloud.define("createTask", async (request) => {
+  function validateNewTask(newTask, maxReward, maxResponses, config) {
+    const MIN_TASKERS = Number(config.get("NEXT_PUBLIC_MIN_TASKERS"));
+    const MIN_TASK_DATA_CHARS = Number(
+      config.get("NEXT_PUBLIC_MIN_TASK_DATA_CHARS")
+    );
+    const MIN_ETH = Number(config.get("NEXT_PUBLIC_MIN_ETH"));
+
+    if (maxReward < MIN_ETH) return false;
+    if (maxResponses < MIN_TASKERS) return false;
+    if (!Number.isInteger(maxResponses)) return false;
+    if (newTask["title"].length < MIN_TASK_DATA_CHARS) return false;
+    if (newTask["description"].length < MIN_TASK_DATA_CHARS) return false;
+    if (
+      newTask["options"].some(
+        (question) => question["question"].length < MIN_TASK_DATA_CHARS
+      )
+    )
+      return false;
+    if (
+      newTask["options"].some((question) => {
+        // See enum QuestionType for type IDs
+
+        // Multiple choice
+        if (question["type"] === 0) {
+          // Check that number of choices is in [1, 5]
+          if (question["options"].length < 1 || question["options"].length > 5)
+            return true;
+        }
+
+        // All question-specific checks passed
+        return false;
+      })
+    )
+      return false;
+
+    // All checks passed at this point
+    return true;
+  }
+
   const ethAddress = request.user.get("ethAddress");
   const newTask = request.params.newTask;
-  const maxReward = request.params.maxReward;
-  const maxResponses = request.params.maxResponses;
+  const maxReward = Number(request.params.maxReward);
+  const maxResponses = Number(request.params.maxResponses);
   const tableName = "Tasks";
   const config = await Moralis.Config.get({ useMasterKey: true });
+
+  if (!validateNewTask(newTask, maxReward, maxResponses, config))
+    return {
+      success: false,
+      message: `Address ${ethAddress} failed to create task "${newTask["title"]}": please provide valid inputs`,
+    };
 
   const Tasks = Moralis.Object.extend(tableName);
 
