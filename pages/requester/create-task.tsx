@@ -14,9 +14,11 @@ import MCQuestion from "../../components/taskerForm/MCQuestion";
 import LoadingOverlay from "../../components/common/LoadingOverlay";
 import { createTask } from "../../src/Database";
 import { useMoralis } from "react-moralis";
+import { useRouter } from "next/router";
 
 export default function Form() {
   const { isInitialized, Moralis } = useMoralis();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [openPosting, setOpenPosting] = useState(false);
   const [questions, setQuestions] = useState<GenericQuestion[]>([]);
@@ -76,10 +78,19 @@ export default function Form() {
 
     setOpenPosting(true);
 
-    const res = await createTask(Moralis, newTask);
-    console.log(res);
+    /*
+      Require user to send ETH here. Wait for x confirmations before continuing.
+    */
 
-    setOpenPosting(false);
+    const res = await createTask(Moralis, newTask, cryptoAllocated, maxTaskers);
+    if (!res.success) {
+      setOpenPosting(false);
+      alert(res.message);
+      return;
+    }
+
+    alert(res.message);
+    router.push("/requester/my-tasks");
   };
 
   return (
@@ -134,7 +145,6 @@ export default function Form() {
                   return;
                 }
 
-                console.log(newTask);
                 handleCreateTask(newTask, cryptoAllocated, maxTaskers);
               }}
             />

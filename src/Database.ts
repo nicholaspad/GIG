@@ -87,7 +87,13 @@ export async function taskerAbandonTask(
 */
 export async function createTask(
   Moralis: MoralisType,
-  newTask: TaskProps
+  newTask: TaskProps,
+  cryptoAllocated: number,
+  maxTaskers: number
 ): Promise<{ success: boolean; message: string }> {
-  return await Moralis.Cloud.run("createTask", { newTask: newTask });
+  return await Moralis.Cloud.run("createTask", {
+    newTask: newTask,
+    maxReward: cryptoAllocated,
+    maxResponses: maxTaskers,
+  });
 }

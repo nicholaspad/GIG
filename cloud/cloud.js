@@ -389,5 +389,33 @@ Moralis.Cloud.define("taskerAbandonTask", async (request) => {
 /* ------------------------------------------------------------------- */
 
 Moralis.Cloud.define("createTask", async (request) => {
-  return { success: true, message: "test" };
+  const ethAddress = request.user.get("ethAddress");
+  const newTask = request.params.newTask;
+  const maxReward = request.params.maxReward;
+  const maxResponses = request.params.maxResponses;
+  const tableName = "Tasks";
+
+  const Tasks = Moralis.Object.extend(tableName);
+
+  const task = new Tasks();
+  task.set("requesterId", ethAddress);
+  task.set("title", newTask["title"]);
+  task.set("description", newTask["description"]);
+  task.set("startDate", new Date());
+  task.set("status", 0); // "in progress"
+  task.set(
+    "estCompletionTime",
+    Math.ceil((newTask["options"].length * 30) / 60)
+  ); // approx 30 seconds per question @bzzbbz @christine-sun @jennsun @nicholaspad
+  task.set("avgRating", -1);
+  task.set("numResponses", 0);
+  task.set("maxResponses", maxResponses);
+  task.set("unitReward", 0.00001); // how should we set this value? @bzzbbz @christine-sun @jennsun @nicholaspad
+  task.set("maxReward", maxReward);
+  await task.save();
+
+  return {
+    success: true,
+    message: `Address ${ethAddress} succesfully created task "${newTask["title"]}"!`,
+  };
 });
