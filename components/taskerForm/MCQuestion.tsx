@@ -19,6 +19,7 @@ export default function MCQuestion(
         <FormLabel id={props.id}>
           <Typography
             variant="body1"
+            fontSize={20}
             fontWeight="medium"
             color="primary.main"
             mt={1}
@@ -44,7 +45,7 @@ export default function MCQuestion(
                 />
               }
               label={
-                <Typography variant="body2" color="primary">
+                <Typography variant="body2" fontSize={16} color="primary">
                   {option}
                 </Typography>
               }
