@@ -10,11 +10,11 @@ import { TaskOverviewData } from "../../../src/Types";
 export default function TaskOverview() {
   const router = useRouter();
   const { taskId, back } = router.query;
-  const { Moralis } = useMoralis();
+  const { isInitialized, Moralis } = useMoralis();
   const [data, setData] = useState<TaskOverviewData>();
 
   useEffect(() => {
-    if (!Moralis || !taskId) return;
+    if (!isInitialized || !taskId) return;
 
     getTaskOverviewData(Moralis, taskId as string).then((res) => {
       let res_ = res[0] as any;
@@ -31,7 +31,7 @@ export default function TaskOverview() {
       };
       setData(tempData);
     });
-  }, [Moralis, taskId]);
+  }, [isInitialized, Moralis, taskId]);
 
   return (
     <>

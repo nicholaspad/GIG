@@ -12,11 +12,11 @@ import { getBrowseTasksTableData } from "../src/Database";
 import { TaskData } from "../src/Types";
 
 export default function Tasks() {
-  const { Moralis, user } = useMoralis();
+  const { isInitialized, Moralis, user } = useMoralis();
   const [data, setData] = useState<TaskData[]>();
 
   useEffect(() => {
-    if (!Moralis || !user) return;
+    if (!isInitialized || !user) return;
 
     getBrowseTasksTableData(Moralis).then(async (res) => {
       let tempData: TaskData[] = [];
@@ -33,7 +33,7 @@ export default function Tasks() {
       }
       setData(tempData);
     });
-  }, [Moralis, user]);
+  }, [isInitialized, Moralis, user]);
 
   return (
     <>

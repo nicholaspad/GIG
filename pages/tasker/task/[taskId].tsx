@@ -47,7 +47,7 @@ export default function TaskerForm() {
 
   const router = useRouter();
   const { taskId } = router.query;
-  const { Moralis, user } = useMoralis();
+  const { isInitialized, Moralis, user } = useMoralis();
   const [openLoading, setOpenLoading] = useState(false);
   const [isAllowed, setIsAllowed] = useState(false);
   const [answers, setAnswers] = useState({});
@@ -55,7 +55,7 @@ export default function TaskerForm() {
   const handleAbandonTask = async (taskName: string) => {
     if (!taskId) return;
     if (
-      !Moralis ||
+      !isInitialized ||
       !confirm(`Are you sure you want to abandon task "${taskName}"?`)
     )
       return;
@@ -87,7 +87,7 @@ export default function TaskerForm() {
   };
 
   useEffect(() => {
-    if (!Moralis || !user || !taskId || !router || !user) return;
+    if (!isInitialized || !user || !taskId || !router || !user) return;
 
     const ethAddress = user.get("ethAddress");
     checkTaskerClaimedTask(Moralis, taskId as string).then((res) => {
@@ -99,7 +99,7 @@ export default function TaskerForm() {
 
       setIsAllowed(true);
     });
-  }, [Moralis, taskId, router, user]);
+  }, [isInitialized, Moralis, taskId, router, user]);
 
   if (!isAllowed)
     return (
