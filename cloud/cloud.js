@@ -402,13 +402,13 @@ Moralis.Cloud.define("createTask", async (request) => {
     if (newTask["title"].length < MIN_TASK_DATA_CHARS) return false;
     if (newTask["description"].length < MIN_TASK_DATA_CHARS) return false;
     if (
-      newTask["options"].some(
+      newTask["questions"].some(
         (question) => question["question"].length < MIN_TASK_DATA_CHARS
       )
     )
       return false;
     if (
-      newTask["options"].some((question) => {
+      newTask["questions"].some((question) => {
         // See enum QuestionType for type IDs
 
         // Multiple choice
@@ -451,7 +451,7 @@ Moralis.Cloud.define("createTask", async (request) => {
   task.set("status", 0); // "in progress"
   task.set(
     "estCompletionTime",
-    Math.ceil((newTask["options"].length * 30) / 60)
+    Math.ceil((newTask["questions"].length * 30) / 60)
   ); // approx 30 seconds per question @bzzbbz @christine-sun @jennsun @nicholaspad
   task.set("avgRating", -1);
   task.set("numResponses", 0);

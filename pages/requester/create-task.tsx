@@ -70,7 +70,7 @@ export default function Form() {
     if (
       !isInitialized ||
       !confirm(
-        `Are you sure you want to create task "${newTask.title}" with ${newTask.options.length} question(s) ` +
+        `Are you sure you want to create task "${newTask.title}" with ${newTask.questions.length} question(s) ` +
           `and ${maxTaskers} maximum responses? You will be required to stake ${cryptoAllocated} ETH.`
       )
     )
@@ -79,7 +79,7 @@ export default function Form() {
     setOpenPosting(true);
 
     /*
-      Require user to send ETH here. Wait for x confirmations before continuing.
+      Require user to send ETH here. Wait for x confirmations before continuing. @christine-sun @jennsun
     */
 
     const res = await createTask(Moralis, newTask, cryptoAllocated, maxTaskers);
@@ -129,7 +129,7 @@ export default function Form() {
                 const newTask: TaskProps = {
                   title: title,
                   description: description,
-                  options: questions,
+                  questions: questions,
                 };
                 const hasError =
                   v(titleError) ||
@@ -138,7 +138,7 @@ export default function Form() {
                   v(maxTaskersError) ||
                   v(currQuestionTitleError) ||
                   v(currQuestionChoicesError) ||
-                  newTask.options.length < 1;
+                  newTask.questions.length < 1;
 
                 if (hasError) {
                   alert("Please provide valid inputs!");
