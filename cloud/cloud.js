@@ -429,6 +429,46 @@ Moralis.Cloud.define("createTask", async (request) => {
     return true;
   }
 
+  async function insertNewTask(newTask, maxReward, maxResponses, config) {
+    const tableName = "Tasks";
+
+    const Tasks = Moralis.Object.extend(tableName);
+
+    const task = new Tasks();
+    task.set("requesterId", ethAddress);
+    task.set("title", newTask["title"]);
+    task.set("description", newTask["description"]);
+    task.set("startDate", new Date());
+    task.set("status", 0); // "in progress"
+    task.set(
+      "estCompletionTime",
+      Math.ceil((newTask["questions"].length * 30) / 60)
+    ); // approx 30 seconds per question @bzzbbz @christine-sun @jennsun @nicholaspad
+    task.set("avgRating", -1);
+    task.set("numResponses", 0);
+    task.set("maxResponses", maxResponses);
+    task.set("unitReward", config.get("NEXT_PUBLIC_UNIT_ETH_REWARD")); // currently 0.00001 @bzzbbz @christine-sun @jennsun @nicholaspad
+    task.set("maxReward", maxReward);
+    const res = await task.save();
+    return res.id;
+  }
+
+  async function insertNewQuestions(newTask, taskId) {
+    const tableName = "Questions";
+
+    const Questions = Moralis.Object.extend(tableName);
+
+    newTask["questions"].forEach(async (question, idx) => {
+      const q = new Questions();
+      q.set("taskId", taskId);
+      q.set("type", question["type"]);
+      q.set("title", question["question"]);
+      q.set("idx", idx);
+      q.set("options", question["options"]);
+      await q.save();
+    });
+  }
+
   const ethAddress = request.user.get("ethAddress");
   const newTask = request.params.newTask;
   const maxReward = Number(request.params.maxReward);
@@ -441,8 +481,8 @@ Moralis.Cloud.define("createTask", async (request) => {
       message: `Address ${ethAddress} failed to create task "${newTask["title"]}": please provide valid inputs`,
     };
 
-  await insertNewTask(newTask, maxReward, maxResponses, config);
-  await insertNewQuestions(newTask);
+  const taskId = await insertNewTask(newTask, maxReward, maxResponses, config);
+  await insertNewQuestions(newTask, taskId);
 
   return {
     success: true,
