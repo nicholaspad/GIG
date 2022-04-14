@@ -416,10 +416,11 @@ Moralis.Cloud.define("createTask", async (request) => {
           // Check that number of choices is in [1, 5]
           if (question["options"].length < 1 || question["options"].length > 5)
             return true;
+          return false;
         }
 
-        // All question-specific checks passed
-        return false;
+        // Invalid/unknown question type, so fail
+        return true;
       })
     )
       return false;
@@ -432,7 +433,6 @@ Moralis.Cloud.define("createTask", async (request) => {
   const newTask = request.params.newTask;
   const maxReward = Number(request.params.maxReward);
   const maxResponses = Number(request.params.maxResponses);
-  const tableName = "Tasks";
   const config = await Moralis.Config.get({ useMasterKey: true });
 
   if (!validateNewTask(newTask, maxReward, maxResponses, config))
@@ -441,24 +441,8 @@ Moralis.Cloud.define("createTask", async (request) => {
       message: `Address ${ethAddress} failed to create task "${newTask["title"]}": please provide valid inputs`,
     };
 
-  const Tasks = Moralis.Object.extend(tableName);
-
-  const task = new Tasks();
-  task.set("requesterId", ethAddress);
-  task.set("title", newTask["title"]);
-  task.set("description", newTask["description"]);
-  task.set("startDate", new Date());
-  task.set("status", 0); // "in progress"
-  task.set(
-    "estCompletionTime",
-    Math.ceil((newTask["questions"].length * 30) / 60)
-  ); // approx 30 seconds per question @bzzbbz @christine-sun @jennsun @nicholaspad
-  task.set("avgRating", -1);
-  task.set("numResponses", 0);
-  task.set("maxResponses", maxResponses);
-  task.set("unitReward", config.get("NEXT_PUBLIC_UNIT_ETH_REWARD")); // currently 0.00001 @bzzbbz @christine-sun @jennsun @nicholaspad
-  task.set("maxReward", maxReward);
-  await task.save();
+  await insertNewTask(newTask, maxReward, maxResponses, config);
+  await insertNewQuestions(newTask);
 
   return {
     success: true,
