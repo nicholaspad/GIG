@@ -1,3 +1,21 @@
+async function computeUnitRewardWei(maxReward, maxTaskers) {
+  const maxRewardWei = Number(
+    await Moralis.Cloud.units({
+      method: "toWei",
+      value: maxReward,
+    })
+  );
+  const unitRewardWei = maxRewardWei / maxTaskers - 1; // ensures that unitRewardWei*maxTaskers < maxRewardWei
+  return unitRewardWei.toString();
+}
+
+async function computeMaxRewardWei(maxReward) {
+  return await Moralis.Cloud.units({
+    method: "toWei",
+    value: maxReward,
+  });
+}
+
 /*
   Check that a task is claimed by a Tasker.
 */
@@ -70,14 +88,14 @@ Moralis.Cloud.define("getBrowseTasksTableData", async (request) => {
   const Tasks = Moralis.Object.extend(tableName);
   const query = new Moralis.Query(Tasks);
   const res = await query.aggregate([
-    { sort: { unitReward: -1 } },
+    { sort: { unitRewardWei: -1 } },
     {
       project: {
         objectId: 1, // taskId
         title: 1,
         avgRating: 1,
-        unitReward: 1,
-        maxReward: 1,
+        unitRewardWei: 1,
+        maxRewardWei: 1,
         requesterId: 1,
         numResponses: 1,
         maxResponses: 1,
@@ -102,7 +120,8 @@ Moralis.Cloud.define("getBrowseTasksTableData", async (request) => {
     return (
       !(task["objectId"] in claimedTaskIds) &&
       task["numResponses"] < task["maxResponses"] &&
-      task["maxReward"] - (task["numResponses"] + 1) * task["unitReward"] >=
+      task["maxRewardWei"] -
+        (task["numResponses"] + 1) * task["unitRewardWei"] >=
         0 &&
       task["status"] === 0
     );
@@ -156,8 +175,8 @@ Moralis.Cloud.define("getRequesterCreatedTasksTableData", async (request) => {
       project: {
         objectId: 1, // taskId
         title: 1,
-        unitReward: 1,
-        maxReward: 1,
+        unitRewardWei: 1,
+        maxRewardWei: 1,
         status: 1,
         numResponses: 1,
         maxResponses: 1,
@@ -200,7 +219,7 @@ Moralis.Cloud.define("getTaskOverviewData", async (request) => {
         title: 1,
         description: 1,
         startDate: 1,
-        unitReward: 1,
+        unitRewardWei: 1,
         estCompletionTime: 1,
         avgRating: 1,
         requesterId: 1,
@@ -246,8 +265,8 @@ Moralis.Cloud.define("taskerClaimTask", async (request) => {
     const task = res[0];
     const blameResponses = task.get("numResponses") >= task.get("maxResponses");
     const blameETH =
-      task.get("maxReward") -
-        (task.get("numResponses") + 1) * task.get("unitReward") <
+      task.get("maxRewardWei") -
+        (task.get("numResponses") + 1) * task.get("unitRewardWei") <
       0;
     const blameStatus = task.get("status") !== 0;
 
@@ -389,14 +408,18 @@ Moralis.Cloud.define("taskerAbandonTask", async (request) => {
 /* ------------------------------------------------------------------- */
 
 Moralis.Cloud.define("createTask", async (request) => {
-  function validateNewTask(newTask, maxReward, maxResponses, config) {
+  const QuestionType = {
+    SINGLE_CHOICE: 0,
+  };
+
+  function validateNewTask(newTask, maxRewardETH, maxResponses, config) {
     const MIN_TASKERS = Number(config.get("NEXT_PUBLIC_MIN_TASKERS"));
     const MIN_TASK_DATA_CHARS = Number(
       config.get("NEXT_PUBLIC_MIN_TASK_DATA_CHARS")
     );
     const MIN_ETH = Number(config.get("NEXT_PUBLIC_MIN_ETH"));
 
-    if (maxReward < MIN_ETH) return false;
+    if (maxRewardETH < MIN_ETH) return false;
     if (maxResponses < MIN_TASKERS) return false;
     if (!Number.isInteger(maxResponses)) return false;
     if (newTask["title"].length < MIN_TASK_DATA_CHARS) return false;
@@ -412,7 +435,7 @@ Moralis.Cloud.define("createTask", async (request) => {
         // See enum QuestionType for type IDs
 
         // Multiple choice
-        if (question["type"] === 0) {
+        if (question["type"] === QuestionType.SINGLE_CHOICE) {
           // Check that number of choices is in [1, 5]
           if (question["options"].length < 1 || question["options"].length > 5)
             return true;
@@ -429,7 +452,7 @@ Moralis.Cloud.define("createTask", async (request) => {
     return true;
   }
 
-  async function insertNewTask(newTask, maxReward, maxResponses, config) {
+  async function insertNewTask(newTask, maxRewardETH, maxResponses) {
     const tableName = "Tasks";
 
     const Tasks = Moralis.Object.extend(tableName);
@@ -447,8 +470,11 @@ Moralis.Cloud.define("createTask", async (request) => {
     task.set("avgRating", -1);
     task.set("numResponses", 0);
     task.set("maxResponses", maxResponses);
-    task.set("unitReward", config.get("NEXT_PUBLIC_UNIT_ETH_REWARD")); // currently 0.00001 @bzzbbz @christine-sun @jennsun @nicholaspad
-    task.set("maxReward", maxReward);
+    task.set(
+      "unitRewardWei",
+      await computeUnitRewardWei(maxRewardETH, maxResponses)
+    );
+    task.set("maxRewardWei", await computeMaxRewardWei(maxRewardETH));
     const res = await task.save();
     return res.id;
   }
@@ -471,17 +497,17 @@ Moralis.Cloud.define("createTask", async (request) => {
 
   const ethAddress = request.user.get("ethAddress");
   const newTask = request.params.newTask;
-  const maxReward = Number(request.params.maxReward);
+  const maxRewardETH = request.params.maxRewardETH;
   const maxResponses = Number(request.params.maxResponses);
   const config = await Moralis.Config.get({ useMasterKey: true });
 
-  if (!validateNewTask(newTask, maxReward, maxResponses, config))
+  if (!validateNewTask(newTask, maxRewardETH, maxResponses, config))
     return {
       success: false,
       message: `Address ${ethAddress} failed to create task "${newTask["title"]}": please provide valid inputs`,
     };
 
-  const taskId = await insertNewTask(newTask, maxReward, maxResponses, config);
+  const taskId = await insertNewTask(newTask, maxRewardETH, maxResponses);
   await insertNewQuestions(newTask, taskId);
 
   return {

@@ -15,6 +15,7 @@ import LoadingOverlay from "../../components/common/LoadingOverlay";
 import { createTask } from "../../src/Database";
 import { useMoralis } from "react-moralis";
 import { useRouter } from "next/router";
+import { computeUnitRewardWei } from "../../src/Helpers";
 
 export default function Form() {
   const { isInitialized, Moralis } = useMoralis();
@@ -212,7 +213,6 @@ export default function Form() {
                       `Must be ≥${process.env.NEXT_PUBLIC_MIN_ETH}`
                     }
                     size="small"
-                    placeholder="ETH"
                     sx={{
                       ml: 2,
                       mr: 1,
@@ -249,9 +249,21 @@ export default function Form() {
               </Grid>
             </Grid>
           </FormControl>
-          <Typography color="primary" mt={2} mx="auto">
-            Taskers will earn {process.env.NEXT_PUBLIC_UNIT_ETH_REWARD} ETH per
-            completed task. This reward is subject to change.
+          <Typography
+            color="primary"
+            mt={
+              cryptoAllocatedError === false && maxTaskersError === false
+                ? 2
+                : 0
+            }
+            mx="auto"
+          >
+            {cryptoAllocatedError === false && maxTaskersError === false
+              ? `Taskers will earn ${Moralis.Units.FromWei(
+                  computeUnitRewardWei(Moralis, cryptoAllocated, maxTaskers)
+                )}
+          ETH per completed task. This reward is subject to change.`
+              : null}
           </Typography>
           <Typography
             color="secondary"

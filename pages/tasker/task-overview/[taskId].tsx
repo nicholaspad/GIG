@@ -22,7 +22,7 @@ export default function TaskOverview() {
       let tempData: TaskOverviewData = {
         task_id: taskId as string,
         name: res_["title"],
-        reward: res_["unitReward"],
+        reward: Moralis.Units.FromWei(res_["unitRewardWei"]),
         rating: res_["avgRating"],
         description: res_["description"],
         estimatedTime: res_["estCompletionTime"],

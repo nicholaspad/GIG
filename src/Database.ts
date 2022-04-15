@@ -93,7 +93,7 @@ export async function createTask(
 ): Promise<{ success: boolean; message: string }> {
   return await Moralis.Cloud.run("createTask", {
     newTask: newTask,
-    maxReward: cryptoAllocated,
+    maxRewardETH: cryptoAllocated,
     maxResponses: maxTaskers,
   });
 }

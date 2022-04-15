@@ -127,7 +127,7 @@ export default function MyTasks() {
         tempData.push({
           task_id: task["taskId"],
           name: task["tasks"][0]["title"],
-          reward: task["tasks"][0]["unitReward"],
+          reward: Moralis.Units.FromWei(task["tasks"][0]["unitRewardWei"]),
           status: task["status"] as TaskStatus,
         });
       }

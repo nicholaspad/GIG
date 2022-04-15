@@ -26,8 +26,8 @@ export default function MyTasks() {
         tempData.push({
           task_id: task["objectId"],
           name: task["title"],
-          reward: task["unitReward"],
-          maxReward: task["maxReward"],
+          reward: Moralis.Units.FromWei(task["unitRewardWei"]),
+          maxRewardWei: Moralis.Units.FromWei(task["maxRewardWei"]),
           numResponses: task["numResponses"],
           maxResponses: task["maxResponses"],
           status: task["status"] as CreatedTaskStatus,
@@ -108,7 +108,7 @@ const extraColumns: GridColDef[] = [
     ),
   },
   {
-    field: "maxReward",
+    field: "maxRewardWei",
     sortable: false,
     disableColumnMenu: true,
     type: "number",
@@ -117,7 +117,8 @@ const extraColumns: GridColDef[] = [
     renderHeader: () => <TableHeader>ETH Used / Max</TableHeader>,
     renderCell: (params: GridValueGetterParams) => (
       <TableCell>
-        {params.row.numResponses * params.row.reward} / {params.row.maxReward}
+        {params.row.numResponses * params.row.reward} /{" "}
+        {params.row.maxRewardWei}
       </TableCell>
     ),
   },
