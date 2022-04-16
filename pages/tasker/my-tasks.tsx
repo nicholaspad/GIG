@@ -1,6 +1,5 @@
 import { Box } from "@mui/material";
 import { GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
 import PrimaryButtonCTA from "../../components/buttons/PrimaryButtonCTA";
@@ -31,14 +30,16 @@ const statusColorMap = {
 };
 
 export default function MyTasks() {
-  const router = useRouter();
   const { isInitialized, Moralis } = useMoralis();
   const [openLoading, setOpenLoading] = useState(false);
   const [data, setData] = useState<TaskData[]>();
   const [refreshTable, setRefreshTable] = useState(false);
 
   const handleAbandonTask = async (taskId: string, taskName: string) => {
-    if (!confirm(`Are you sure you want to abandon task "${taskName}"?`))
+    if (
+      !isInitialized ||
+      !confirm(`Are you sure you want to abandon task "${taskName}"?`)
+    )
       return;
 
     setOpenLoading(true);
@@ -126,18 +127,18 @@ export default function MyTasks() {
         tempData.push({
           task_id: task["taskId"],
           name: task["tasks"][0]["title"],
-          reward: task["tasks"][0]["unitReward"],
+          reward: Moralis.Units.FromWei(task["tasks"][0]["unitRewardWei"]),
           status: task["status"] as TaskStatus,
         });
       }
       setData(tempData);
     });
-  }, [isInitialized, refreshTable]);
+  }, [isInitialized, Moralis, refreshTable]);
 
   return (
     <>
       <PageHeader title="My Tasks" />
-      <LoadingOverlay open={openLoading} />
+      <LoadingOverlay open={openLoading} text="Abandoning Task..." />
       <PrimaryButtonCTA
         text="Browse Tasks →"
         size="small"

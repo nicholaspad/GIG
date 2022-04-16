@@ -20,7 +20,10 @@ export default function TaskDetails() {
 
   const handleClaimTask = async () => {
     if (!taskId) return;
-    if (!confirm(`Are you sure you want to claim task "${data?.name}"?`))
+    if (
+      !isInitialized ||
+      !confirm(`Are you sure you want to claim task "${data?.name}"?`)
+    )
       return;
 
     setOpenLoading(true);
@@ -48,7 +51,7 @@ export default function TaskDetails() {
       let tempData: TaskOverviewData = {
         task_id: taskId as string,
         name: res_["title"],
-        reward: res_["unitReward"],
+        reward: Moralis.Units.FromWei(res_["unitRewardWei"]),
         rating: res_["avgRating"],
         description: res_["description"],
         estimatedTime: res_["estCompletionTime"],
@@ -58,12 +61,12 @@ export default function TaskDetails() {
 
       setData(tempData);
     });
-  }, [isInitialized, taskId]);
+  }, [isInitialized, Moralis, taskId]);
 
   return (
     <>
       <PageHeader title="Task Details" />
-      <LoadingOverlay open={openLoading} />
+      <LoadingOverlay open={openLoading} text="Claiming Task..." />
       <TaskOverviewTemplate
         data={data}
         title="Task Details"

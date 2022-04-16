@@ -21,7 +21,7 @@ export type TaskProps = {
   id?: string;
   title: string;
   description: string;
-  options: GenericQuestion[];
+  questions: GenericQuestion[];
 };
 
 export type TaskOverviewData = TaskData & {
@@ -40,8 +40,8 @@ export type TaskData = {
   name: string;
   rating?: number;
   status?: TaskStatus | CreatedTaskStatus;
-  reward: number;
-  maxReward?: number;
+  reward: string;
+  maxRewardWei?: string;
   numResponses?: number;
   maxResponses?: number;
 };

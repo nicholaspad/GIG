@@ -17,7 +17,7 @@ export default function NavbarTab(props: {
   };
 
   return (
-    <Link href={getTabRoute()}>
+    <Link href={getTabRoute()} passHref>
       <Box
         sx={{
           background: props.isSelected ? gigTheme.palette.secondary.main : null,

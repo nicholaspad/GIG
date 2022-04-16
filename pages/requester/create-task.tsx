@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Box from "@mui/material/Box";
 import { Container, Modal, styled, Typography } from "@mui/material";
 import TextField from "@mui/material/TextField";
@@ -6,18 +6,22 @@ import { gigTheme } from "../../src/Theme";
 import FormControl from "@mui/material/FormControl";
 import DefaultGrayCard from "../../components/common/DefaultGrayCard";
 import Grid from "@mui/material/Grid";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
 import { GenericQuestion, QuestionType, TaskProps } from "../../src/Types";
 import PageHeader from "../../components/common/PageHeader";
 import PrimaryButtonCTA from "../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../components/buttons/SecondaryButtonCTA";
+import MCQuestion from "../../components/taskerForm/MCQuestion";
+import LoadingOverlay from "../../components/common/LoadingOverlay";
+import { createTask } from "../../src/Database";
+import { useMoralis } from "react-moralis";
+import { useRouter } from "next/router";
+import { computeUnitRewardWei } from "../../src/Helpers";
 
 export default function Form() {
+  const { isInitialized, Moralis } = useMoralis();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [openPosting, setOpenPosting] = useState(false);
   const [questions, setQuestions] = useState<GenericQuestion[]>([]);
   const [currIndex, setCurrIndex] = useState(1);
 
@@ -28,19 +32,20 @@ export default function Form() {
   const [maxTaskers, setMaxTaskers] = useState(0);
 
   // Errors associated with task overvieww
-  const [titleError, setTitleError] = useState(false);
-  const [descriptionError, setDescriptionError] = useState(false);
-  const [cryptoAllocatedError, setCryptoAllocatedError] = useState(false);
-  const [maxTaskersError, setMaxTaskersError] = useState(false);
+  const [titleError, setTitleError] = useState<boolean>();
+  const [descriptionError, setDescriptionError] = useState<boolean>();
+  const [cryptoAllocatedError, setCryptoAllocatedError] = useState<boolean>();
+  const [maxTaskersError, setMaxTaskersError] = useState<boolean>();
 
   // New question from modal popup
   const [currQuestionTitle, setCurrQuestionTitle] = useState("");
   const [currQuestionChoices, setCurrQuestionChoices] = useState<string[]>([]);
 
   // Errors associated with new question modal popup
-  const [currQuestionTitleError, setCurrQuestionTitleError] = useState(false);
+  const [currQuestionTitleError, setCurrQuestionTitleError] =
+    useState<boolean>();
   const [currQuestionChoicesError, setCurrQuestionChoicesError] =
-    useState(false);
+    useState<boolean>();
 
   const removeQuestion = (index: number) => {
     var array = [...questions];
@@ -58,9 +63,41 @@ export default function Form() {
     setOpen(false);
   };
 
+  const handleCreateTask = async (
+    newTask: TaskProps,
+    cryptoAllocated: number,
+    maxTaskers: number
+  ) => {
+    if (
+      !isInitialized ||
+      !confirm(
+        `Are you sure you want to create task "${newTask.title}" with ${newTask.questions.length} question(s) ` +
+          `and ${maxTaskers} maximum responses? You will be required to stake ${cryptoAllocated} ETH.`
+      )
+    )
+      return;
+
+    setOpenPosting(true);
+
+    /*
+      Require user to send ETH here. Wait for x confirmations before continuing. @christine-sun @jennsun
+    */
+
+    const res = await createTask(Moralis, newTask, cryptoAllocated, maxTaskers);
+    if (!res.success) {
+      setOpenPosting(false);
+      alert(res.message);
+      return;
+    }
+
+    alert(res.message);
+    router.push("/requester/my-tasks");
+  };
+
   return (
     <>
-      <PageHeader title="My Tasks" />
+      <PageHeader title="Requester Create Task" />
+      <LoadingOverlay open={openPosting} text="Creating Task..." />
       <Container maxWidth="md">
         <Grid
           container
@@ -88,20 +125,28 @@ export default function Form() {
               size="big"
               sx={{ ml: 4 }}
               onClick={() => {
+                const v = (c: boolean | undefined) =>
+                  c === undefined || c === true;
                 const newTask: TaskProps = {
                   title: title,
                   description: description,
-                  options: questions,
+                  questions: questions,
                 };
-                console.log(
-                  titleError ||
-                    descriptionError ||
-                    cryptoAllocatedError ||
-                    maxTaskersError ||
-                    currQuestionTitleError ||
-                    currQuestionChoicesError
-                );
-                console.log(newTask);
+                const hasError =
+                  v(titleError) ||
+                  v(descriptionError) ||
+                  v(cryptoAllocatedError) ||
+                  v(maxTaskersError) ||
+                  v(currQuestionTitleError) ||
+                  v(currQuestionChoicesError) ||
+                  newTask.questions.length < 1;
+
+                if (hasError) {
+                  alert("Please provide valid inputs!");
+                  return;
+                }
+
+                handleCreateTask(newTask, cryptoAllocated, maxTaskers);
               }}
             />
           </Box>
@@ -156,15 +201,11 @@ export default function Form() {
                   <CustomTextField
                     onChange={(e) => {
                       const val = Number(e.target.value);
-                      if (
+                      setCryptoAllocatedError(
                         isNaN(val) ||
-                        val < Number(process.env.NEXT_PUBLIC_MIN_ETH)
-                      ) {
-                        setCryptoAllocatedError(true);
-                      } else {
-                        setCryptoAllocatedError(false);
-                        setCryptoAllocated(val);
-                      }
+                          val < Number(process.env.NEXT_PUBLIC_MIN_ETH)
+                      );
+                      setCryptoAllocated(val);
                     }}
                     error={cryptoAllocatedError}
                     helperText={
@@ -172,7 +213,6 @@ export default function Form() {
                       `Must be ≥${process.env.NEXT_PUBLIC_MIN_ETH}`
                     }
                     size="small"
-                    placeholder="ETH"
                     sx={{
                       ml: 2,
                       mr: 1,
@@ -190,20 +230,17 @@ export default function Form() {
                   <CustomTextField
                     onChange={(e) => {
                       const val = Number(e.target.value);
-                      if (
+                      setMaxTaskersError(
                         isNaN(val) ||
-                        val < Number(process.env.NEXT_PUBLIC_MIN_TASKERS)
-                      ) {
-                        setMaxTaskersError(true);
-                      } else {
-                        setMaxTaskersError(false);
-                        setMaxTaskers(val);
-                      }
+                          val < Number(process.env.NEXT_PUBLIC_MIN_TASKERS) ||
+                          !Number.isInteger(val)
+                      );
+                      setMaxTaskers(val);
                     }}
                     error={maxTaskersError}
                     helperText={
                       maxTaskersError &&
-                      `Must be ≥${process.env.NEXT_PUBLIC_MIN_TASKERS}`
+                      `Must be integer ≥${process.env.NEXT_PUBLIC_MIN_TASKERS}`
                     }
                     size="small"
                     sx={{ ml: 2, width: 100 }}
@@ -212,14 +249,30 @@ export default function Form() {
               </Grid>
             </Grid>
           </FormControl>
-
+          <Typography
+            color="primary"
+            mt={
+              cryptoAllocatedError === false && maxTaskersError === false
+                ? 2
+                : 0
+            }
+            mx="auto"
+          >
+            {cryptoAllocatedError === false && maxTaskersError === false
+              ? `Taskers will earn ${Moralis.Units.FromWei(
+                  computeUnitRewardWei(Moralis, cryptoAllocated, maxTaskers)
+                )}
+          ETH per completed task. This reward is subject to change.`
+              : null}
+          </Typography>
           <Typography
             color="secondary"
             align="center"
-            sx={{ fontStyle: "italic", mt: 2 }}
+            fontStyle="italic"
+            mt={2}
           >
-            The task will close when either the crypto allocation runs out or
-            the number of Taskers reaches the limit, whichever comes first
+            Your task will close when either the crypto allocation runs out or
+            the number of Taskers reaches the limit, whichever comes first.
           </Typography>
         </DefaultGrayCard>
         {/* ===== End Task Heading ===== */}
@@ -236,10 +289,12 @@ export default function Form() {
 
         {/* Render all options in questions */}
         {questions.map((question: GenericQuestion, i: number) => (
-          <QuestionCard
-            title={question.question}
-            choices={question.options}
+          <MCQuestion
             key={i}
+            idx={i}
+            question={question.question}
+            options={question.options}
+            handleSetAnswers={() => {}}
           />
         ))}
 
@@ -281,7 +336,6 @@ export default function Form() {
                       Number(process.env.NEXT_PUBLIC_MIN_TASK_DATA_CHARS)
                   );
                 }}
-                placeholder="Interesting Task Title"
                 error={currQuestionTitleError}
                 helperText={
                   currQuestionTitleError &&
@@ -357,32 +411,6 @@ export default function Form() {
         {/* ===== End Modal to add another question ===== */}
       </Container>
     </>
-  );
-}
-
-function QuestionCard(props: { title: string; choices: string[] }) {
-  return (
-    <DefaultGrayCard>
-      <Typography color="primary" variant="h5" mb={1}>
-        {props.title}
-      </Typography>
-      <List>
-        {props.choices.map((choice, i: number) => (
-          <ListItem sx={{ mb: -0.5 }} key={i}>
-            <ListItemIcon>
-              <CircleOutlinedIcon
-                style={{ color: gigTheme.palette.primary.main }}
-              />
-            </ListItemIcon>
-            <ListItemText
-              primaryTypographyProps={{ fontSize: "20px" }}
-              primary={choice}
-              style={{ color: gigTheme.palette.primary.main }}
-            />
-          </ListItem>
-        ))}
-      </List>
-    </DefaultGrayCard>
   );
 }
 
