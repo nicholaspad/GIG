@@ -82,8 +82,8 @@ Moralis.Cloud.define(
   "getBrowseTasksTableData",
   async (request) => {
     /*
-    Retreives the task IDs for the tasks a user has claimed.
-  */
+      Retreives the task IDs for the tasks a user has claimed.
+    */
     async function getTaskerClaimedTaskIds(ethAddress) {
       const tableName = "TaskUsers";
 
@@ -446,6 +446,83 @@ Moralis.Cloud.define(
     return res.destroy().then(
       async () => {
         await decrementNumTaskers(taskId);
+        return {
+          success: true,
+          message: `Address ${ethAddress} successfully abandoned task ${taskId}!`,
+        };
+      },
+      (error) => {
+        return {
+          success: false,
+          message: `Address ${ethAddress} failed to abandon task ${taskId}: ${error}`,
+        };
+      }
+    );
+  },
+  {
+    fields: ["taskId"],
+    requireUser: true,
+  }
+);
+
+/* ------------------------------------------------------------------- */
+
+Moralis.Cloud.define(
+  "requesterAbandonTask",
+  async (request) => {
+    async function destroyQuestions(taskId) {
+      const tableName = "Questions";
+
+      const Questions = Moralis.Object.extend(tableName);
+      const query = new Moralis.Query(Questions);
+      const res = await query.equalTo("taskId", taskId).find();
+
+      res.forEach(async (e) => await e.destroy());
+    }
+
+    async function destroyClaimedTasks(taskId) {
+      const verifiedAndPaid = 2;
+      const tableName = "TaskUsers";
+
+      const TaskUsers = Moralis.Object.extend(tableName);
+      const query = new Moralis.Query(TaskUsers);
+      const res = await query
+        .equalTo("taskId", taskId)
+        .notEqualTo("status", verifiedAndPaid)
+        .find();
+
+      res.forEach(async (e) => await e.destroy());
+    }
+
+    const ethAddress = request.user.get("ethAddress");
+    const taskId = request.params.taskId;
+    const tableName = "Tasks";
+
+    const Tasks = Moralis.Object.extend(tableName);
+    const query = new Moralis.Query(Tasks);
+    const res = await query
+      .equalTo("requesterId", ethAddress)
+      .equalTo("objectId", taskId)
+      .first();
+
+    if (!res)
+      return {
+        success: false,
+        message: `Address ${ethAddress} failed to abandon task ${taskId}: address did not create task`,
+      };
+
+    // Do not allow task abandonment if its status is not in progress
+    if (res.get("status") !== 0)
+      return {
+        success: false,
+        message: `Address ${ethAddress} failed to abandon task ${taskId}: task is not in progress`,
+      };
+
+    await destroyQuestions(taskId);
+    await destroyClaimedTasks(taskId);
+
+    return res.destroy().then(
+      async () => {
         return {
           success: true,
           message: `Address ${ethAddress} successfully abandoned task ${taskId}!`,
