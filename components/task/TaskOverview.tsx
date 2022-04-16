@@ -87,7 +87,7 @@ export default function TaskOverviewTemplate(props: {
                 <SectionTitle>Reward</SectionTitle>
                 <Box
                   borderRadius={2}
-                  width={230}
+                  width="fit-content"
                   display="flex"
                   flexDirection="row"
                   alignItems="center"
@@ -96,6 +96,7 @@ export default function TaskOverviewTemplate(props: {
                   mb={3}
                   mx="auto"
                   py={1}
+                  px={2}
                   sx={{
                     backgroundImage: `linear-gradient(90deg, ${gigTheme.palette.primaryCTA.primary}, ${gigTheme.palette.primaryCTA.secondary})`,
                   }}
