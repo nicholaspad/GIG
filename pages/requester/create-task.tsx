@@ -16,14 +16,27 @@ import { createTask } from "../../src/Database";
 import { useMoralis } from "react-moralis";
 import { useRouter } from "next/router";
 import { computeUnitRewardWei } from "../../src/Helpers";
+import { ethers } from "ethers";
+import EscrowFactory from "../../src/utils/abi/EscrowFactory.json";
+import {
+  StackedLineChartSharp,
+  StackedLineChartTwoTone,
+} from "@mui/icons-material";
 
 export default function Form() {
+  const escrowFactoryAddress: string =
+    "0x18f82D00D407e08b704F4Eb900D4F5128c44A3f7";
+  const maticTokenAddress: string =
+    "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0";
   const { isInitialized, Moralis } = useMoralis();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [openPosting, setOpenPosting] = useState(false);
   const [questions, setQuestions] = useState<GenericQuestion[]>([]);
   const [currIndex, setCurrIndex] = useState(1);
+  const { user } = useMoralis();
+  const requesterAddress = user?.get("ethAddress");
+  const escrowABI = EscrowFactory.abi;
 
   // Task overview
   const [title, setTitle] = useState("");
@@ -82,7 +95,38 @@ export default function Form() {
     /*
       Require user to send ETH here. Wait for x confirmations before continuing. @christine-sun @jennsun
     */
+    // Deploy new contract for this Task
+    alert("Before staking");
+    await stakeCrypto();
+    alert("After staking");
+    // const escrowFactory = new ethers.Contract(
+    //   escrowFactoryAddress,
+    //   EscrowFactory.abi
+    // );
 
+    // const result = await escrowFactory
+    //   .connect(requesterAddress)
+    //   .createNewEscrow(
+    //     maticTokenAddress,
+    //     maxTaskers,
+    //     requesterAddress
+    //     // , {gasLimit: 300000, // Best number to use here?}
+    //   );
+    // await result.wait();
+    // const length = await (
+    //   await escrowFactory.connect(requesterAddress)
+    // ).escrowArrayLength();
+
+    // const newContractAddress = await escrowFactory
+    //   .connect(requesterAddress)
+    //   .escrowArray(length - 1);
+    // console.log(
+    //   "Successfully created new contract on the frontend with this address"
+    // );
+    // console.log(newContractAddress);
+
+    // Putting Task in Moralis
+    // TODO - Add contract address to database info associated with newTask
     const res = await createTask(Moralis, newTask, cryptoAllocated, maxTaskers);
     if (!res.success) {
       setOpenPosting(false);
@@ -92,6 +136,59 @@ export default function Form() {
 
     alert(res.message);
     router.push("/requester/my-tasks");
+  };
+
+  const stakeCrypto = async () => {
+    alert("About to stake crypto");
+    try {
+      const { ethereum } = window;
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+
+        // Deploy a new contract for this Task
+        alert("1");
+        const escrowFactory = new ethers.Contract(
+          escrowFactoryAddress,
+          escrowABI,
+          signer
+        );
+        alert("2");
+        // THE ERROR IS HERE
+        // const newContractResult = await (
+        //   await escrowFactory.connect(requesterAddress)
+        // ).createNewEscrow(maticTokenAddress, maxTaskers, requesterAddress);
+        const newContractResult = await escrowFactory.createNewEscrow(
+          maticTokenAddress,
+          maxTaskers,
+          requesterAddress
+        );
+        alert("3");
+        await newContractResult.wait();
+        // def ways we can make this faster by reusing the connection
+        alert("4");
+        const length = await (
+          await escrowFactory.connect(requesterAddress)
+        ).escrowArrayLength();
+        alert("5");
+
+        const newContractAddress = await escrowFactory
+          .connect(requesterAddress)
+          .escrowArray(length - 1);
+        alert("5");
+        alert(
+          `Successfully created new contract with address "${newContractAddress}" yeah`
+        );
+        console.log(
+          "Successfully created new contract on the frontend with this address"
+        );
+        console.log(newContractAddress);
+      }
+    } catch (error) {
+      // you should probably return the error here and not do stuff after\
+      alert("Oh no there was an error");
+      alert(`${error}`);
+    }
   };
 
   return (
