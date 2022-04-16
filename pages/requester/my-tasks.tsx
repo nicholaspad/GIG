@@ -79,21 +79,6 @@ export default function MyTasks() {
       ),
     },
     {
-      field: "maxRewardWei",
-      sortable: false,
-      disableColumnMenu: true,
-      type: "number",
-      minWidth: 180,
-      align: "left",
-      renderHeader: () => <TableHeader>ETH Used / Max</TableHeader>,
-      renderCell: (params: GridValueGetterParams) => (
-        <TableCell>
-          {params.row.numResponses * params.row.reward} /{" "}
-          {params.row.maxRewardWei}
-        </TableCell>
-      ),
-    },
-    {
       field: "numResponses",
       sortable: false,
       disableColumnMenu: true,
@@ -104,6 +89,21 @@ export default function MyTasks() {
       renderCell: (params: GridValueGetterParams) => (
         <TableCell>
           {params.row.numResponses} / {params.row.maxResponses}
+        </TableCell>
+      ),
+    },
+    {
+      field: "maxRewardWei",
+      sortable: false,
+      disableColumnMenu: true,
+      type: "number",
+      minWidth: 450,
+      align: "left",
+      renderHeader: () => <TableHeader>ETH Used / Max</TableHeader>,
+      renderCell: (params: GridValueGetterParams) => (
+        <TableCell>
+          {params.row.numResponses * params.row.reward} /{" "}
+          {params.row.maxRewardWei}
         </TableCell>
       ),
     },
