@@ -43,11 +43,11 @@ export default function TasksTable(props: {
       sortable: false,
       disableColumnMenu: true,
       type: "number",
-      minWidth: 150,
+      minWidth: 200,
       align: "left",
-      renderHeader: () => <TableHeader>Reward</TableHeader>,
+      renderHeader: () => <TableHeader>ETH Reward</TableHeader>,
       renderCell: (params: GridValueGetterParams) => (
-        <TableCell>{params.row.reward} ETH</TableCell>
+        <TableCell>{params.row.reward}</TableCell>
       ),
     },
   ];

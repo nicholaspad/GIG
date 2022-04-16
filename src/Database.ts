@@ -82,6 +82,16 @@ export async function taskerAbandonTask(
   return await Moralis.Cloud.run("taskerAbandonTask", { taskId: taskId });
 }
 
+/*
+  Abandons a task (Requester functionality).
+*/
+export async function requesterAbandonTask(
+  Moralis: MoralisType,
+  taskId: string
+): Promise<{ success: boolean; message: string }> {
+  return await Moralis.Cloud.run("requesterAbandonTask", { taskId: taskId });
+}
+
 /* 
   Post a new task (Requester functionality).
 */
