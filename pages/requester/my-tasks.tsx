@@ -4,16 +4,50 @@ import { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
 import PrimaryButtonCTA from "../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../components/buttons/SecondaryButtonCTA";
+import LoadingOverlay from "../../components/common/LoadingOverlay";
 import PageHeader from "../../components/common/PageHeader";
 import { TableCell, TableHeader } from "../../components/tables/Helpers";
 import MyTasksTable from "../../components/tables/MyTasksTable";
-import { getRequesterCreatedTasksTableData } from "../../src/Database";
+import {
+  getRequesterCreatedTasksTableData,
+  requesterAbandonTask,
+} from "../../src/Database";
 import { gigTheme } from "../../src/Theme";
-import { CreatedTaskStatus, TaskData, TaskStatus } from "../../src/Types";
+import { CreatedTaskStatus, TaskData } from "../../src/Types";
 
 export default function MyTasks() {
   const { isInitialized, Moralis } = useMoralis();
+  const [openLoading, setOpenLoading] = useState(false);
   const [data, setData] = useState<TaskData[]>();
+  const [refreshTable, setRefreshTable] = useState(false);
+
+  const handleAbandonTask = async (
+    taskId: string,
+    taskName: string,
+    remainingReward: number
+  ) => {
+    if (
+      !isInitialized ||
+      !confirm(
+        `Are you sure you want to abandon task "${taskName}"? You will be refunded approximately ${remainingReward} ETH.`
+      )
+    )
+      return;
+
+    setOpenLoading(true);
+
+    const res = await requesterAbandonTask(Moralis, taskId as string);
+
+    if (!res.success) {
+      setOpenLoading(false);
+      alert(res.message);
+      return;
+    }
+
+    alert(res.message);
+    setRefreshTable(!refreshTable);
+    setOpenLoading(false);
+  };
 
   const extraColumns: GridColDef[] = [
     {
@@ -56,7 +90,14 @@ export default function MyTasks() {
               <SecondaryButtonCTA
                 text="Abandon"
                 size="small"
-                to="/requester/my-tasks"
+                onClick={() => {
+                  handleAbandonTask(
+                    params.row.task_id,
+                    params.row.name,
+                    params.row.maxRewardWei -
+                      params.row.numResponses * params.row.reward
+                  );
+                }}
               />
             </Box>
           ) : null}
@@ -129,11 +170,12 @@ export default function MyTasks() {
       }
       setData(tempData);
     });
-  }, [isInitialized, Moralis]);
+  }, [isInitialized, Moralis, refreshTable]);
 
   return (
     <>
       <PageHeader title="Requester Created Tasks" />
+      <LoadingOverlay open={openLoading} text="Abandoning Task..." />
       <PrimaryButtonCTA
         text="Create Task →"
         size="small"
