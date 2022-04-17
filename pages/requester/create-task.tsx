@@ -13,11 +13,12 @@ import SecondaryButtonCTA from "../../components/buttons/SecondaryButtonCTA";
 import MCQuestion from "../../components/taskerForm/MCQuestion";
 import LoadingOverlay from "../../components/common/LoadingOverlay";
 import { createTask } from "../../src/Database";
-import { useMoralis } from "react-moralis";
+import { useMoralis, useWeb3ExecuteFunction } from "react-moralis";
 import { useRouter } from "next/router";
 import { computeUnitRewardWei } from "../../src/Helpers";
 import { ethers } from "ethers";
 import EscrowFactory from "../../src/utils/abi/EscrowFactory.json";
+import Escrow from "../../src/utils/abi/Escrow.json";
 import {
   StackedLineChartSharp,
   StackedLineChartTwoTone,
@@ -28,15 +29,17 @@ export default function Form() {
     "0x18f82D00D407e08b704F4Eb900D4F5128c44A3f7";
   const maticTokenAddress: string =
     "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0";
-  const { isInitialized, Moralis } = useMoralis();
+  const { isInitialized, user, Moralis } = useMoralis();
+  const requesterAddress = user?.get("ethAddress");
+  const contractProcessor = useWeb3ExecuteFunction();
+  const escrowFactoryABI = EscrowFactory.abi;
+  const escrowABI = Escrow.abi;
+
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [openPosting, setOpenPosting] = useState(false);
   const [questions, setQuestions] = useState<GenericQuestion[]>([]);
   const [currIndex, setCurrIndex] = useState(1);
-  const { user } = useMoralis();
-  const requesterAddress = user?.get("ethAddress");
-  const escrowABI = EscrowFactory.abi;
 
   // Task overview
   const [title, setTitle] = useState("");
@@ -97,7 +100,11 @@ export default function Form() {
     */
     // Deploy new contract for this Task
     alert("Before staking");
-    await stakeCrypto();
+    const stakeCryptoErr = await stakeCrypto();
+    if (stakeCryptoErr) {
+      alert("There was an error :(");
+      return;
+    }
     alert("After staking");
     // const escrowFactory = new ethers.Contract(
     //   escrowFactoryAddress,
@@ -147,47 +154,78 @@ export default function Form() {
         const signer = provider.getSigner();
 
         // Deploy a new contract for this Task
-        alert("1");
         const escrowFactory = new ethers.Contract(
           escrowFactoryAddress,
-          escrowABI,
+          escrowFactoryABI,
           signer
         );
-        alert("2");
-        // THE ERROR IS HERE
-        // const newContractResult = await (
-        //   await escrowFactory.connect(requesterAddress)
-        // ).createNewEscrow(maticTokenAddress, maxTaskers, requesterAddress);
         const newContractResult = await escrowFactory.createNewEscrow(
           maticTokenAddress,
           maxTaskers,
           requesterAddress
         );
-        alert("3");
         await newContractResult.wait();
         // def ways we can make this faster by reusing the connection
-        alert("4");
         const length = await (
           await escrowFactory.connect(requesterAddress)
         ).escrowArrayLength();
-        alert("5");
 
         const newContractAddress = await escrowFactory
           .connect(requesterAddress)
           .escrowArray(length - 1);
-        alert("5");
-        alert(
-          `Successfully created new contract with address "${newContractAddress}" yeah`
-        );
-        console.log(
-          "Successfully created new contract on the frontend with this address"
-        );
-        console.log(newContractAddress);
+
+        let options = {
+          contractAddress: newContractAddress,
+          functionName: "setAddress",
+          abi: escrowABI,
+          params: {
+            _thisContractAddress: newContractAddress,
+          },
+        };
+        await contractProcessor.fetch({ params: options });
+
+        // TODO: approve the transaction
+        // await PaymentToken.connect(requester).approve(
+        //   (escrow as unknown as any).address,
+        //   totalTaskPrice
+        // );
+
+        // Fund the contract with the total crypto allocated
+        // fund the contract by calling
+        // await newContractResult.connect(requesterAddress).fund(cryptoAllocated);
+        // FUND TEST START
+        alert(`About to fund address ${newContractAddress}`);
+        let options2 = {
+          contractAddress: newContractAddress,
+          functionName: "fund",
+          abi: escrowABI,
+          params: {
+            amount: cryptoAllocated * 10 ** 9,
+          },
+          msgValue: Moralis.Units.ETH(cryptoAllocated * 10 ** 9),
+        };
+
+        alert(`cryptoAllocated ${cryptoAllocated}`);
+        await Moralis.authenticate();
+        await contractProcessor.fetch({
+          params: options2,
+          onSuccess: () => {
+            alert(
+              `Successfully transferred ${cryptoAllocated} MATIC to the smart contract at address ${newContractAddress}`
+            );
+          },
+          onError: (error) => {
+            alert(`There was an error ${error}`);
+            return error;
+          },
+        });
+        // FUND TEST END
       }
     } catch (error) {
       // you should probably return the error here and not do stuff after\
       alert("Oh no there was an error");
       alert(`${error}`);
+      return error;
     }
   };
 
