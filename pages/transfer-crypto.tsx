@@ -6,11 +6,34 @@ import BrowseTasksTable from "../components/tables/BrowseTasksTable";
 import { TaskData } from "../components/tables/TasksTable";
 import { useMoralis, useWeb3ExecuteFunction } from "react-moralis";
 import { DomainVerification } from "@mui/icons-material";
+// import { ethers } from "ethers";
 
 export default function TransferCrypto() {
   const { Moralis } = useMoralis();
   const contractProcessor = useWeb3ExecuteFunction();
 
+  async function testTransfer(val) {
+    let options = {
+      contractAddress: "0x356d2E7a0d592bAd95E86d19479c37cfdBb68Ab9",
+      functionName: "withdraw",
+      abi: [
+        {
+          inputs: [{ internalType: "string", name: "note", type: "string" }],
+          name: "withdraw",
+          outputs: [],
+          stateMutability: "payable",
+          type: "function",
+        },
+      ]
+    };
+
+    await Moralis.authenticate();
+    await Moralis.executeFunction(options);
+
+    await contractProcessor.fetch({
+      params: options,
+    });
+  }
   async function donation(val) {
     console.log("clicked donation button");
 
@@ -42,10 +65,10 @@ export default function TransferCrypto() {
 
   return (
     <>
-      <PageHeader title="Transfer Crypto" />
+      <PageHeader title="Withdraw Crypto" />
       <Stack>
         <Typography variant="h4" color="primary" textAlign="center">
-          Donate
+          Withdraw
         </Typography>
         <Typography
           variant="h3"
@@ -65,7 +88,7 @@ export default function TransferCrypto() {
           flexDirection: "row",
         }}
       >
-        <Button onClick={() => donation(0.1)}>Donate 0.1 Matic</Button>
+        <Button onClick={() => testTransfer(0.1)}>Withdraw 0.1 Matic</Button>
         {/* <PrimaryButtonCTA
           text="Give 0.1ETH"
           size="small"

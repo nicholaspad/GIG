@@ -16,9 +16,10 @@ import { createTask } from "../../src/Database";
 import { useMoralis, useWeb3ExecuteFunction } from "react-moralis";
 import { useRouter } from "next/router";
 import { computeUnitRewardWei } from "../../src/Helpers";
-import { ethers } from "ethers";
+import { ethers, BigNumber } from "ethers";
 import EscrowFactory from "../../src/utils/abi/EscrowFactory.json";
 import Escrow from "../../src/utils/abi/Escrow.json";
+import ERC20ABI from "../../src/utils/abi/ERC20Token.json";
 import {
   StackedLineChartSharp,
   StackedLineChartTwoTone,
@@ -26,7 +27,7 @@ import {
 
 export default function Form() {
   const escrowFactoryAddress: string =
-    "0x18f82D00D407e08b704F4Eb900D4F5128c44A3f7";
+    "0x5dbd6085d4bDCb57eBF5E4b2817D6e20DdEE136b";
   const maticTokenAddress: string =
     "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0";
   const { isInitialized, user, Moralis } = useMoralis();
@@ -44,10 +45,12 @@ export default function Form() {
   // Task overview
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [cryptoAllocated, setCryptoAllocated] = useState(0);
+  const [cryptoAllocated, setCryptoAllocated] = useState<BigNumber>(
+    BigNumber.from("0")
+  );
   const [maxTaskers, setMaxTaskers] = useState(0);
 
-  // Errors associated with task overvieww
+  // Errors associated with task overview
   const [titleError, setTitleError] = useState<boolean>();
   const [descriptionError, setDescriptionError] = useState<boolean>();
   const [cryptoAllocatedError, setCryptoAllocatedError] = useState<boolean>();
@@ -146,80 +149,71 @@ export default function Form() {
   };
 
   const stakeCrypto = async () => {
-    alert("About to stake crypto");
+    console.log("About to stake crypto");
     try {
       const { ethereum } = window;
       if (ethereum) {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
 
+        console.log("new contract factory");
         // Deploy a new contract for this Task
         const escrowFactory = new ethers.Contract(
           escrowFactoryAddress,
           escrowFactoryABI,
           signer
         );
+        console.log("new contract");
         const newContractResult = await escrowFactory.createNewEscrow(
           maticTokenAddress,
           maxTaskers,
           requesterAddress
         );
-        await newContractResult.wait();
+        console.log("wait");
+        await newContractResult.wait(); // wait for transaction to be accepted into block
+
+        console.log("get length");
         // def ways we can make this faster by reusing the connection
         const length = await (
           await escrowFactory.connect(requesterAddress)
         ).escrowArrayLength();
 
+        console.log("new contract address");
         const newContractAddress = await escrowFactory
           .connect(requesterAddress)
           .escrowArray(length - 1);
-
-        let options = {
-          contractAddress: newContractAddress,
-          functionName: "setAddress",
-          abi: escrowABI,
-          params: {
-            _thisContractAddress: newContractAddress,
-          },
-        };
-        await contractProcessor.fetch({ params: options });
-
-        // TODO: approve the transaction
-        // await PaymentToken.connect(requester).approve(
-        //   (escrow as unknown as any).address,
-        //   totalTaskPrice
-        // );
+        console.log(`new contract at ${newContractAddress}`);
 
         // Fund the contract with the total crypto allocated
-        // fund the contract by calling
-        // await newContractResult.connect(requesterAddress).fund(cryptoAllocated);
-        // FUND TEST START
-        alert(`About to fund address ${newContractAddress}`);
-        let options2 = {
-          contractAddress: newContractAddress,
-          functionName: "fund",
-          abi: escrowABI,
-          params: {
-            amount: cryptoAllocated * 10 ** 9,
-          },
-          msgValue: Moralis.Units.ETH(cryptoAllocated * 10 ** 9),
-        };
+        console.log("new escrow ref");
+        const escrow = new ethers.Contract(
+          newContractAddress,
+          escrowABI,
+          signer
+        );
+        console.log("matic token");
+        // Get reference to MATIC Token contract
+        const maticContract = new ethers.Contract(
+          maticTokenAddress,
+          ERC20ABI,
+          signer
+        );
+        console.log("approve");
+        // Ask PaymentToken to give allowance
+        const approvalResult = await maticContract
+          .connect(signer)
+          .approve(
+            (escrow as unknown as any).address,
+            cryptoAllocated.mul(BigNumber.from(10).pow(18)).toString()
+          );
+        await approvalResult.wait();
+        console.log("get escrow fund result");
+        const escrowFundResult = await escrow
+          .connect(requesterAddress)
+          .fund(cryptoAllocated);
 
-        alert(`cryptoAllocated ${cryptoAllocated}`);
-        await Moralis.authenticate();
-        await contractProcessor.fetch({
-          params: options2,
-          onSuccess: () => {
-            alert(
-              `Successfully transferred ${cryptoAllocated} MATIC to the smart contract at address ${newContractAddress}`
-            );
-          },
-          onError: (error) => {
-            alert(`There was an error ${error}`);
-            return error;
-          },
-        });
-        // FUND TEST END
+        // fund the contract by calling
+        // await newContractAddress.connect(requesterAddress).fund(cryptoAllocated);
       }
     } catch (error) {
       // you should probably return the error here and not do stuff after\
@@ -336,11 +330,14 @@ export default function Form() {
                   <CustomTextField
                     onChange={(e) => {
                       const val = Number(e.target.value);
+                      if (isNaN(val)) {
+                        return;
+                      }
                       setCryptoAllocatedError(
                         isNaN(val) ||
                           val < Number(process.env.NEXT_PUBLIC_MIN_ETH)
                       );
-                      setCryptoAllocated(val);
+                      setCryptoAllocated(BigNumber.from(e.target.value));
                     }}
                     error={cryptoAllocatedError}
                     helperText={
