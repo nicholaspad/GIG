@@ -1,4 +1,3 @@
-import MoralisType from "moralis";
 import { Container, Box, CircularProgress } from "@mui/material";
 import Question from "../../../components/taskerForm/Question";
 import PrimaryButtonCTA from "../../../components/buttons/PrimaryButtonCTA";
@@ -15,7 +14,7 @@ import {
 } from "../../../src/Database";
 import LoadingOverlay from "../../../components/common/LoadingOverlay";
 
-export default function taskerForm() {
+export default function TaskerForm() {
   /* Test Data */
   const q1 = {
     id: "00001",
@@ -55,7 +54,10 @@ export default function taskerForm() {
 
   const handleAbandonTask = async (taskName: string) => {
     if (!taskId) return;
-    if (!confirm(`Are you sure you want to abandon task "${taskName}"?`))
+    if (
+      !isInitialized ||
+      !confirm(`Are you sure you want to abandon task "${taskName}"?`)
+    )
       return;
 
     setOpenLoading(true);
@@ -85,7 +87,7 @@ export default function taskerForm() {
   };
 
   useEffect(() => {
-    if (!isInitialized || !user || !taskId) return;
+    if (!isInitialized || !user || !taskId || !router || !user) return;
 
     const ethAddress = user.get("ethAddress");
     checkTaskerClaimedTask(Moralis, taskId as string).then((res) => {
@@ -97,7 +99,7 @@ export default function taskerForm() {
 
       setIsAllowed(true);
     });
-  }, [isInitialized, taskId]);
+  }, [isInitialized, Moralis, taskId, router, user]);
 
   if (!isAllowed)
     return (
@@ -120,7 +122,7 @@ export default function taskerForm() {
   return (
     <>
       <PageHeader title="Task" />
-      <LoadingOverlay open={openLoading} />
+      <LoadingOverlay open={openLoading} text="Abandoning Task..." />
       <Container maxWidth="sm">
         <GrayCard sx={{ mt: 2 }}>
           <Box sx={{ p: 3 }}>

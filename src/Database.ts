@@ -1,4 +1,5 @@
 import MoralisType from "moralis";
+import { TaskProps } from "./Types";
 
 /*
   Edit the below functions on the Moralis Dashboard (Cloud Functions) or by
@@ -73,13 +74,36 @@ export async function taskerClaimTask(
 
 /*
   Abandons a task (Tasker functionality).
-  @nicholaspad Do we want abandoned tasks to return to Browse Tasks?
-    Or do we want them to be marked as "Abandoned" in My Tasks and not
-    let the Tasker claim them again?
 */
 export async function taskerAbandonTask(
   Moralis: MoralisType,
   taskId: string
 ): Promise<{ success: boolean; message: string }> {
   return await Moralis.Cloud.run("taskerAbandonTask", { taskId: taskId });
+}
+
+/*
+  Abandons a task (Requester functionality).
+*/
+export async function requesterAbandonTask(
+  Moralis: MoralisType,
+  taskId: string
+): Promise<{ success: boolean; message: string }> {
+  return await Moralis.Cloud.run("requesterAbandonTask", { taskId: taskId });
+}
+
+/* 
+  Post a new task (Requester functionality).
+*/
+export async function createTask(
+  Moralis: MoralisType,
+  newTask: TaskProps,
+  cryptoAllocated: number,
+  maxTaskers: number
+): Promise<{ success: boolean; message: string }> {
+  return await Moralis.Cloud.run("createTask", {
+    newTask: newTask,
+    maxRewardETH: cryptoAllocated,
+    maxResponses: maxTaskers,
+  });
 }

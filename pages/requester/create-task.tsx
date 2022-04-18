@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Box from "@mui/material/Box";
 import { Container, Modal, styled, Typography } from "@mui/material";
 import TextField from "@mui/material/TextField";
@@ -6,41 +6,63 @@ import { gigTheme } from "../../src/Theme";
 import FormControl from "@mui/material/FormControl";
 import DefaultGrayCard from "../../components/common/DefaultGrayCard";
 import Grid from "@mui/material/Grid";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
 import { GenericQuestion, QuestionType, TaskProps } from "../../src/Types";
 import PageHeader from "../../components/common/PageHeader";
 import PrimaryButtonCTA from "../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../components/buttons/SecondaryButtonCTA";
+import MCQuestion from "../../components/taskerForm/MCQuestion";
+import LoadingOverlay from "../../components/common/LoadingOverlay";
+import { createTask } from "../../src/Database";
+import { useMoralis, useWeb3ExecuteFunction } from "react-moralis";
+import { useRouter } from "next/router";
+import { computeUnitRewardWei } from "../../src/Helpers";
+import { ethers, BigNumber } from "ethers";
+import EscrowFactory from "../../src/utils/abi/EscrowFactory.json";
+import Escrow from "../../src/utils/abi/Escrow.json";
+import ERC20ABI from "../../src/utils/abi/ERC20Token.json";
+import {
+  StackedLineChartSharp,
+  StackedLineChartTwoTone,
+} from "@mui/icons-material";
 
 export default function Form() {
+  const escrowFactoryAddress: string =
+    "0x5dbd6085d4bDCb57eBF5E4b2817D6e20DdEE136b";
+  const maticTokenAddress: string =
+    "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889";
+  const { isInitialized, user, Moralis } = useMoralis();
+  const requesterAddress = user?.get("ethAddress");
+  const contractProcessor = useWeb3ExecuteFunction();
+  const escrowFactoryABI = EscrowFactory.abi;
+  const escrowABI = Escrow.abi;
+
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [openPosting, setOpenPosting] = useState(false);
   const [questions, setQuestions] = useState<GenericQuestion[]>([]);
   const [currIndex, setCurrIndex] = useState(1);
 
   // Task overview
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [cryptoAllocated, setCryptoAllocated] = useState(0);
+  const [cryptoAllocated, setCryptoAllocated] = useState<string>("0");
   const [maxTaskers, setMaxTaskers] = useState(0);
 
-  // Errors associated with task overvieww
-  const [titleError, setTitleError] = useState(false);
-  const [descriptionError, setDescriptionError] = useState(false);
-  const [cryptoAllocatedError, setCryptoAllocatedError] = useState(false);
-  const [maxTaskersError, setMaxTaskersError] = useState(false);
+  // Errors associated with task overview
+  const [titleError, setTitleError] = useState<boolean>();
+  const [descriptionError, setDescriptionError] = useState<boolean>();
+  const [cryptoAllocatedError, setCryptoAllocatedError] = useState<boolean>();
+  const [maxTaskersError, setMaxTaskersError] = useState<boolean>();
 
   // New question from modal popup
   const [currQuestionTitle, setCurrQuestionTitle] = useState("");
   const [currQuestionChoices, setCurrQuestionChoices] = useState<string[]>([]);
 
   // Errors associated with new question modal popup
-  const [currQuestionTitleError, setCurrQuestionTitleError] = useState(false);
+  const [currQuestionTitleError, setCurrQuestionTitleError] =
+    useState<boolean>();
   const [currQuestionChoicesError, setCurrQuestionChoicesError] =
-    useState(false);
+    useState<boolean>();
 
   const removeQuestion = (index: number) => {
     var array = [...questions];
@@ -58,9 +80,108 @@ export default function Form() {
     setOpen(false);
   };
 
+  const handleCreateTask = async (
+    newTask: TaskProps,
+    cryptoAllocated: string,
+    maxTaskers: number
+  ) => {
+    if (
+      !isInitialized ||
+      !confirm(
+        `Are you sure you want to create task "${newTask.title}" with ${newTask.questions.length} question(s) ` +
+          `and ${maxTaskers} maximum responses? You will be required to stake ${cryptoAllocated} ETH.`
+      )
+    )
+      return;
+
+    setOpenPosting(true);
+
+    // Deploy new contract for this Task
+    const stakeCryptoErr = await stakeCrypto();
+    if (stakeCryptoErr) {
+      alert("There was an error creating this task.");
+      return;
+    }
+
+    // Putting Task in Moralis
+    // TODO - Add contract address to database info associated with newTask
+    const res = await createTask(
+      Moralis,
+      newTask,
+      parseFloat(cryptoAllocated),
+      maxTaskers
+    );
+    if (!res.success) {
+      setOpenPosting(false);
+      alert(res.message);
+      return;
+    }
+
+    alert(res.message);
+    router.push("/requester/my-tasks");
+  };
+
+  const stakeCrypto = async () => {
+    try {
+      const { ethereum } = window;
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+
+        // Deploy a new contract for this Task
+        const escrowFactory = new ethers.Contract(
+          escrowFactoryAddress,
+          escrowFactoryABI,
+          signer
+        );
+        const newContractResult = await escrowFactory.createNewEscrow(
+          maticTokenAddress,
+          maxTaskers,
+          requesterAddress
+        );
+        await newContractResult.wait(); // Wait for transaction to be mined
+
+        const length = await escrowFactory.escrowArrayLength();
+        // @nicholaspad this newContractAddress is what should be pushed to MoralisDB
+        const newContractAddress = await escrowFactory.escrowArray(length - 1);
+
+        // Fund the contract with the total crypto allocated
+        const escrow = new ethers.Contract(
+          newContractAddress,
+          escrowABI,
+          signer
+        );
+        // Get reference to MATIC Token contract
+        const maticContract = new ethers.Contract(
+          maticTokenAddress,
+          ERC20ABI,
+          signer
+        );
+        var bigNumCryptoAllocated = BigNumber.from(
+          parseFloat(cryptoAllocated) * 10 ** 8
+        ).mul(BigNumber.from(10).pow(10));
+
+        // Approve accessed to user's WMATIC
+        const approvalTxn = await maticContract.approve(
+          (escrow as unknown as any).address,
+          bigNumCryptoAllocated.toString()
+        );
+        await approvalTxn.wait();
+
+        // Fund the contract
+        const escrowFundTxn = await escrow.fund(
+          bigNumCryptoAllocated.toString()
+        );
+      }
+    } catch (error) {
+      return error;
+    }
+  };
+
   return (
     <>
-      <PageHeader title="My Tasks" />
+      <PageHeader title="Requester Create Task" />
+      <LoadingOverlay open={openPosting} text="Creating Task..." />
       <Container maxWidth="md">
         <Grid
           container
@@ -88,20 +209,28 @@ export default function Form() {
               size="big"
               sx={{ ml: 4 }}
               onClick={() => {
+                const v = (c: boolean | undefined) =>
+                  c === undefined || c === true;
                 const newTask: TaskProps = {
                   title: title,
                   description: description,
-                  options: questions,
+                  questions: questions,
                 };
-                console.log(
-                  titleError ||
-                    descriptionError ||
-                    cryptoAllocatedError ||
-                    maxTaskersError ||
-                    currQuestionTitleError ||
-                    currQuestionChoicesError
-                );
-                console.log(newTask);
+                const hasError =
+                  v(titleError) ||
+                  v(descriptionError) ||
+                  v(cryptoAllocatedError) ||
+                  v(maxTaskersError) ||
+                  v(currQuestionTitleError) ||
+                  v(currQuestionChoicesError) ||
+                  newTask.questions.length < 1;
+
+                if (hasError) {
+                  alert("Please provide valid inputs!");
+                  return;
+                }
+
+                handleCreateTask(newTask, cryptoAllocated, maxTaskers);
               }}
             />
           </Box>
@@ -156,15 +285,15 @@ export default function Form() {
                   <CustomTextField
                     onChange={(e) => {
                       const val = Number(e.target.value);
-                      if (
-                        isNaN(val) ||
-                        val < Number(process.env.NEXT_PUBLIC_MIN_ETH)
-                      ) {
-                        setCryptoAllocatedError(true);
-                      } else {
-                        setCryptoAllocatedError(false);
-                        setCryptoAllocated(val);
+                      if (isNaN(val)) {
+                        return;
                       }
+                      setCryptoAllocatedError(
+                        isNaN(val) ||
+                          val < Number(process.env.NEXT_PUBLIC_MIN_ETH)
+                      );
+                      setCryptoAllocated(e.target.value);
+                      // BigNumber.from(e.target.value)
                     }}
                     error={cryptoAllocatedError}
                     helperText={
@@ -172,7 +301,6 @@ export default function Form() {
                       `Must be ≥${process.env.NEXT_PUBLIC_MIN_ETH}`
                     }
                     size="small"
-                    placeholder="ETH"
                     sx={{
                       ml: 2,
                       mr: 1,
@@ -190,20 +318,17 @@ export default function Form() {
                   <CustomTextField
                     onChange={(e) => {
                       const val = Number(e.target.value);
-                      if (
+                      setMaxTaskersError(
                         isNaN(val) ||
-                        val < Number(process.env.NEXT_PUBLIC_MIN_TASKERS)
-                      ) {
-                        setMaxTaskersError(true);
-                      } else {
-                        setMaxTaskersError(false);
-                        setMaxTaskers(val);
-                      }
+                          val < Number(process.env.NEXT_PUBLIC_MIN_TASKERS) ||
+                          !Number.isInteger(val)
+                      );
+                      setMaxTaskers(val);
                     }}
                     error={maxTaskersError}
                     helperText={
                       maxTaskersError &&
-                      `Must be ≥${process.env.NEXT_PUBLIC_MIN_TASKERS}`
+                      `Must be integer ≥${process.env.NEXT_PUBLIC_MIN_TASKERS}`
                     }
                     size="small"
                     sx={{ ml: 2, width: 100 }}
@@ -212,14 +337,30 @@ export default function Form() {
               </Grid>
             </Grid>
           </FormControl>
-
+          <Typography
+            color="primary"
+            mt={
+              cryptoAllocatedError === false && maxTaskersError === false
+                ? 2
+                : 0
+            }
+            mx="auto"
+          >
+            {cryptoAllocatedError === false && maxTaskersError === false
+              ? `Taskers will earn ${Moralis.Units.FromWei(
+                  computeUnitRewardWei(Moralis, cryptoAllocated, maxTaskers)
+                )}
+          ETH per completed task. This reward is subject to change.`
+              : null}
+          </Typography>
           <Typography
             color="secondary"
             align="center"
-            sx={{ fontStyle: "italic", mt: 2 }}
+            fontStyle="italic"
+            mt={2}
           >
-            The task will close when either the crypto allocation runs out or
-            the number of Taskers reaches the limit, whichever comes first
+            Your task will close when either the crypto allocation runs out or
+            the number of Taskers reaches the limit, whichever comes first.
           </Typography>
         </DefaultGrayCard>
         {/* ===== End Task Heading ===== */}
@@ -236,10 +377,12 @@ export default function Form() {
 
         {/* Render all options in questions */}
         {questions.map((question: GenericQuestion, i: number) => (
-          <QuestionCard
-            title={question.question}
-            choices={question.options}
+          <MCQuestion
             key={i}
+            idx={i}
+            question={question.question}
+            options={question.options}
+            handleSetAnswers={() => {}}
           />
         ))}
 
@@ -281,7 +424,6 @@ export default function Form() {
                       Number(process.env.NEXT_PUBLIC_MIN_TASK_DATA_CHARS)
                   );
                 }}
-                placeholder="Interesting Task Title"
                 error={currQuestionTitleError}
                 helperText={
                   currQuestionTitleError &&
@@ -357,32 +499,6 @@ export default function Form() {
         {/* ===== End Modal to add another question ===== */}
       </Container>
     </>
-  );
-}
-
-function QuestionCard(props: { title: string; choices: string[] }) {
-  return (
-    <DefaultGrayCard>
-      <Typography color="primary" variant="h5" mb={1}>
-        {props.title}
-      </Typography>
-      <List>
-        {props.choices.map((choice, i: number) => (
-          <ListItem sx={{ mb: -0.5 }} key={i}>
-            <ListItemIcon>
-              <CircleOutlinedIcon
-                style={{ color: gigTheme.palette.primary.main }}
-              />
-            </ListItemIcon>
-            <ListItemText
-              primaryTypographyProps={{ fontSize: "20px" }}
-              primary={choice}
-              style={{ color: gigTheme.palette.primary.main }}
-            />
-          </ListItem>
-        ))}
-      </List>
-    </DefaultGrayCard>
   );
 }
 

@@ -11,6 +11,7 @@ export default function PageHeader(props: {
   disableAuthFunc?: boolean;
   customSetUserData?: Function;
 }) {
+  const { title, disableAuthFunc, customSetUserData } = props;
   const { user, isAuthenticated, isUnauthenticated, authError, Moralis } =
     useMoralis();
   const [userData, setUserData] = useState<MoralisType.Object>();
@@ -20,18 +21,25 @@ export default function PageHeader(props: {
   }, [isUnauthenticated]);
 
   useEffect(() => {
-    if (props.disableAuthFunc || !isAuthenticated || authError || !user) return;
+    if (disableAuthFunc || !isAuthenticated || authError || !user) return;
 
     makeOrGetNewUser(Moralis).then((res) => {
       setUserData(res);
-      if (props.customSetUserData) props.customSetUserData(res);
+      if (customSetUserData) customSetUserData(res);
     });
-  }, [isAuthenticated]);
+  }, [
+    isAuthenticated,
+    authError,
+    Moralis,
+    user,
+    disableAuthFunc,
+    customSetUserData,
+  ]);
 
   return (
     <>
       <Head>
-        <title>{props.title} | GIG</title>
+        <title>{title} | GIG</title>
       </Head>
       <Navbar
         walletAddress={user?.get("ethAddress")}

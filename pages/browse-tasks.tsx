@@ -7,7 +7,7 @@ import { useMoralis } from "react-moralis";
 import PrimaryButtonCTA from "../components/buttons/PrimaryButtonCTA";
 import PageHeader from "../components/common/PageHeader";
 import BrowseTasksTable from "../components/tables/BrowseTasksTable";
-import { TableHeader } from "../components/tables/Helpers";
+import { TableCell, TableHeader } from "../components/tables/Helpers";
 import { getBrowseTasksTableData } from "../src/Database";
 import { TaskData } from "../src/Types";
 
@@ -27,13 +27,13 @@ export default function Tasks() {
         tempData.push({
           task_id: task["objectId"],
           name: task["title"],
-          reward: task["unitReward"],
+          reward: Moralis.Units.FromWei(task["unitRewardWei"]),
           rating: task["avgRating"],
         });
       }
       setData(tempData);
     });
-  }, [isInitialized, user]);
+  }, [isInitialized, Moralis, user]);
 
   return (
     <>
@@ -58,16 +58,19 @@ const extraColumns: GridColDef[] = [
     minWidth: 200,
     align: "left",
     renderHeader: () => <TableHeader>Rating</TableHeader>,
-    renderCell: (params: GridValueGetterParams) => (
-      <StyledRating
-        readOnly
-        value={params.row.rating}
-        size="large"
-        precision={0.5}
-        icon={<StarRoundedIcon fontSize="inherit" />}
-        emptyIcon={<StarOutlineRoundedIcon fontSize="inherit" />}
-      />
-    ),
+    renderCell: (params: GridValueGetterParams) =>
+      params.row.rating >= 0 ? (
+        <StyledRating
+          readOnly
+          value={params.row.rating}
+          size="large"
+          precision={0.5}
+          icon={<StarRoundedIcon fontSize="inherit" />}
+          emptyIcon={<StarOutlineRoundedIcon fontSize="inherit" />}
+        />
+      ) : (
+        <TableCell>No ratings yet!</TableCell>
+      ),
   },
   {
     field: "",
