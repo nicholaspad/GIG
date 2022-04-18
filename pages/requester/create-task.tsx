@@ -29,7 +29,7 @@ export default function Form() {
   const escrowFactoryAddress: string =
     "0x5dbd6085d4bDCb57eBF5E4b2817D6e20DdEE136b";
   const maticTokenAddress: string =
-    "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0";
+    "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889";
   const { isInitialized, user, Moralis } = useMoralis();
   const requesterAddress = user?.get("ethAddress");
   const contractProcessor = useWeb3ExecuteFunction();
@@ -45,9 +45,7 @@ export default function Form() {
   // Task overview
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [cryptoAllocated, setCryptoAllocated] = useState<BigNumber>(
-    BigNumber.from("0")
-  );
+  const [cryptoAllocated, setCryptoAllocated] = useState<string>("0");
   const [maxTaskers, setMaxTaskers] = useState(0);
 
   // Errors associated with task overview
@@ -84,7 +82,7 @@ export default function Form() {
 
   const handleCreateTask = async (
     newTask: TaskProps,
-    cryptoAllocated: number,
+    cryptoAllocated: string,
     maxTaskers: number
   ) => {
     if (
@@ -174,14 +172,10 @@ export default function Form() {
 
         console.log("get length");
         // def ways we can make this faster by reusing the connection
-        const length = await (
-          await escrowFactory.connect(requesterAddress)
-        ).escrowArrayLength();
+        const length = await escrowFactory.escrowArrayLength();
 
         console.log("new contract address");
-        const newContractAddress = await escrowFactory
-          .connect(requesterAddress)
-          .escrowArray(length - 1);
+        const newContractAddress = await escrowFactory.escrowArray(length - 1);
         console.log(`new contract at ${newContractAddress}`);
 
         // Fund the contract with the total crypto allocated
@@ -200,17 +194,25 @@ export default function Form() {
         );
         console.log("approve");
         // Ask PaymentToken to give allowance
-        const approvalResult = await maticContract
-          .connect(signer)
-          .approve(
-            (escrow as unknown as any).address,
-            cryptoAllocated.mul(BigNumber.from(10).pow(18)).toString()
-          );
+        console.log("cryptoallocated is", cryptoAllocated);
+        // convert string to number
+        var bigNumCryptoAllocated = BigNumber.from(
+          parseFloat(cryptoAllocated) * 10 ** 8
+        ).mul(BigNumber.from(10).pow(10));
+        // do number
+        console.log("big number ver", bigNumCryptoAllocated.toString());
+        console.log("ily chrissy");
+        const approvalResult = await maticContract.approve(
+          (escrow as unknown as any).address,
+          bigNumCryptoAllocated.toString()
+        );
+
+        console.log("approve2");
         await approvalResult.wait();
         console.log("get escrow fund result");
-        const escrowFundResult = await escrow
-          .connect(requesterAddress)
-          .fund(cryptoAllocated);
+        const escrowFundResult = await escrow.fund(
+          bigNumCryptoAllocated.toString()
+        );
 
         // fund the contract by calling
         // await newContractAddress.connect(requesterAddress).fund(cryptoAllocated);
@@ -337,7 +339,8 @@ export default function Form() {
                         isNaN(val) ||
                           val < Number(process.env.NEXT_PUBLIC_MIN_ETH)
                       );
-                      setCryptoAllocated(BigNumber.from(e.target.value));
+                      setCryptoAllocated(e.target.value);
+                      // BigNumber.from(e.target.value)
                     }}
                     error={cryptoAllocatedError}
                     helperText={

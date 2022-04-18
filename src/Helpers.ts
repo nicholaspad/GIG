@@ -1,12 +1,13 @@
+import { BigNumber } from "ethers";
 import MoralisType from "moralis";
 
 export function computeUnitRewardWei(
   Moralis: MoralisType,
-  maxReward: number,
+  maxReward: string,
   maxTaskers: number
 ): string {
-  const maxRewardWei = Number(Moralis.Units.ETH(maxReward));
-  const unitRewardWei = maxRewardWei / maxTaskers - 1; // ensures that unitRewardWei*maxTaskers < maxRewardWei
+  const maxRewardWei = BigNumber.from(Moralis.Units.ETH(maxReward));
+  const unitRewardWei = maxRewardWei.div(maxTaskers).sub(1); // ensures that unitRewardWei*maxTaskers < maxRewardWei
   return unitRewardWei.toString();
 }
 
