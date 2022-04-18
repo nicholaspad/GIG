@@ -162,14 +162,14 @@ export default function Form() {
         ).mul(BigNumber.from(10).pow(10));
 
         // Approve accessed to user's WMATIC
-        const approvalResult = await maticContract.approve(
+        const approvalTxn = await maticContract.approve(
           (escrow as unknown as any).address,
           bigNumCryptoAllocated.toString()
         );
-        await approvalResult.wait();
+        await approvalTxn.wait();
 
         // Fund the contract
-        const escrowFundResult = await escrow.fund(
+        const escrowFundTxn = await escrow.fund(
           bigNumCryptoAllocated.toString()
         );
       }

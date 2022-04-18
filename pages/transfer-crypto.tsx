@@ -6,62 +6,58 @@ import BrowseTasksTable from "../components/tables/BrowseTasksTable";
 import { TaskData } from "../components/tables/TasksTable";
 import { useMoralis, useWeb3ExecuteFunction } from "react-moralis";
 import { DomainVerification } from "@mui/icons-material";
-// import { ethers } from "ethers";
+import { ethers, BigNumber } from "ethers";
+import Escrow from "../src/utils/abi/Escrow.json";
+import ERC20ABI from "../src/utils/abi/ERC20Token.json";
 
 export default function TransferCrypto() {
-  const { Moralis } = useMoralis();
-  const contractProcessor = useWeb3ExecuteFunction();
+  const escrowABI = Escrow.abi;
+  const maticTokenAddress: string =
+    "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889";
 
-  async function testTransfer(val) {
-    let options = {
-      contractAddress: "0x356d2E7a0d592bAd95E86d19479c37cfdBb68Ab9",
-      functionName: "withdraw",
-      abi: [
-        {
-          inputs: [{ internalType: "string", name: "note", type: "string" }],
-          name: "withdraw",
-          outputs: [],
-          stateMutability: "payable",
-          type: "function",
-        },
-      ]
-    };
+  const withdraw = async () => {
+    try {
+      const { ethereum } = window;
+      if (ethereum) {
+        console.log("1");
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        console.log("2");
+        // RIGHT NOW WE WILL BE USING THE DEPLOYED ADDRESS, but eventually we'll pull the contract address from the backend that's associated with this task
+        const escrowContractAddress =
+          "0x57b355b047eda23c15a5c0eab51c9608b8684e8f";
 
-    await Moralis.authenticate();
-    await Moralis.executeFunction(options);
+        // Get reference to this task's escrow contract
+        const escrowContract = new ethers.Contract(
+          escrowContractAddress,
+          escrowABI,
+          signer
+        );
+        console.log("3");
+        // Get reference to MATIC token contract
+        // const maticContract = new ethers.Contract(
+        //   maticTokenAddress,
+        //   ERC20ABI,
+        //   signer
+        // );
+        // console.log("4");
+        // const approvalResult = await maticContract.approve(
+        //   escrowContractAddress,
+        //   "0"
+        // );
+        // await approvalResult.wait();
+        console.log("5");
 
-    await contractProcessor.fetch({
-      params: options,
-    });
-  }
-  async function donation(val) {
-    console.log("clicked donation button");
-
-    let options = {
-      contractAddress: "0x356d2E7a0d592bAd95E86d19479c37cfdBb68Ab9",
-      functionName: "newDonation",
-      abi: [
-        {
-          inputs: [{ internalType: "string", name: "note", type: "string" }],
-          name: "newDonation",
-          outputs: [],
-          stateMutability: "payable",
-          type: "function",
-        },
-      ],
-      params: {
-        note: "Thanks for your work",
-      },
-      msgValue: Moralis.Units.ETH(val),
-    };
-
-    await Moralis.authenticate();
-    await Moralis.executeFunction(options);
-
-    await contractProcessor.fetch({
-      params: options,
-    });
-  }
+        const withdrawTxn = await escrowContract.withdraw();
+        console.log("6");
+        await withdrawTxn.wait();
+        console.log("7");
+      }
+    } catch (error) {
+      console.log(error.data);
+      alert(error.data);
+    }
+  };
 
   return (
     <>
@@ -88,7 +84,7 @@ export default function TransferCrypto() {
           flexDirection: "row",
         }}
       >
-        <Button onClick={() => testTransfer(0.1)}>Withdraw 0.1 Matic</Button>
+        <Button onClick={withdraw}>Withdraw some Matic</Button>
         {/* <PrimaryButtonCTA
           text="Give 0.1ETH"
           size="small"
