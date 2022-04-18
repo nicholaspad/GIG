@@ -96,46 +96,21 @@ export default function Form() {
 
     setOpenPosting(true);
 
-    /*
-      Require user to send ETH here. Wait for x confirmations before continuing. @christine-sun @jennsun
-    */
     // Deploy new contract for this Task
-    alert("Before staking");
     const stakeCryptoErr = await stakeCrypto();
     if (stakeCryptoErr) {
-      alert("There was an error :(");
+      alert("There was an error creating this task.");
       return;
     }
-    alert("After staking");
-    // const escrowFactory = new ethers.Contract(
-    //   escrowFactoryAddress,
-    //   EscrowFactory.abi
-    // );
-
-    // const result = await escrowFactory
-    //   .connect(requesterAddress)
-    //   .createNewEscrow(
-    //     maticTokenAddress,
-    //     maxTaskers,
-    //     requesterAddress
-    //     // , {gasLimit: 300000, // Best number to use here?}
-    //   );
-    // await result.wait();
-    // const length = await (
-    //   await escrowFactory.connect(requesterAddress)
-    // ).escrowArrayLength();
-
-    // const newContractAddress = await escrowFactory
-    //   .connect(requesterAddress)
-    //   .escrowArray(length - 1);
-    // console.log(
-    //   "Successfully created new contract on the frontend with this address"
-    // );
-    // console.log(newContractAddress);
 
     // Putting Task in Moralis
     // TODO - Add contract address to database info associated with newTask
-    const res = await createTask(Moralis, newTask, cryptoAllocated, maxTaskers);
+    const res = await createTask(
+      Moralis,
+      newTask,
+      parseFloat(cryptoAllocated),
+      maxTaskers
+    );
     if (!res.success) {
       setOpenPosting(false);
       alert(res.message);
@@ -147,80 +122,58 @@ export default function Form() {
   };
 
   const stakeCrypto = async () => {
-    console.log("About to stake crypto");
     try {
       const { ethereum } = window;
       if (ethereum) {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
 
-        console.log("new contract factory");
         // Deploy a new contract for this Task
         const escrowFactory = new ethers.Contract(
           escrowFactoryAddress,
           escrowFactoryABI,
           signer
         );
-        console.log("new contract");
         const newContractResult = await escrowFactory.createNewEscrow(
           maticTokenAddress,
           maxTaskers,
           requesterAddress
         );
-        console.log("wait");
-        await newContractResult.wait(); // wait for transaction to be accepted into block
+        await newContractResult.wait(); // Wait for transaction to be mined
 
-        console.log("get length");
-        // def ways we can make this faster by reusing the connection
         const length = await escrowFactory.escrowArrayLength();
-
-        console.log("new contract address");
+        // @nicholaspad this newContractAddress is what should be pushed to MoralisDB
         const newContractAddress = await escrowFactory.escrowArray(length - 1);
-        console.log(`new contract at ${newContractAddress}`);
 
         // Fund the contract with the total crypto allocated
-        console.log("new escrow ref");
         const escrow = new ethers.Contract(
           newContractAddress,
           escrowABI,
           signer
         );
-        console.log("matic token");
         // Get reference to MATIC Token contract
         const maticContract = new ethers.Contract(
           maticTokenAddress,
           ERC20ABI,
           signer
         );
-        console.log("approve");
-        // Ask PaymentToken to give allowance
-        console.log("cryptoallocated is", cryptoAllocated);
-        // convert string to number
         var bigNumCryptoAllocated = BigNumber.from(
           parseFloat(cryptoAllocated) * 10 ** 8
         ).mul(BigNumber.from(10).pow(10));
-        // do number
-        console.log("big number ver", bigNumCryptoAllocated.toString());
-        console.log("ily chrissy");
+
+        // Approve accessed to user's WMATIC
         const approvalResult = await maticContract.approve(
           (escrow as unknown as any).address,
           bigNumCryptoAllocated.toString()
         );
-
-        console.log("approve2");
         await approvalResult.wait();
-        console.log("get escrow fund result");
+
+        // Fund the contract
         const escrowFundResult = await escrow.fund(
           bigNumCryptoAllocated.toString()
         );
-
-        // fund the contract by calling
-        // await newContractAddress.connect(requesterAddress).fund(cryptoAllocated);
       }
     } catch (error) {
-      // you should probably return the error here and not do stuff after\
-      alert("Oh no there was an error");
-      alert(`${error}`);
       return error;
     }
   };
