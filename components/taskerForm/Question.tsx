@@ -1,11 +1,11 @@
 import MCQuestion from "./MCQuestion";
 import { Box, Typography } from "@mui/material";
-import { GenericQuestion } from "../../src/Types";
+import { GenericQuestion, QuestionType } from "../../src/Types";
 
 export default function Question(
   props: GenericQuestion & { handleSetAnswers: Function }
 ) {
-  if (props.options && props.type === 1) {
+  if (props.type === QuestionType.SINGLE_CHOICE) {
     return (
       <MCQuestion
         question={props.question}
@@ -17,9 +17,9 @@ export default function Question(
     );
   }
   return (
-    <Box>
-      <Typography color="primary">
-        Error: Question type not available
+    <Box my={4} px={3}>
+      <Typography color="error">
+        Error retrieving question {props.idx + 1}
       </Typography>
     </Box>
   );

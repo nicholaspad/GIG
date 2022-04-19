@@ -17,40 +17,9 @@ import LoadingOverlay from "../../../components/common/LoadingOverlay";
 import { TaskProps } from "../../../src/Types";
 
 export default function TaskerForm() {
-  /* Test Data */
-  const q1 = {
-    id: "00001",
-    type: 1,
-    question: "How are you",
-    options: ["I'm fine", "I'm not fine", "None of your business"],
-  };
-
-  const q2 = {
-    id: "00002",
-    type: 1,
-    question: "Do you want Ether",
-    options: ["Yes", "No"],
-  };
-
-  const q3 = {
-    id: "00003",
-    type: 1,
-    question: "Do you like GIG?",
-    options: ["Yes", "Certainly", "Absolutely", "I'm a die hard fan"],
-  };
-
-  const formData = [q1, q2, q3];
-  const formInfo = {
-    title: "My Survey",
-    description: "Please select the best answer",
-    eta: 5,
-  };
-  /* End of Test Data */
-
   const router = useRouter();
   const { taskId } = router.query;
   const { isInitialized, Moralis, user } = useMoralis();
-  const [openLoading, setOpenLoading] = useState(false);
   const [openAbandonLoading, setOpenAbandonLoading] = useState(false);
   const [isAllowed, setIsAllowed] = useState(false);
   const [data, setData] = useState<TaskProps>();
@@ -108,46 +77,41 @@ export default function TaskerForm() {
   useEffect(() => {
     if (!isInitialized || !taskId || !isAllowed) return;
 
-    setOpenLoading(true);
-
     getTaskFormData(Moralis, taskId as string).then((res) => {
       if (!res) {
         alert("Failed to retrieve task data.");
         return;
       }
-      console.log(res);
-
       setData(res);
-      setOpenLoading(false);
     });
   }, [isAllowed, isInitialized, Moralis, taskId]);
 
   if (!isAllowed) return <LoadingOverlay open={true} text="Verifying..." />;
+  if (!data) return <LoadingOverlay open={true} text="Loading Task..." />;
 
   return (
     <>
       <PageHeader title="Task" />
       <LoadingOverlay open={openAbandonLoading} text="Abandoning Task..." />
-      <LoadingOverlay open={openLoading} text="Loading Task..." />
       <Container maxWidth="sm">
         <GrayCard sx={{ mt: 2 }}>
           <Box sx={{ p: 3 }}>
             <Typography variant="h4" color="primary" fontWeight={600}>
-              {formInfo.title}
+              {data.title}
             </Typography>
             <Typography sx={{ mt: 2 }} variant="body2" color="primary">
-              {formInfo.description}
+              {data.description}
             </Typography>
           </Box>
         </GrayCard>
-        {formData.map((props, idx) => (
+        {data.questions.map((q) => (
           <Question
-            type={props.type}
-            idx={idx}
-            id={props.id}
-            question={props.question}
-            options={props.options}
-            key={props.id}
+            type={q.type}
+            idx={q.idx}
+            id={q.id}
+            question={q.question}
+            options={q.options}
+            key={q.idx}
             handleSetAnswers={handleSetAnswers}
           />
         ))}
@@ -163,7 +127,7 @@ export default function TaskerForm() {
             size="small"
             text="Abandon"
             onClick={() => {
-              handleAbandonTask(formInfo.title);
+              handleAbandonTask(data.title);
             }}
           />
           <Box>
@@ -173,10 +137,10 @@ export default function TaskerForm() {
               align="center"
               fontStyle="italic"
             >
-              Approximate time to complete
+              Approx time to complete
             </Typography>
             <Typography variant="body1" color="primary" align="center">
-              {formInfo.eta} minutes
+              {data.estCompletionTime} mins
             </Typography>
           </Box>
           <PrimaryButtonCTA size="small" text="Submit" to="/tasker/completed" />
