@@ -662,3 +662,51 @@ Moralis.Cloud.define(
     requireUser: true,
   }
 );
+
+/* ------------------------------------------------------------------- */
+
+Moralis.Cloud.define(
+  "getTaskFormData",
+  async (request) => {
+    async function getQuestions(taskId) {
+      const tableName = "Questions";
+      const Questions = Moralis.Object.extend(tableName);
+      const query = new Moralis.Query(Questions);
+      const res = await query.equalTo("taskId", taskId).find();
+
+      return res.map((q) => {
+        return {
+          id: q.id,
+          type: q.get("type"),
+          idx: q.get("idx"),
+          question: q.get("title"),
+          options: q.get("options"),
+        };
+      });
+    }
+
+    const taskId = request.params.taskId;
+    const ethAddress = request.user.get("ethAddress");
+    const tableName = "Tasks";
+
+    if (!(await checkTaskerClaimedTask(ethAddress, taskId))) return null;
+
+    const Tasks = Moralis.Object.extend(tableName);
+    const query = new Moralis.Query(Tasks);
+    const res = await query.equalTo("objectId", taskId).first();
+
+    if (!res) return null;
+
+    return {
+      id: res.id,
+      title: res.get("title"),
+      description: res.get("description"),
+      estCompletionTime: res.get("estCompletionTime"),
+      questions: await getQuestions(taskId),
+    };
+  },
+  {
+    fields: ["taskId"],
+    requireUser: true,
+  }
+);

@@ -10,9 +10,11 @@ import { useRouter } from "next/router";
 import { useMoralis } from "react-moralis";
 import {
   checkTaskerClaimedTask,
+  getTaskFormData,
   taskerAbandonTask,
 } from "../../../src/Database";
 import LoadingOverlay from "../../../components/common/LoadingOverlay";
+import { TaskProps } from "../../../src/Types";
 
 export default function TaskerForm() {
   /* Test Data */
@@ -49,7 +51,9 @@ export default function TaskerForm() {
   const { taskId } = router.query;
   const { isInitialized, Moralis, user } = useMoralis();
   const [openLoading, setOpenLoading] = useState(false);
+  const [openAbandonLoading, setOpenAbandonLoading] = useState(false);
   const [isAllowed, setIsAllowed] = useState(false);
+  const [data, setData] = useState<TaskProps>();
   const [answers, setAnswers] = useState({});
 
   const handleAbandonTask = async (taskName: string) => {
@@ -60,12 +64,12 @@ export default function TaskerForm() {
     )
       return;
 
-    setOpenLoading(true);
+    setOpenAbandonLoading(true);
 
     const res = await taskerAbandonTask(Moralis, taskId as string);
 
     if (!res.success) {
-      setOpenLoading(false);
+      setOpenAbandonLoading(false);
       alert(res.message);
       return;
     }
@@ -87,7 +91,7 @@ export default function TaskerForm() {
   };
 
   useEffect(() => {
-    if (!isInitialized || !user || !taskId || !router || !user) return;
+    if (!isInitialized || !user || !taskId || !router) return;
 
     const ethAddress = user.get("ethAddress");
     checkTaskerClaimedTask(Moralis, taskId as string).then((res) => {
@@ -101,12 +105,30 @@ export default function TaskerForm() {
     });
   }, [isInitialized, Moralis, taskId, router, user]);
 
+  useEffect(() => {
+    if (!isInitialized || !taskId || !isAllowed) return;
+
+    setOpenLoading(true);
+
+    getTaskFormData(Moralis, taskId as string).then((res) => {
+      if (!res) {
+        alert("Failed to retrieve task data.");
+        return;
+      }
+      console.log(res);
+
+      setData(res);
+      setOpenLoading(false);
+    });
+  }, [isAllowed, isInitialized, Moralis, taskId]);
+
   if (!isAllowed) return <LoadingOverlay open={true} text="Verifying..." />;
 
   return (
     <>
       <PageHeader title="Task" />
-      <LoadingOverlay open={openLoading} text="Abandoning Task..." />
+      <LoadingOverlay open={openAbandonLoading} text="Abandoning Task..." />
+      <LoadingOverlay open={openLoading} text="Loading Task..." />
       <Container maxWidth="sm">
         <GrayCard sx={{ mt: 2 }}>
           <Box sx={{ p: 3 }}>

@@ -107,3 +107,13 @@ export async function createTask(
     maxResponses: maxTaskers,
   });
 }
+
+/* Retrieves task data for form completion pages. */
+export async function getTaskFormData(
+  Moralis: MoralisType,
+  taskId: string
+): Promise<TaskProps | null> {
+  return await Moralis.Cloud.run("getTaskFormData", {
+    taskId: taskId,
+  });
+}
