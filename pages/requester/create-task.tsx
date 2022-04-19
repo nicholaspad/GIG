@@ -13,7 +13,7 @@ import SecondaryButtonCTA from "../../components/buttons/SecondaryButtonCTA";
 import MCQuestion from "../../components/taskerForm/MCQuestion";
 import LoadingOverlay from "../../components/common/LoadingOverlay";
 import { createTask } from "../../src/Database";
-import { useMoralis, useWeb3ExecuteFunction } from "react-moralis";
+import { useMoralis } from "react-moralis";
 import { useRouter } from "next/router";
 import { computeUnitRewardWei } from "../../src/Helpers";
 import { ethers, BigNumber } from "ethers";
@@ -27,12 +27,11 @@ import {
 
 export default function Form() {
   const escrowFactoryAddress: string =
-    "0x5dbd6085d4bDCb57eBF5E4b2817D6e20DdEE136b";
-  const maticTokenAddress: string =
-    "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889";
+    process.env.NEXT_PUBLIC_ESCROW_FACTORY_ADDRESS;
+  const maticTokenAddress: string = process.env.NEXT_PUBLIC_MATIC_TOKEN_ADDRESS;
   const { isInitialized, user, Moralis } = useMoralis();
-  const requesterAddress = user?.get("ethAddress");
-  const contractProcessor = useWeb3ExecuteFunction();
+  // @ts-expect-error
+  const requesterAddress = user.get("ethAddress");
   const escrowFactoryABI = EscrowFactory.abi;
   const escrowABI = Escrow.abi;
 
@@ -59,10 +58,14 @@ export default function Form() {
   const [currQuestionChoices, setCurrQuestionChoices] = useState<string[]>([]);
 
   // Errors associated with new question modal popup
-  const [currQuestionTitleError, setCurrQuestionTitleError] =
-    useState<boolean>();
-  const [currQuestionChoicesError, setCurrQuestionChoicesError] =
-    useState<boolean>();
+  const [
+    currQuestionTitleError,
+    setCurrQuestionTitleError,
+  ] = useState<boolean>();
+  const [
+    currQuestionChoicesError,
+    setCurrQuestionChoicesError,
+  ] = useState<boolean>();
 
   const removeQuestion = (index: number) => {
     var array = [...questions];
@@ -99,7 +102,7 @@ export default function Form() {
     // Deploy new contract for this Task
     const stakeCryptoErr = await stakeCrypto();
     if (stakeCryptoErr) {
-      alert("There was an error creating this task.");
+      alert(`There was an error creating this task: ${stakeCryptoError}`);
       return;
     }
 
@@ -123,8 +126,9 @@ export default function Form() {
 
   const stakeCrypto = async () => {
     try {
+      // @ts-expect-error
       const { ethereum } = window;
-      if (ethereum) {
+      if (ethereum && user) {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
 
@@ -163,7 +167,7 @@ export default function Form() {
 
         // Approve accessed to user's WMATIC
         const approvalTxn = await maticContract.approve(
-          (escrow as unknown as any).address,
+          ((escrow as unknown) as any).address,
           bigNumCryptoAllocated.toString()
         );
         await approvalTxn.wait();
@@ -293,7 +297,6 @@ export default function Form() {
                           val < Number(process.env.NEXT_PUBLIC_MIN_ETH)
                       );
                       setCryptoAllocated(e.target.value);
-                      // BigNumber.from(e.target.value)
                     }}
                     error={cryptoAllocatedError}
                     helperText={
