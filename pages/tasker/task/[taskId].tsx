@@ -1,4 +1,4 @@
-import { Container, Box, CircularProgress } from "@mui/material";
+import { Container, Box } from "@mui/material";
 import Question from "../../../components/taskerForm/Question";
 import PrimaryButtonCTA from "../../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../../components/buttons/SecondaryButtonCTA";
@@ -101,23 +101,7 @@ export default function TaskerForm() {
     });
   }, [isInitialized, Moralis, taskId, router, user]);
 
-  if (!isAllowed)
-    return (
-      <>
-        <PageHeader title="Verifying" />
-        <Box display="flex" flexDirection="column" alignItems="center">
-          <CircularProgress color="secondary" sx={{ mt: 2, mb: 3 }} />
-          <Typography
-            textAlign="center"
-            color="primary"
-            fontWeight={400}
-            fontSize={20}
-          >
-            Verifying...
-          </Typography>
-        </Box>
-      </>
-    );
+  if (!isAllowed) return <LoadingOverlay open={true} text="Verifying..." />;
 
   return (
     <>
