@@ -513,6 +513,16 @@ Moralis.Cloud.define(
       res.forEach(async (e) => await e.destroy());
     }
 
+    async function destroyResponses(taskId) {
+      const tableName = "Responses";
+
+      const Responses = Moralis.Object.extend(tableName);
+      const query = new Moralis.Query(Responses);
+      const res = await query.equalTo("taskId", taskId).find();
+
+      res.forEach(async (e) => await e.destroy());
+    }
+
     async function destroyClaimedTasks(taskId) {
       const verifiedAndPaid = 2;
       const tableName = "TaskUsers";
@@ -552,6 +562,7 @@ Moralis.Cloud.define(
       };
 
     await destroyQuestions(taskId);
+    await destroyResponses(taskId);
     await destroyClaimedTasks(taskId);
 
     return res.destroy().then(
