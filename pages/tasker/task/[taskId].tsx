@@ -11,6 +11,7 @@ import { useMoralis } from "react-moralis";
 import {
   checkTaskerClaimedTask,
   getTaskFormData,
+  postTaskFormData,
   taskerAbandonTask,
 } from "../../../src/Database";
 import LoadingOverlay from "../../../components/common/LoadingOverlay";
@@ -21,17 +22,20 @@ export default function TaskerForm() {
   const router = useRouter();
   const { taskId } = router.query;
   const { isInitialized, Moralis, user } = useMoralis();
+  const [openPosting, setOpenPosting] = useState(false);
   const [openAbandonLoading, setOpenAbandonLoading] = useState(false);
   const [isAllowed, setIsAllowed] = useState(false);
   const [data, setData] = useState<TaskProps>();
   const formik = useFormik({
     initialValues: {},
-    onSubmit: (values: { [key: string]: string }) => {
+    onSubmit: async (values: { [key: string]: string }) => {
       if (Object.keys(values).some((k) => values[k] === null)) {
         alert("Please answer all questions!");
         return;
       }
-      if (!data) return;
+      if (!data || !isInitialized) return;
+
+      setOpenPosting(true);
 
       let qTypes: { [key: string]: QuestionType } = {};
       data.questions.forEach((q) => {
@@ -44,7 +48,15 @@ export default function TaskerForm() {
           return { questionId: k, response: { idx: Number(values[k]) } };
       }) as GenericResponse[];
 
-      console.log(responses);
+      const res = await postTaskFormData(Moralis, taskId as string, responses);
+      if (!res.success) {
+        setOpenPosting(false);
+        alert(res.message);
+        return;
+      }
+
+      alert(res.message);
+      // router.push("/requester/my-tasks");
     },
   });
 
@@ -109,6 +121,7 @@ export default function TaskerForm() {
   return (
     <>
       <PageHeader title="Task" />
+      <LoadingOverlay open={openPosting} text="Submitting Task..." />
       <LoadingOverlay open={openAbandonLoading} text="Abandoning Task..." />
       <Container maxWidth="sm">
         <GrayCard sx={{ mt: 2 }}>

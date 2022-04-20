@@ -19,13 +19,13 @@ async function computeMaxRewardWei(maxReward) {
 /*
   Check that a task is claimed by a Tasker.
 */
-async function checkTaskerClaimedTask(ethAddress, taskId) {
+async function checkTaskerClaimedTask(taskerId, taskId) {
   const tableName = "TaskUsers";
 
   const TaskUsers = Moralis.Object.extend(tableName);
   const query = new Moralis.Query(TaskUsers);
   const res = await query
-    .equalTo("taskerId", ethAddress)
+    .equalTo("taskerId", taskerId)
     .equalTo("taskId", taskId)
     .find();
 
@@ -704,6 +704,43 @@ Moralis.Cloud.define(
   },
   {
     fields: ["taskId"],
+    requireUser: true,
+  }
+);
+
+/* ------------------------------------------------------------------- */
+
+Moralis.Cloud.define(
+  "postTaskFormData",
+  async (request) => {
+    async function insertResponses(responses, taskerId) {
+      const tableName = "Responses";
+
+      const Responses = Moralis.Object.extend(tableName);
+
+      responses.forEach(async (response) => {
+        const r = new Responses();
+        r.set("questionId", response["questionId"]);
+        r.set("taskerId", taskerId);
+        r.set("response", response["response"]);
+        await r.save();
+      });
+    }
+
+
+    const responses = request.params.responses;
+    const taskId = request.params.taskId;
+    const ethAddress = request.user.get("ethAddress");
+
+    await insertResponses(responses, ethAddress);
+
+    return {
+      success: true,
+      message: `Address ${ethAddress} successfully submitted task ${taskId}!`,
+    };
+  },
+  {
+    fields: ["responses"],
     requireUser: true,
   }
 );

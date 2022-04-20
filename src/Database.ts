@@ -1,5 +1,5 @@
 import MoralisType from "moralis";
-import { TaskProps } from "./Types";
+import { GenericResponse, TaskProps } from "./Types";
 
 /*
   Edit the below functions on the Moralis Dashboard (Cloud Functions) or by
@@ -115,5 +115,17 @@ export async function getTaskFormData(
 ): Promise<TaskProps | null> {
   return await Moralis.Cloud.run("getTaskFormData", {
     taskId: taskId,
+  });
+}
+
+/* Posts response data for form completion pages. */
+export async function postTaskFormData(
+  Moralis: MoralisType,
+  taskId: string,
+  responses: GenericResponse[]
+): Promise<{ success: boolean; message: string }> {
+  return await Moralis.Cloud.run("postTaskFormData", {
+    taskId: taskId,
+    responses: responses,
   });
 }
