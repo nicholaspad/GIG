@@ -727,12 +727,29 @@ Moralis.Cloud.define(
       });
     }
 
+    async function updateTaskStatus(taskerId, taskId) {
+      const tableName = "TaskUsers";
+
+      const TaskUsers = Moralis.Object.extend(tableName);
+      const query = new Moralis.Query(TaskUsers);
+      const res = await query
+        .equalTo("taskerId", taskerId)
+        .equalTo("taskId", taskId)
+        .first();
+
+      if (!res) return;
+
+      res.set("status", 1);
+
+      await res.save();
+    }
 
     const responses = request.params.responses;
     const taskId = request.params.taskId;
     const ethAddress = request.user.get("ethAddress");
 
     await insertResponses(responses, ethAddress);
+    await updateTaskStatus(ethAddress, taskId);
 
     return {
       success: true,
