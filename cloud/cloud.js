@@ -746,7 +746,7 @@ Moralis.Cloud.define(
 Moralis.Cloud.define(
   "postTaskFormData",
   async (request) => {
-    async function insertResponses(responses, taskerId) {
+    async function insertResponses(responses, taskerId, taskId) {
       const tableName = "Responses";
 
       const Responses = Moralis.Object.extend(tableName);
@@ -754,6 +754,7 @@ Moralis.Cloud.define(
       responses.forEach(async (response) => {
         const r = new Responses();
         r.set("questionId", response["questionId"]);
+        r.set("taskId", taskId);
         r.set("taskerId", taskerId);
         r.set("response", response["response"]);
         await r.save();
@@ -794,6 +795,7 @@ Moralis.Cloud.define(
       };
 
     await insertResponses(responses, ethAddress);
+    await insertResponses(responses, ethAddress, taskId);
     await updateTaskStatus(ethAddress, taskId);
 
     return {
