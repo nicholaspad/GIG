@@ -575,12 +575,9 @@ Moralis.Cloud.define(
 
           // Multiple choice
           if (question["type"] === QuestionType.SINGLE_CHOICE) {
+            const options = question["content"]["options"];
             // Check that number of choices is in [1, 5]
-            if (
-              question["options"].length < 1 ||
-              question["options"].length > 5
-            )
-              return true;
+            if (options.length < 1 || options.length > 5) return true;
             return false;
           }
 
@@ -632,7 +629,7 @@ Moralis.Cloud.define(
         q.set("type", question["type"]);
         q.set("title", question["question"]);
         q.set("idx", idx);
-        q.set("options", question["options"]);
+        q.set("content", question["content"]);
         await q.save();
       });
     }
@@ -668,10 +665,6 @@ Moralis.Cloud.define(
 Moralis.Cloud.define(
   "getTaskFormData",
   async (request) => {
-    const QuestionType = {
-      SINGLE_CHOICE: 0,
-    };
-
     async function getQuestions(taskId) {
       const tableName = "Questions";
       const Questions = Moralis.Object.extend(tableName);
@@ -679,16 +672,13 @@ Moralis.Cloud.define(
       const res = await query.equalTo("taskId", taskId).find();
 
       return res.map((q) => {
-        const temp = {
+        return {
           id: q.id,
           type: q.get("type"),
           idx: q.get("idx"),
           question: q.get("title"),
+          content: q.get("content"),
         };
-        if (temp["type"] === QuestionType.SINGLE_CHOICE)
-          temp["content"] = { options: q.get("options") };
-        else return;
-        return temp;
       });
     }
 

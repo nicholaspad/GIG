@@ -10,12 +10,12 @@ import { GenericQuestion, QuestionType, TaskProps } from "../../src/Types";
 import PageHeader from "../../components/common/PageHeader";
 import PrimaryButtonCTA from "../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../components/buttons/SecondaryButtonCTA";
-import MCQuestion from "../../components/taskerForm/MCQuestion";
 import LoadingOverlay from "../../components/common/LoadingOverlay";
 import { createTask } from "../../src/Database";
 import { useMoralis } from "react-moralis";
 import { useRouter } from "next/router";
 import { computeUnitRewardWei } from "../../src/Helpers";
+import Question from "../../components/taskerForm/Question";
 
 export default function Form() {
   const { isInitialized, Moralis } = useMoralis();
@@ -82,7 +82,6 @@ export default function Form() {
     /*
       Require user to send ETH here. Wait for x confirmations before continuing. @christine-sun @jennsun
     */
-
     const res = await createTask(Moralis, newTask, cryptoAllocated, maxTaskers);
     if (!res.success) {
       setOpenPosting(false);
@@ -288,14 +287,8 @@ export default function Form() {
         </Box>
 
         {/* Render all options in questions */}
-        {questions.map((question: GenericQuestion, i: number) => (
-          <MCQuestion
-            key={i}
-            idx={i}
-            question={question.question}
-            options={question.options}
-            handleSetAnswers={() => {}}
-          />
+        {questions.map((q: GenericQuestion, i: number) => (
+          <Question q={q} key={q.idx} handleChange={() => {}} />
         ))}
 
         {/* ===== Modal to add another question ===== */}
@@ -394,10 +387,11 @@ export default function Form() {
 
                     const newQuestions = questions.concat([
                       {
+                        id: "-1", // dummy
                         idx: questions.length,
                         type: QuestionType.SINGLE_CHOICE,
                         question: currQuestionTitle,
-                        options: currQuestionChoices,
+                        content: { options: currQuestionChoices },
                       },
                     ]);
                     setQuestions(newQuestions);
