@@ -10,6 +10,7 @@ import { useRouter } from "next/router";
 import { useMoralis } from "react-moralis";
 import {
   checkTaskerClaimedTask,
+  checkTaskerSubmittedTask,
   getTaskFormData,
   postTaskFormData,
   taskerAbandonTask,
@@ -92,8 +93,13 @@ export default function TaskerForm() {
         router.push("/browse-tasks");
         return;
       }
-
-      setIsAllowed(true);
+      checkTaskerSubmittedTask(Moralis, taskId as string).then((res) => {
+        if (!res) {
+          alert(`Address ${ethAddress} already submitted task ${taskId}.`);
+          return;
+        }
+        setIsAllowed(true);
+      });
     });
   }, [isInitialized, Moralis, taskId, router, user]);
 

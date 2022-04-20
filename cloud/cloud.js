@@ -68,6 +68,21 @@ Moralis.Cloud.define(
 /* ------------------------------------------------------------------- */
 
 Moralis.Cloud.define(
+  "checkTaskerSubmittedTask",
+  async (request) => {
+    const ethAddress = request.user.get("ethAddress");
+    const taskId = request.params.taskId;
+    return await checkTaskerSubmittedTask(ethAddress, taskId);
+  },
+  {
+    fields: ["taskId"],
+    requireUser: true,
+  }
+);
+
+/* ------------------------------------------------------------------- */
+
+Moralis.Cloud.define(
   "makeOrGetNewUser",
   async (request) => {
     const ethAddress = request.user.get("ethAddress");
