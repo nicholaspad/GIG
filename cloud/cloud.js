@@ -774,6 +774,7 @@ Moralis.Cloud.define(
       if (!res) return;
 
       res.set("status", 1);
+      res.set("completedDate", new Date());
 
       await res.save();
     }
