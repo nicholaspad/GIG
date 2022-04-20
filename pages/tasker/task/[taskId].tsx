@@ -47,7 +47,11 @@ export default function TaskerForm() {
 
       let responses = Object.keys(values).map((k) => {
         if (qTypes[k] === QuestionType.SINGLE_CHOICE)
-          return { questionId: k, response: { idx: Number(values[k]) } };
+          return {
+            type: QuestionType.SINGLE_CHOICE,
+            questionId: k,
+            response: { idx: Number(values[k]) },
+          };
       }) as GenericResponse[];
 
       const res = await postTaskFormData(Moralis, taskId as string, responses);
@@ -58,7 +62,7 @@ export default function TaskerForm() {
       }
 
       alert(res.message);
-      // router.push("/requester/my-tasks");
+      router.push("/browse-tasks");
     },
   });
 
@@ -97,6 +101,7 @@ export default function TaskerForm() {
       checkTaskerSubmittedTask(Moralis, taskId as string).then((res) => {
         if (res) {
           alert(`Address ${ethAddress} already submitted task ${taskId}.`);
+          router.push("/browse-tasks");
           return;
         }
         setIsAllowed(true);

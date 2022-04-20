@@ -746,6 +746,59 @@ Moralis.Cloud.define(
 Moralis.Cloud.define(
   "postTaskFormData",
   async (request) => {
+    const QuestionType = {
+      SINGLE_CHOICE: 0,
+    };
+
+    async function validateResponses(responses, taskerId, taskId) {
+      const tableName = "Responses";
+
+      const Responses = Moralis.Object.extend(tableName);
+      let query = new Moralis.Query(Responses);
+
+      for (response of responses) {
+        // Check whether rows with taskerId + taskId already exist
+        let res = await query
+          .equalTo("taskerId", taskerId)
+          .equalTo("taskId", taskId)
+          .first();
+        if (res) return false;
+
+        // Check whether rows with questionId + taskId already exist
+        res = await query
+          .equalTo("questionId", response["questionId"])
+          .equalTo("taskId", taskId)
+          .first();
+        if (res) return false;
+
+        // Check whether questionId is valid
+        query = new Moralis.Query(Moralis.Object.extend("Questions"));
+        res = await query
+          .equalTo("objectId", response["questionId"])
+          .equalTo("taskId", taskId)
+          .find();
+        if (res.length !== 1) return false;
+
+        // Check whether taskId is valid
+        query = new Moralis.Query(Moralis.Object.extend("Tasks"));
+        res = await query.equalTo("objectId", taskId).find();
+        if (res.length !== 1) return false;
+
+        // Check schema of the actual response data
+        const r = response["response"];
+        switch (response["type"]) {
+          case QuestionType.SINGLE_CHOICE:
+            const keys = Object.keys(r);
+            if (keys.length !== 1) return false;
+            if (!keys.includes("idx")) return false;
+            if (typeof r["idx"] !== "number") return false;
+            break;
+        }
+      }
+
+      return true;
+    }
+
     async function insertResponses(responses, taskerId, taskId) {
       const tableName = "Responses";
 
@@ -755,6 +808,7 @@ Moralis.Cloud.define(
         const r = new Responses();
         r.set("questionId", response["questionId"]);
         r.set("taskId", taskId);
+        r.set("type", response["type"]);
         r.set("taskerId", taskerId);
         r.set("response", response["response"]);
         await r.save();
@@ -795,7 +849,12 @@ Moralis.Cloud.define(
         message: `Address ${ethAddress} has already submitted task ${taskId}.`,
       };
 
-    await insertResponses(responses, ethAddress);
+    if (!(await validateResponses(responses, ethAddress, taskId)))
+      return {
+        success: false,
+        message: `Response data for task ${taskId} contains malformed data.`,
+      };
+
     await insertResponses(responses, ethAddress, taskId);
     await updateTaskStatus(ethAddress, taskId);
 

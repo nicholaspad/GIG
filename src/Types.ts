@@ -23,6 +23,7 @@ export type SingleChoiceResponse = {
 };
 
 export type GenericResponse = {
+  type: QuestionType;
   questionId: string;
   response: SingleChoiceResponse;
 };
