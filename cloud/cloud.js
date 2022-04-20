@@ -668,6 +668,10 @@ Moralis.Cloud.define(
 Moralis.Cloud.define(
   "getTaskFormData",
   async (request) => {
+    const QuestionType = {
+      SINGLE_CHOICE: 0,
+    };
+
     async function getQuestions(taskId) {
       const tableName = "Questions";
       const Questions = Moralis.Object.extend(tableName);
@@ -675,13 +679,16 @@ Moralis.Cloud.define(
       const res = await query.equalTo("taskId", taskId).find();
 
       return res.map((q) => {
-        return {
+        const temp = {
           id: q.id,
           type: q.get("type"),
           idx: q.get("idx"),
           question: q.get("title"),
-          options: q.get("options"),
         };
+        if (temp["type"] === QuestionType.SINGLE_CHOICE)
+          temp["content"] = { options: q.get("options") };
+        else return;
+        return temp;
       });
     }
 

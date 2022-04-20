@@ -121,19 +121,9 @@ export default function TaskerForm() {
             </Typography>
           </Box>
         </GrayCard>
-        {data.questions.map((q) =>
-          q.id ? (
-            <Question
-              type={q.type}
-              idx={q.idx}
-              id={q.id}
-              question={q.question}
-              options={q.options}
-              key={q.idx}
-              handleChange={formik.handleChange}
-            />
-          ) : null
-        )}
+        {data.questions.map((q) => (
+          <Question q={q} key={q.idx} handleChange={formik.handleChange} />
+        ))}
         <Box
           sx={{
             mb: 5,

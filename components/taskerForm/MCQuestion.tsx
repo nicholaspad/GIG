@@ -8,10 +8,13 @@ import {
 } from "@mui/material";
 
 import GrayCard from "../common/DefaultGrayCard";
-import { SingleChoiceQuestion } from "../../src/Types";
+import { GenericQuestion, SingleChoiceQuestion } from "../../src/Types";
 
 export default function MCQuestion(
-  props: SingleChoiceQuestion & { handleChange: Function }
+  props: GenericQuestion & {
+    content: SingleChoiceQuestion;
+    handleChange: Function;
+  }
 ) {
   return (
     <GrayCard>
@@ -28,12 +31,8 @@ export default function MCQuestion(
             {`${props.idx + 1}. ${props.question}`}
           </Typography>
         </FormLabel>
-        <RadioGroup
-          aria-labelledby={props.id}
-          name={props.id}
-          onChange={props.handleChange as any}
-        >
-          {props.options.map((option, optionid) => (
+        <RadioGroup name={props.id} onChange={props.handleChange as any}>
+          {props.content.options.map((option, optionid) => (
             <FormControlLabel
               value={optionid}
               key={`${props.id}-${optionid}`}

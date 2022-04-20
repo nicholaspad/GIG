@@ -5,18 +5,15 @@ export enum QuestionType {
 }
 
 export type SingleChoiceQuestion = {
-  idx: number;
-  id?: string;
-  question: string;
   options: string[];
 };
 
 export type GenericQuestion = {
   type: QuestionType;
   idx: number;
-  id?: string;
+  id: string;
   question: string;
-  options: string[];
+  content: SingleChoiceQuestion;
 };
 
 // Response types
