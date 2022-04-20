@@ -604,14 +604,12 @@ Moralis.Cloud.define(
         return false;
       if (
         newTask["questions"].some((question) => {
-          // See enum QuestionType for type IDs
-
-          // Multiple choice
-          if (question["type"] === QuestionType.SINGLE_CHOICE) {
-            const options = question["content"]["options"];
-            // Check that number of choices is in [1, 5]
-            if (options.length < 1 || options.length > 5) return true;
-            return false;
+          switch (question["type"]) {
+            case QuestionType.SINGLE_CHOICE:
+              const options = question["content"]["options"];
+              // Check that number of choices is in [1, 5]
+              if (options.length < 1 || options.length > 5) return true;
+              return false;
           }
 
           // Invalid/unknown question type, so fail

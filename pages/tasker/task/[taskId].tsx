@@ -46,12 +46,14 @@ export default function TaskerForm() {
       });
 
       let responses = Object.keys(values).map((k) => {
-        if (qTypes[k] === QuestionType.SINGLE_CHOICE)
-          return {
-            type: QuestionType.SINGLE_CHOICE,
-            questionId: k,
-            response: { idx: Number(values[k]) },
-          };
+        switch (qTypes[k]) {
+          case QuestionType.SINGLE_CHOICE:
+            return {
+              type: QuestionType.SINGLE_CHOICE,
+              questionId: k,
+              response: { idx: Number(values[k]) },
+            };
+        }
       }) as GenericResponse[];
 
       const res = await postTaskFormData(Moralis, taskId as string, responses);
