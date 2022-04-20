@@ -11,7 +11,7 @@ import GrayCard from "../common/DefaultGrayCard";
 import { SingleChoiceQuestion } from "../../src/Types";
 
 export default function MCQuestion(
-  props: SingleChoiceQuestion & { handleSetAnswers: Function }
+  props: SingleChoiceQuestion & { handleChange: Function }
 ) {
   return (
     <GrayCard>
@@ -28,7 +28,11 @@ export default function MCQuestion(
             {`${props.idx + 1}. ${props.question}`}
           </Typography>
         </FormLabel>
-        <RadioGroup aria-labelledby={props.id} name={props.id}>
+        <RadioGroup
+          aria-labelledby={props.id}
+          name={props.id}
+          onChange={props.handleChange as any}
+        >
           {props.options.map((option, optionid) => (
             <FormControlLabel
               value={optionid}
@@ -40,8 +44,6 @@ export default function MCQuestion(
                       color: "secondary.main",
                     },
                   }}
-                  required
-                  onClick={() => props.handleSetAnswers(props.id, optionid)}
                 />
               }
               label={

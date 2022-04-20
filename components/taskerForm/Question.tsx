@@ -3,7 +3,9 @@ import { Box, Typography } from "@mui/material";
 import { GenericQuestion, QuestionType } from "../../src/Types";
 
 export default function Question(
-  props: GenericQuestion & { handleSetAnswers: Function }
+  props: GenericQuestion & {
+    handleChange: Function;
+  }
 ) {
   if (props.type === QuestionType.SINGLE_CHOICE) {
     return (
@@ -12,7 +14,7 @@ export default function Question(
         idx={props.idx}
         id={props.id}
         options={props.options}
-        handleSetAnswers={props.handleSetAnswers}
+        handleChange={props.handleChange}
       />
     );
   }

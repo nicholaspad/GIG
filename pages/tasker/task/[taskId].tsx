@@ -14,7 +14,8 @@ import {
   taskerAbandonTask,
 } from "../../../src/Database";
 import LoadingOverlay from "../../../components/common/LoadingOverlay";
-import { TaskProps } from "../../../src/Types";
+import { GenericResponse, QuestionType, TaskProps } from "../../../src/Types";
+import { useFormik } from "formik";
 
 export default function TaskerForm() {
   const router = useRouter();
@@ -23,7 +24,29 @@ export default function TaskerForm() {
   const [openAbandonLoading, setOpenAbandonLoading] = useState(false);
   const [isAllowed, setIsAllowed] = useState(false);
   const [data, setData] = useState<TaskProps>();
-  const [answers, setAnswers] = useState({});
+  const formik = useFormik({
+    initialValues: {},
+    onSubmit: (values: { [key: string]: string }) => {
+      if (Object.keys(values).some((k) => values[k] === null)) {
+        alert("Please answer all questions!");
+        return;
+      }
+      if (!data) return;
+
+      let qTypes: { [key: string]: QuestionType } = {};
+      data.questions.forEach((q) => {
+        if (!q.id) return;
+        qTypes[q.id] = q.type;
+      });
+
+      let responses = Object.keys(values).map((k) => {
+        if (qTypes[k] === QuestionType.SINGLE_CHOICE)
+          return { questionId: k, response: { idx: Number(values[k]) } };
+      }) as GenericResponse[];
+
+      console.log(responses);
+    },
+  });
 
   const handleAbandonTask = async (taskName: string) => {
     if (!taskId) return;
@@ -45,18 +68,6 @@ export default function TaskerForm() {
 
     alert(res.message);
     router.push("/browse-tasks");
-  };
-
-  const handleSetAnswers = (id: string, answer: string) => {
-    setAnswers({ ...answers, [id]: answer });
-  };
-
-  /* TODO: use this function after building submit handling */
-  const convertResponseFormat = (responses: { [key: string]: string }) => {
-    return Object.keys(responses).map((key) => ({
-      questionId: key,
-      response: responses[key],
-    }));
   };
 
   useEffect(() => {
@@ -82,6 +93,12 @@ export default function TaskerForm() {
         alert("Failed to retrieve task data.");
         return;
       }
+
+      res.questions.forEach((q) => {
+        if (!q.id) return;
+        formik.setFieldValue(q.id, null);
+      });
+
       setData(res);
     });
   }, [isAllowed, isInitialized, Moralis, taskId]);
@@ -104,17 +121,19 @@ export default function TaskerForm() {
             </Typography>
           </Box>
         </GrayCard>
-        {data.questions.map((q) => (
-          <Question
-            type={q.type}
-            idx={q.idx}
-            id={q.id}
-            question={q.question}
-            options={q.options}
-            key={q.idx}
-            handleSetAnswers={handleSetAnswers}
-          />
-        ))}
+        {data.questions.map((q) =>
+          q.id ? (
+            <Question
+              type={q.type}
+              idx={q.idx}
+              id={q.id}
+              question={q.question}
+              options={q.options}
+              key={q.idx}
+              handleChange={formik.handleChange}
+            />
+          ) : null
+        )}
         <Box
           sx={{
             mb: 5,
@@ -143,7 +162,11 @@ export default function TaskerForm() {
               {data.estCompletionTime} mins
             </Typography>
           </Box>
-          <PrimaryButtonCTA size="small" text="Submit" to="/tasker/completed" />
+          <PrimaryButtonCTA
+            size="small"
+            text="Submit"
+            onClick={formik.handleSubmit}
+          />
         </Box>
       </Container>
     </>
