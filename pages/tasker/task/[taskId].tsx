@@ -35,6 +35,7 @@ export default function TaskerForm() {
         return;
       }
       if (!data || !isInitialized) return;
+      if (!confirm(`Are you sure you want to submit task ${taskId}?`)) return;
 
       setOpenPosting(true);
 
@@ -94,7 +95,7 @@ export default function TaskerForm() {
         return;
       }
       checkTaskerSubmittedTask(Moralis, taskId as string).then((res) => {
-        if (!res) {
+        if (res) {
           alert(`Address ${ethAddress} already submitted task ${taskId}.`);
           return;
         }
