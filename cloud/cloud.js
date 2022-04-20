@@ -32,6 +32,24 @@ async function checkTaskerClaimedTask(taskerId, taskId) {
   return res.length > 0;
 }
 
+/*
+  Check if a task has already been submitted by a Tasker.
+*/
+async function checkTaskerSubmittedTask(taskerId, taskId) {
+  const tableName = "TaskUsers";
+
+  const TaskUsers = Moralis.Object.extend(tableName);
+  const query = new Moralis.Query(TaskUsers);
+  const res = await query
+    .equalTo("taskerId", taskerId)
+    .equalTo("taskId", taskId)
+    .first();
+
+  if (!res) return false;
+
+  return res.get("status") !== 0;
+}
+
 /* ------------------------------------------------------------------- */
 
 Moralis.Cloud.define(
@@ -747,6 +765,18 @@ Moralis.Cloud.define(
     const responses = request.params.responses;
     const taskId = request.params.taskId;
     const ethAddress = request.user.get("ethAddress");
+
+    if (!(await checkTaskerClaimedTask(ethAddress, taskId)))
+      return {
+        success: false,
+        message: `Address ${ethAddress} has not claimed task ${taskId}.`,
+      };
+
+    if (await checkTaskerSubmittedTask(ethAddress, taskId))
+      return {
+        success: false,
+        message: `Address ${ethAddress} has already submitted task ${taskId}.`,
+      };
 
     await insertResponses(responses, ethAddress);
     await updateTaskStatus(ethAddress, taskId);
