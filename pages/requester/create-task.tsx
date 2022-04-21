@@ -245,6 +245,12 @@ export default function Form() {
           </Box>
         </Grid>
 
+        <Typography color="secondary" align="center" fontStyle="italic" mt={3}>
+          After clicking "Post Task," a series of MetaMask popups will appear.
+          Please be patient as there may be delays during the task creation
+          process.
+        </Typography>
+
         {/* ===== Task Heading ===== */}
         <DefaultGrayCard>
           <FormControl fullWidth>
