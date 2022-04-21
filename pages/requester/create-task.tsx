@@ -16,9 +16,20 @@ import { useMoralis } from "react-moralis";
 import { useRouter } from "next/router";
 import { computeUnitRewardWei } from "../../src/Helpers";
 import Question from "../../components/taskerForm/Question";
+import { ethers, BigNumber } from "ethers";
+import EscrowFactory from "../../src/utils/abi/EscrowFactory.json";
+import Escrow from "../../src/utils/abi/Escrow.json";
+import ERC20ABI from "../../src/utils/abi/ERC20Token.json";
 
 export default function Form() {
-  const { isInitialized, Moralis } = useMoralis();
+  const escrowFactoryAddress = process.env
+    .NEXT_PUBLIC_ESCROW_FACTORY_ADDRESS as string;
+  const maticTokenAddress = process.env
+    .NEXT_PUBLIC_MATIC_TOKEN_ADDRESS as string;
+  const { isInitialized, user, Moralis } = useMoralis();
+  const escrowFactoryABI = EscrowFactory.abi;
+  const escrowABI = Escrow.abi;
+
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [openPosting, setOpenPosting] = useState(false);
@@ -28,10 +39,10 @@ export default function Form() {
   // Task overview
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [cryptoAllocated, setCryptoAllocated] = useState(0);
+  const [cryptoAllocated, setCryptoAllocated] = useState<string>("0");
   const [maxTaskers, setMaxTaskers] = useState(0);
 
-  // Errors associated with task overvieww
+  // Errors associated with task overview
   const [titleError, setTitleError] = useState<boolean>();
   const [descriptionError, setDescriptionError] = useState<boolean>();
   const [cryptoAllocatedError, setCryptoAllocatedError] = useState<boolean>();
@@ -65,7 +76,7 @@ export default function Form() {
 
   const handleCreateTask = async (
     newTask: TaskProps,
-    cryptoAllocated: number,
+    cryptoAllocated: string,
     maxTaskers: number
   ) => {
     if (
@@ -79,10 +90,21 @@ export default function Form() {
 
     setOpenPosting(true);
 
-    /*
-      Require user to send ETH here. Wait for x confirmations before continuing. @christine-sun @jennsun
-    */
-    const res = await createTask(Moralis, newTask, cryptoAllocated, maxTaskers);
+    // Deploy new contract for this Task
+    const stakeCryptoErr = await stakeCrypto();
+    if (stakeCryptoErr) {
+      alert(`There was an error creating this task: ${stakeCryptoErr}`);
+      return;
+    }
+
+    // Putting Task in Moralis
+    // TODO - Add contract address to database info associated with newTask
+    const res = await createTask(
+      Moralis,
+      newTask,
+      parseFloat(cryptoAllocated),
+      maxTaskers
+    );
     if (!res.success) {
       setOpenPosting(false);
       alert(res.message);
@@ -91,6 +113,65 @@ export default function Form() {
 
     alert(res.message);
     router.push("/requester/my-tasks");
+  };
+
+  const stakeCrypto = async () => {
+    try {
+      // @ts-expect-error
+      const { ethereum } = window;
+      if (ethereum && user) {
+        const requesterAddress = user.get("ethAddress");
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+
+        // Deploy a new contract for this Task
+        const escrowFactory = new ethers.Contract(
+          escrowFactoryAddress,
+          escrowFactoryABI,
+          signer
+        );
+        const newContractResult = await escrowFactory.createNewEscrow(
+          maticTokenAddress,
+          maxTaskers,
+          requesterAddress
+        );
+        await newContractResult.wait(); // Wait for transaction to be mined
+
+        const length = await escrowFactory.escrowArrayLength();
+        // @nicholaspad this newContractAddress is what should be pushed to MoralisDB
+        const newContractAddress = await escrowFactory.escrowArray(length - 1);
+
+        // Fund the contract with the total crypto allocated
+        const escrow = new ethers.Contract(
+          newContractAddress,
+          escrowABI,
+          signer
+        );
+        // Get reference to MATIC Token contract
+        const maticContract = new ethers.Contract(
+          maticTokenAddress,
+          ERC20ABI,
+          signer
+        );
+        var bigNumCryptoAllocated = BigNumber.from(
+          parseFloat(cryptoAllocated) * 10 ** 8
+        ).mul(BigNumber.from(10).pow(10));
+
+        // Approve accessed to user's WMATIC
+        const approvalTxn = await maticContract.approve(
+          (escrow as unknown as any).address,
+          bigNumCryptoAllocated.toString()
+        );
+        await approvalTxn.wait();
+
+        // Fund the contract
+        const escrowFundTxn = await escrow.fund(
+          bigNumCryptoAllocated.toString()
+        );
+      }
+    } catch (error) {
+      return error;
+    }
   };
 
   return (
@@ -200,11 +281,14 @@ export default function Form() {
                   <CustomTextField
                     onChange={(e) => {
                       const val = Number(e.target.value);
+                      if (isNaN(val)) {
+                        return;
+                      }
                       setCryptoAllocatedError(
                         isNaN(val) ||
                           val < Number(process.env.NEXT_PUBLIC_MIN_ETH)
                       );
-                      setCryptoAllocated(val);
+                      setCryptoAllocated(e.target.value);
                     }}
                     error={cryptoAllocatedError}
                     helperText={
