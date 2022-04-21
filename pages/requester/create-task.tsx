@@ -20,10 +20,6 @@ import { ethers, BigNumber } from "ethers";
 import EscrowFactory from "../../src/utils/abi/EscrowFactory.json";
 import Escrow from "../../src/utils/abi/Escrow.json";
 import ERC20ABI from "../../src/utils/abi/ERC20Token.json";
-import {
-  StackedLineChartSharp,
-  StackedLineChartTwoTone,
-} from "@mui/icons-material";
 
 export default function Form() {
   const escrowFactoryAddress = process.env
@@ -57,14 +53,10 @@ export default function Form() {
   const [currQuestionChoices, setCurrQuestionChoices] = useState<string[]>([]);
 
   // Errors associated with new question modal popup
-  const [
-    currQuestionTitleError,
-    setCurrQuestionTitleError,
-  ] = useState<boolean>();
-  const [
-    currQuestionChoicesError,
-    setCurrQuestionChoicesError,
-  ] = useState<boolean>();
+  const [currQuestionTitleError, setCurrQuestionTitleError] =
+    useState<boolean>();
+  const [currQuestionChoicesError, setCurrQuestionChoicesError] =
+    useState<boolean>();
 
   const removeQuestion = (index: number) => {
     var array = [...questions];
@@ -101,7 +93,7 @@ export default function Form() {
     // Deploy new contract for this Task
     const stakeCryptoErr = await stakeCrypto();
     if (stakeCryptoErr) {
-      alert(`There was an error creating this task: ${stakeCryptoError}`);
+      alert(`There was an error creating this task: ${stakeCryptoErr}`);
       return;
     }
 
@@ -167,7 +159,7 @@ export default function Form() {
 
         // Approve accessed to user's WMATIC
         const approvalTxn = await maticContract.approve(
-          ((escrow as unknown) as any).address,
+          (escrow as unknown as any).address,
           bigNumCryptoAllocated.toString()
         );
         await approvalTxn.wait();
