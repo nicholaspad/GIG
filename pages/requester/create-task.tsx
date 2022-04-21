@@ -26,12 +26,11 @@ import {
 } from "@mui/icons-material";
 
 export default function Form() {
-  const escrowFactoryAddress: string =
-    process.env.NEXT_PUBLIC_ESCROW_FACTORY_ADDRESS;
-  const maticTokenAddress: string = process.env.NEXT_PUBLIC_MATIC_TOKEN_ADDRESS;
+  const escrowFactoryAddress = process.env
+    .NEXT_PUBLIC_ESCROW_FACTORY_ADDRESS as string;
+  const maticTokenAddress = process.env
+    .NEXT_PUBLIC_MATIC_TOKEN_ADDRESS as string;
   const { isInitialized, user, Moralis } = useMoralis();
-  // @ts-expect-error
-  const requesterAddress = user.get("ethAddress");
   const escrowFactoryABI = EscrowFactory.abi;
   const escrowABI = Escrow.abi;
 
@@ -129,6 +128,7 @@ export default function Form() {
       // @ts-expect-error
       const { ethereum } = window;
       if (ethereum && user) {
+        const requesterAddress = user.get("ethAddress");
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
 
