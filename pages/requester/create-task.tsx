@@ -334,6 +334,7 @@ export default function Form() {
           </FormControl>
           <Typography
             color="primary"
+            textAlign="center"
             mt={
               cryptoAllocatedError === false && maxTaskersError === false
                 ? 2
