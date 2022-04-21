@@ -633,7 +633,12 @@ Moralis.Cloud.define(
       return true;
     }
 
-    async function insertNewTask(newTask, maxRewardETH, maxResponses) {
+    async function insertNewTask(
+      newTask,
+      maxRewardETH,
+      maxResponses,
+      contractAddress
+    ) {
       const tableName = "Tasks";
 
       const Tasks = Moralis.Object.extend(tableName);
@@ -643,6 +648,7 @@ Moralis.Cloud.define(
       task.set("title", newTask["title"]);
       task.set("description", newTask["description"]);
       task.set("startDate", new Date());
+      task.set("contractAddress", contractAddress);
       task.set("status", 0); // "in progress"
       task.set(
         "estCompletionTime",
@@ -680,6 +686,7 @@ Moralis.Cloud.define(
     const newTask = request.params.newTask;
     const maxRewardETH = request.params.maxRewardETH;
     const maxResponses = Number(request.params.maxResponses);
+    const contractAddress = request.params.contractAddress;
     const config = await Moralis.Config.get({ useMasterKey: true });
 
     if (!validateNewTask(newTask, maxRewardETH, maxResponses, config))
@@ -688,7 +695,12 @@ Moralis.Cloud.define(
         message: `Address ${ethAddress} failed to create task "${newTask["title"]}": please provide valid inputs`,
       };
 
-    const taskId = await insertNewTask(newTask, maxRewardETH, maxResponses);
+    const taskId = await insertNewTask(
+      newTask,
+      maxRewardETH,
+      maxResponses,
+      contractAddress
+    );
     await insertNewQuestions(newTask, taskId);
 
     return {

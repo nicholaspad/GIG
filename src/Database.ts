@@ -108,12 +108,14 @@ export async function createTask(
   Moralis: MoralisType,
   newTask: TaskProps,
   cryptoAllocated: number,
-  maxTaskers: number
+  maxTaskers: number,
+  contractAddress: string
 ): Promise<{ success: boolean; message: string }> {
   return await Moralis.Cloud.run("createTask", {
     newTask: newTask,
     maxRewardETH: cryptoAllocated,
     maxResponses: maxTaskers,
+    contractAddress: contractAddress,
   });
 }
 

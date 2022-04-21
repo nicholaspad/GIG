@@ -91,9 +91,15 @@ export default function Form() {
     setOpenPosting(true);
 
     // Deploy new contract for this Task
-    const stakeCryptoErr = await stakeCrypto();
-    if (stakeCryptoErr) {
-      alert(`There was an error creating this task: ${stakeCryptoErr}`);
+    const { contractAddress, error } = await stakeCrypto();
+    if (error) {
+      setOpenPosting(false);
+      alert(`There was an error creating this task: ${error.toString()}`);
+      return;
+    }
+    if (!contractAddress) {
+      setOpenPosting(false);
+      alert("There was an error creating this task.");
       return;
     }
 
@@ -103,7 +109,8 @@ export default function Form() {
       Moralis,
       newTask,
       parseFloat(cryptoAllocated),
-      maxTaskers
+      maxTaskers,
+      contractAddress
     );
     if (!res.success) {
       setOpenPosting(false);
@@ -115,7 +122,10 @@ export default function Form() {
     router.push("/requester/my-tasks");
   };
 
-  const stakeCrypto = async () => {
+  const stakeCrypto = async (): Promise<{
+    contractAddress: string | null;
+    error: any;
+  }> => {
     try {
       // @ts-expect-error
       const { ethereum } = window;
@@ -168,9 +178,12 @@ export default function Form() {
         const escrowFundTxn = await escrow.fund(
           bigNumCryptoAllocated.toString()
         );
+
+        return { contractAddress: newContractAddress, error: null };
       }
+      return { contractAddress: null, error: "Unknown" };
     } catch (error) {
-      return error;
+      return { contractAddress: null, error: error };
     }
   };
 
