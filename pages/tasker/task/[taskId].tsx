@@ -64,7 +64,7 @@ export default function TaskerForm() {
       }
 
       alert(res.message);
-      router.push("/tasker/my-tasks");
+      router.push(`/tasker/task-completed/${taskId}`);
     },
   });
 
