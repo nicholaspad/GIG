@@ -9,6 +9,7 @@ import { gigTheme } from "../../../src/Theme";
 import { useRouter } from "next/router";
 import { useMoralis } from "react-moralis";
 import { useState } from "react";
+import PageHeader from "../../../components/common/PageHeader";
 
 export default function TaskCompleted() {
   const router = useRouter();
@@ -18,80 +19,88 @@ export default function TaskCompleted() {
   const [isAllowed, setIsAllowed] = useState(false);
 
   return (
-    <Container maxWidth="md">
-      <GrayCard>
-        <Box alignSelf="center">
-          <Typography
-            variant="h4"
-            color="primary"
-            textAlign="center"
-            fontWeight={600}
-          >
-            Task Completed
-          </Typography>
-        </Box>
-      </GrayCard>
-      <GrayCard>
-        <Box alignSelf="center">
-          <Box display="flex" justifyContent="center" mt={2} mb={5}>
-            <Typography variant="h6" fontWeight="normal" color="primary" mr={2}>
-              Rate your experience:
-            </Typography>
-            <StyledRating
-              sx={{ mx: 0 }}
-              size="large"
-              precision={0.5}
-              icon={<StarRoundedIcon fontSize="inherit" />}
-              emptyIcon={<StarOutlineRoundedIcon fontSize="inherit" />}
-            />
-          </Box>
-          <hr
-            style={{ border: `1px solid ${gigTheme.palette.secondary.main}` }}
-          />
-          <Typography
-            variant="h6"
-            fontWeight="normal"
-            color="primary"
-            textAlign="center"
-            my={5}
-          >
-            When the requester approves your submission, you will receive a
-            reward of:
-          </Typography>
-          <Box
-            borderRadius={2}
-            width="fit-content"
-            display="flex"
-            flexDirection="row"
-            alignItems="center"
-            justifyContent="center"
-            mx="auto"
-            py={1}
-            px={2}
-            sx={{
-              backgroundImage: `linear-gradient(90deg, ${gigTheme.palette.primaryCTA.primary}, ${gigTheme.palette.primaryCTA.secondary})`,
-            }}
-          >
-            <Typography color="primary" fontWeight={400} fontSize={20}>
-              {"5"} ETH
+    <>
+      <PageHeader title="Task Completed" />
+      <Container maxWidth="md">
+        <GrayCard>
+          <Box alignSelf="center">
+            <Typography
+              variant="h4"
+              color="primary"
+              textAlign="center"
+              fontWeight={600}
+            >
+              Task Completed
             </Typography>
           </Box>
-          <Box display="flex" justifyContent="center" mt={5} mb={2}>
-            <SecondaryButtonCTA
-              text="My Tasks"
-              size="big"
-              to="/tasker/my-tasks"
+        </GrayCard>
+        <GrayCard>
+          <Box alignSelf="center">
+            <Box display="flex" justifyContent="center" mt={2} mb={5}>
+              <Typography
+                variant="h6"
+                fontWeight="normal"
+                color="primary"
+                mr={2}
+              >
+                Rate your experience:
+              </Typography>
+              <StyledRating
+                sx={{ mx: 0 }}
+                size="large"
+                precision={0.5}
+                icon={<StarRoundedIcon fontSize="inherit" />}
+                emptyIcon={<StarOutlineRoundedIcon fontSize="inherit" />}
+              />
+            </Box>
+            <hr
+              style={{ border: `1px solid ${gigTheme.palette.secondary.main}` }}
             />
-            <PrimaryButtonCTA
-              text="Browse Tasks"
-              size="big"
-              to="/browse-tasks"
-              sx={{ ml: 4 }}
-            />
+            <Typography
+              variant="h6"
+              fontWeight="normal"
+              color="primary"
+              textAlign="center"
+              my={5}
+            >
+              When the requester approves your submission, you will receive a
+              reward of:
+            </Typography>
+            <Box
+              borderRadius={2}
+              width="fit-content"
+              display="flex"
+              flexDirection="row"
+              alignItems="center"
+              justifyContent="center"
+              mx="auto"
+              py={1}
+              px={2}
+              sx={{
+                backgroundImage: `linear-gradient(90deg, ${gigTheme.palette.primaryCTA.primary}, ${gigTheme.palette.primaryCTA.secondary})`,
+              }}
+            >
+              <Typography color="primary" fontWeight={400} fontSize={20}>
+                {"5"} ETH
+              </Typography>
+            </Box>
+            <Box display="flex" justifyContent="center" mt={5} mb={2}>
+              <SecondaryButtonCTA
+                text="My Tasks"
+                size="big"
+                to="/tasker/my-tasks"
+              />
+              <PrimaryButtonCTA
+                text="Browse Tasks"
+                size="big"
+                to="/browse-tasks"
+                sx={{ ml: 4 }}
+              />
+            </Box>
           </Box>
-        </Box>
-      </GrayCard>
-    </Container>
+        </GrayCard>
+      </Container>
+    </>
   );
 }
 
