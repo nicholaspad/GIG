@@ -9,11 +9,23 @@ import { DomainVerification } from "@mui/icons-material";
 import { ethers, BigNumber } from "ethers";
 import Escrow from "../src/utils/abi/Escrow.json";
 import ERC20ABI from "../src/utils/abi/ERC20Token.json";
+import { useState } from "react";
+import { Box } from "@mui/material";
+import { TaskOverviewData } from "../../src/Types";
 
-export default function TransferCrypto() {
+export default function TransferCrypto( props: {
+  data: TaskOverviewData;
+}
+) {
   const escrowABI = Escrow.abi;
   const maticTokenAddress: string =
-    "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889";
+    "0x0000000000000000000000000000000000001010";
+  // RIGHT NOW WE WILL BE USING THE DEPLOYED ADDRESS, but eventually 
+  // we'll pull the contract address from the backend that's associated with this task
+  const escrowContractAddress =
+        "0x242f379b6852aa66E7FcB0e83f8DD00D36889311";
+
+  const [contract, setContract] = useState<ethers.Contract>();
 
   const withdraw = async () => {
     try {
@@ -23,16 +35,15 @@ export default function TransferCrypto() {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
         console.log("2");
-        // RIGHT NOW WE WILL BE USING THE DEPLOYED ADDRESS, but eventually we'll pull the contract address from the backend that's associated with this task
-        const escrowContractAddress =
-          "0x57b355b047eda23c15a5c0eab51c9608b8684e8f";
-
+        
         // Get reference to this task's escrow contract
         const escrowContract = new ethers.Contract(
           escrowContractAddress,
           escrowABI,
           signer
         );
+
+        setContract(escrowContract)
         console.log("3");
         // Get reference to MATIC token contract
         // const maticContract = new ethers.Contract(
@@ -63,17 +74,21 @@ export default function TransferCrypto() {
     <>
       <PageHeader title="Withdraw Crypto" />
       <Stack>
-        <Typography variant="h4" color="primary" textAlign="center">
-          Withdraw
-        </Typography>
-        <Typography
-          variant="h3"
-          color="primaryCTA.primary"
-          display="inline"
-          textAlign="center"
+        <Box
+          m={3}
         >
-          0.1 ETH
-        </Typography>
+          <Typography variant="h4" color="primary" textAlign="center">
+            [Task name] has been approved. You have earned
+          </Typography>
+        </Box>
+          <Typography
+            variant="h3"
+            color="primaryCTA.primary"
+            display="inline"
+            textAlign="center"
+          >
+            [Insert Amount] ETH
+          </Typography>
       </Stack>
       <Grid
         container
@@ -84,17 +99,13 @@ export default function TransferCrypto() {
           flexDirection: "row",
         }}
       >
-        <Button onClick={withdraw}>Withdraw some Matic</Button>
-        {/* <PrimaryButtonCTA
-          text="Give 0.1ETH"
-          size="small"
-          to="/"
+        {/* <Button onClick={withdraw}>Withdraw Matic</Button> */}
+        <PrimaryButtonCTA
+          text="Withdraw"
+          size="big"
+          // to="/"
+          onClick={withdraw}
         />
-        <SecondaryButtonCTA
-          text="Withdraw crypto"
-          size="small"
-          to="/"
-        /> */}
       </Grid>
     </>
   );

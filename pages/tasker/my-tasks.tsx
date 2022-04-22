@@ -111,6 +111,17 @@ export default function MyTasks() {
                   )}?back=/tasker/my-tasks`
             }
           />
+          <Box
+            // render if withdraw is allowed
+            // visibility={}
+            ml={2}
+          >
+            <SecondaryButtonCTA
+              text="Withdraw"
+              size="small"
+              to="/transfer-crypto"
+            />
+          </Box>
         </>
       ),
     },

@@ -294,6 +294,7 @@ Moralis.Cloud.define(
           startDate: 1,
           unitRewardWei: 1,
           estCompletionTime: 1,
+          contractAddress: 1,
           avgRating: 1,
           requesterId: 1,
         },
