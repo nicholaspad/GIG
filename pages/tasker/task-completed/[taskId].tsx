@@ -69,7 +69,6 @@ export default function TaskCompleted() {
   return (
     <>
       <PageHeader title="Task Completed" />
-      <LoadingOverlay open={openPosting} text="Submitting Rating..." />
       <Container maxWidth="md">
         <GrayCard>
           <Box alignSelf="center">
@@ -86,25 +85,45 @@ export default function TaskCompleted() {
         <GrayCard>
           <Box alignSelf="center">
             <Box display="flex" justifyContent="center" mt={2} mb={5}>
-              <Typography
-                variant="h6"
-                fontWeight="normal"
-                color="primary"
-                mr={2}
-              >
-                Rate your experience:
-              </Typography>
-              <StyledRating
-                sx={{ mx: 0 }}
-                size="large"
-                precision={0.5}
-                icon={<StarRoundedIcon fontSize="inherit" />}
-                emptyIcon={<StarOutlineRoundedIcon fontSize="inherit" />}
-                onChange={(_, value) => {
-                  if (!value) return;
-                  handleRating(value);
-                }}
-              />
+              {openPosting ? (
+                <>
+                  <CircularProgress
+                    color="secondary"
+                    size={34}
+                    sx={{ mr: 1.5 }}
+                  />
+                  <Typography
+                    variant="h6"
+                    fontWeight="normal"
+                    color="primary"
+                    mr={2}
+                  >
+                    Saving rating...
+                  </Typography>
+                </>
+              ) : (
+                <>
+                  <Typography
+                    variant="h6"
+                    fontWeight="normal"
+                    color="primary"
+                    mr={2}
+                  >
+                    Rate your experience:
+                  </Typography>
+                  <StyledRating
+                    sx={{ mx: 0 }}
+                    size="large"
+                    precision={0.5}
+                    icon={<StarRoundedIcon fontSize="inherit" />}
+                    emptyIcon={<StarOutlineRoundedIcon fontSize="inherit" />}
+                    onChange={(_, value) => {
+                      if (!value) return;
+                      handleRating(value);
+                    }}
+                  />
+                </>
+              )}
             </Box>
             <hr
               style={{ border: `1px solid ${gigTheme.palette.secondary.main}` }}
