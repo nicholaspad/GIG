@@ -7,6 +7,9 @@ import { GenericResponse, TaskProps } from "./Types";
   of the Cloud Functions popup on the Moralis Dashboard).
 */
 
+/*
+  Checks if a task is claimed by a Tasker.
+*/
 export async function checkTaskerClaimedTask(
   Moralis: MoralisType,
   taskId: string
@@ -14,11 +17,27 @@ export async function checkTaskerClaimedTask(
   return await Moralis.Cloud.run("checkTaskerClaimedTask", { taskId: taskId });
 }
 
+/*
+  Checks if a task has already been submitted by a Tasker.
+*/
 export async function checkTaskerSubmittedTask(
   Moralis: MoralisType,
   taskId: string
 ): Promise<boolean> {
   return await Moralis.Cloud.run("checkTaskerSubmittedTask", {
+    taskId: taskId,
+  });
+}
+
+/*
+  Checks whether a tasker has status "pending verification"
+  and has not been rated.
+*/
+export async function checkTaskerTaskHasNotRated(
+  Moralis: MoralisType,
+  taskId: string
+): Promise<boolean> {
+  return await Moralis.Cloud.run("checkTaskerTaskHasNotRated", {
     taskId: taskId,
   });
 }
@@ -119,7 +138,9 @@ export async function createTask(
   });
 }
 
-/* Retrieves task data for form completion pages. */
+/* 
+  Retrieves task data for form completion pages.
+*/
 export async function getTaskFormData(
   Moralis: MoralisType,
   taskId: string
@@ -129,7 +150,9 @@ export async function getTaskFormData(
   });
 }
 
-/* Posts response data for form completion pages. */
+/*
+  Posts response data for form completion pages.
+*/
 export async function postTaskFormData(
   Moralis: MoralisType,
   taskId: string,

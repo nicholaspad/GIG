@@ -11,6 +11,7 @@ import { useMoralis } from "react-moralis";
 import { useEffect, useState } from "react";
 import PageHeader from "../../../components/common/PageHeader";
 import LoadingOverlay from "../../../components/common/LoadingOverlay";
+import { checkTaskerTaskHasNotRated } from "../../../src/Database";
 
 export default function TaskCompleted() {
   const router = useRouter();
@@ -35,7 +36,17 @@ export default function TaskCompleted() {
 
     const ethAddress = user.get("ethAddress");
 
-    // TODO: check that task submission is status 1 and has not received rating
+    checkTaskerTaskHasNotRated(Moralis, taskId as string).then((res) => {
+      console.log(res);
+
+      // if (!res) {
+      //   alert(`Address ${ethAddress} has not claimed task ${taskId}.`);
+      //   router.push("/browse-tasks");
+      //   return;
+      // }
+
+      setIsAllowed(true);
+    });
 
     setIsAllowed(true);
   }, [isInitialized, Moralis, taskId, router, user]);
