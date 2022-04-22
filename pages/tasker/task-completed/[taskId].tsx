@@ -1,4 +1,4 @@
-import { Container, styled, Rating, Grid, Box } from "@mui/material";
+import { Container, styled, Rating, Box } from "@mui/material";
 import PrimaryButtonCTA from "../../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../../components/buttons/SecondaryButtonCTA";
 import { Typography } from "@mui/material";
@@ -6,8 +6,17 @@ import GrayCard from "../../../components/common/DefaultGrayCard";
 import StarOutlineRoundedIcon from "@mui/icons-material/StarOutlineRounded";
 import StarRoundedIcon from "@mui/icons-material/StarRounded";
 import { gigTheme } from "../../../src/Theme";
+import { useRouter } from "next/router";
+import { useMoralis } from "react-moralis";
+import { useState } from "react";
 
 export default function TaskCompleted() {
+  const router = useRouter();
+  const { taskId } = router.query;
+  const { isInitialized, Moralis, user } = useMoralis();
+  const [openPosting, setOpenPosting] = useState(false);
+  const [isAllowed, setIsAllowed] = useState(false);
+
   return (
     <Container maxWidth="md">
       <GrayCard>
