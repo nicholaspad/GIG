@@ -28,25 +28,36 @@ export default function TaskCompleted() {
   const { isInitialized, Moralis, user } = useMoralis();
   const [openPosting, setOpenPosting] = useState(false);
   const [isAllowed, setIsAllowed] = useState(false);
+  const [rating, setRating] = useState(0);
 
-  const handleRating = async (rating: number) => {
-    if (!taskId || !isInitialized) return;
+  useEffect(() => {
+    if (!taskId || !isInitialized || !router || !rating) return;
     if (rating <= 0 || rating > 5) return;
-
-    setOpenPosting(true);
-    // sleep to allow time for the overlay
-    await new Promise((r) => setTimeout(r, 25));
-
-    const res = await postTaskRating(Moralis, taskId as string, rating);
-    if (!res.success) {
-      setOpenPosting(false);
-      alert(res.message);
+    if (
+      !confirm(
+        `Are you sure you want to rate this task as ${rating} stars? You may rate only once!`
+      )
+    ) {
+      setRating(0);
       return;
     }
 
-    alert(res.message);
-    setOpenPosting(false);
-  };
+    setOpenPosting(true);
+    // sleep to allow time for the overlay
+    const sleepMs = 25;
+    new Promise((r) => setTimeout(r, sleepMs)).then(() => {
+      postTaskRating(Moralis, taskId as string, rating).then((res) => {
+        if (!res.success) {
+          setOpenPosting(false);
+          alert(res.message);
+          return;
+        }
+
+        alert(res.message);
+        setOpenPosting(false);
+      });
+    });
+  }, [isInitialized, Moralis, taskId, router, rating]);
 
   useEffect(() => {
     if (!isInitialized || !user || !taskId || !router) return;
@@ -117,9 +128,11 @@ export default function TaskCompleted() {
                     precision={0.5}
                     icon={<StarRoundedIcon fontSize="inherit" />}
                     emptyIcon={<StarOutlineRoundedIcon fontSize="inherit" />}
+                    readOnly={rating > 0 && rating <= 5}
+                    value={rating}
                     onChange={(_, value) => {
                       if (!value) return;
-                      handleRating(value);
+                      setRating(value);
                     }}
                   />
                 </>
