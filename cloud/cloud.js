@@ -1,4 +1,17 @@
 Moralis.Cloud.define(
+  "checkTaskerTaskHasNotRated",
+  async (request) => {
+    const ethAddress = request.user.get("ethAddress");
+    const taskId = request.params.taskId;
+    return await checkTaskerTaskHasNotRated(ethAddress, taskId);
+  },
+  {
+    fields: ["taskId"],
+    requireUser: true,
+  }
+);
+
+Moralis.Cloud.define(
   "checkTaskerClaimedTask",
   async (request) => {
     const ethAddress = request.user.get("ethAddress");

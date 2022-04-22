@@ -57,3 +57,23 @@ async function checkTaskerSubmittedTask(taskerId, taskId) {
 
   return res.get("status") !== 0;
 }
+
+/*
+  Checks whether a tasker has status "pending verification"
+  and has not been rated.
+*/
+async function checkTaskerTaskHasNotRated(taskerId, taskId) {
+  const tableName = "TaskUsers";
+
+  const TaskUsers = Moralis.Object.extend(tableName);
+  const query = new Moralis.Query(TaskUsers);
+
+  const res = await query
+    .equalTo("taskerId", taskerId)
+    .equalTo("taskId", taskId)
+    .first();
+
+  if (!res) return false;
+
+  return res.get("status") === 1 && res.get("hasRated") === false;
+}
