@@ -8,8 +8,9 @@ import StarRoundedIcon from "@mui/icons-material/StarRounded";
 import { gigTheme } from "../../../src/Theme";
 import { useRouter } from "next/router";
 import { useMoralis } from "react-moralis";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PageHeader from "../../../components/common/PageHeader";
+import LoadingOverlay from "../../../components/common/LoadingOverlay";
 
 export default function TaskCompleted() {
   const router = useRouter();
@@ -18,9 +19,33 @@ export default function TaskCompleted() {
   const [openPosting, setOpenPosting] = useState(false);
   const [isAllowed, setIsAllowed] = useState(false);
 
+  const handleRating = async (rating: number) => {
+    if (!taskId || !isInitialized) return;
+
+    setOpenPosting(true);
+
+    // TODO: post rating to MoralisDB with validation
+    alert("Rating: " + rating);
+
+    setOpenPosting(false);
+  };
+
+  useEffect(() => {
+    if (!isInitialized || !user || !taskId || !router) return;
+
+    const ethAddress = user.get("ethAddress");
+
+    // TODO: check that task submission is status 1 and has not received rating
+
+    setIsAllowed(true);
+  }, [isInitialized, Moralis, taskId, router, user]);
+
+  if (!isAllowed) return <LoadingOverlay open={true} text="Verifying..." />;
+
   return (
     <>
       <PageHeader title="Task Completed" />
+      <LoadingOverlay open={openPosting} text="Submitting Rating..." />
       <Container maxWidth="md">
         <GrayCard>
           <Box alignSelf="center">
@@ -51,6 +76,10 @@ export default function TaskCompleted() {
                 precision={0.5}
                 icon={<StarRoundedIcon fontSize="inherit" />}
                 emptyIcon={<StarOutlineRoundedIcon fontSize="inherit" />}
+                onChange={(_, value) => {
+                  if (!value) return;
+                  handleRating(value);
+                }}
               />
             </Box>
             <hr
