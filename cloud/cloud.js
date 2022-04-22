@@ -100,7 +100,6 @@ Moralis.Cloud.define(
         project: {
           objectId: 1, // taskId
           title: 1,
-          avgRating: 1,
           unitRewardWei: 1,
           maxRewardWei: 1,
           requesterId: 1,
@@ -110,6 +109,8 @@ Moralis.Cloud.define(
         },
       },
     ]);
+
+    // compute and set average rating (avgRating) for each
 
     const claimedTaskIds = {};
     (await getTaskerClaimedTaskIds(ethAddress)).forEach((task) => {
@@ -253,11 +254,12 @@ Moralis.Cloud.define(
           startDate: 1,
           unitRewardWei: 1,
           estCompletionTime: 1,
-          avgRating: 1,
           requesterId: 1,
         },
       },
     ]);
+
+    // compute and set average rating (avgRating) for each
 
     return res;
   },
@@ -613,7 +615,6 @@ Moralis.Cloud.define(
         "estCompletionTime",
         Math.ceil((newTask["questions"].length * 30) / 60)
       ); // approx 30 seconds per question @bzzbbz @christine-sun @jennsun @nicholaspad
-      task.set("avgRating", -1);
       task.set("numResponses", 0);
       task.set("maxResponses", maxResponses);
       task.set(
