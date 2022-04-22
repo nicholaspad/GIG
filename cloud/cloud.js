@@ -848,3 +848,35 @@ Moralis.Cloud.define(
     requireUser: true,
   }
 );
+
+/* ------------------------------------------------------------------- */
+
+Moralis.Cloud.define(
+  "postTaskRating",
+  async (request) => {
+    const ethAddress = request.user.get("ethAddress");
+    const taskId = request.params.taskId;
+    const rating = Number(request.params.rating);
+
+    if (!(await checkTaskerTaskHasNotRated(ethAddress, taskId)))
+      return {
+        success: false,
+        message: `Address ${ethAddress} cannot rate task ${taskId}.`,
+      };
+
+    if (rating <= 0 || rating > 5)
+      return {
+        success: false,
+        message: `Out of bounds rating for task ${taskId}.`,
+      };
+
+    return {
+      success: true,
+      message: `Address ${ethAddress} successfully rated task ${taskId} as ${rating} stars!`,
+    };
+  },
+  {
+    fields: ["taskId"],
+    requireUser: true,
+  }
+);
