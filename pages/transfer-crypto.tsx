@@ -13,7 +13,7 @@ import ERC20ABI from "../src/utils/abi/ERC20Token.json";
 export default function TransferCrypto() {
   const escrowABI = Escrow.abi;
   const maticTokenAddress: string =
-    "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889";
+    "0x0000000000000000000000000000000000001010";
 
   const withdraw = async () => {
     try {
@@ -24,8 +24,9 @@ export default function TransferCrypto() {
         const signer = provider.getSigner();
         console.log("2");
         // RIGHT NOW WE WILL BE USING THE DEPLOYED ADDRESS, but eventually we'll pull the contract address from the backend that's associated with this task
+        
         const escrowContractAddress =
-          "0x57b355b047eda23c15a5c0eab51c9608b8684e8f";
+          "0x242f379b6852aa66E7FcB0e83f8DD00D36889311";
 
         // Get reference to this task's escrow contract
         const escrowContract = new ethers.Contract(
