@@ -1,83 +1,86 @@
-import { Container, styled, Rating, Grid } from "@mui/material";
+import { Container, styled, Rating, Grid, Box } from "@mui/material";
 import PrimaryButtonCTA from "../../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../../components/buttons/SecondaryButtonCTA";
 import { Typography } from "@mui/material";
 import GrayCard from "../../../components/common/DefaultGrayCard";
 import StarOutlineRoundedIcon from "@mui/icons-material/StarOutlineRounded";
 import StarRoundedIcon from "@mui/icons-material/StarRounded";
+import { gigTheme } from "../../../src/Theme";
 
 export default function TaskCompleted() {
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="md">
       <GrayCard>
-        <Grid
-          container
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          sx={{ pt: "3%" }}
-        >
+        <Box alignSelf="center">
           <Typography
             variant="h4"
             color="primary"
-            align="center"
+            textAlign="center"
             fontWeight={600}
           >
             Task Completed
           </Typography>
-        </Grid>
-        <Grid
-          container
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          sx={{ mt: "10%", mb: "5%" }}
-        >
-          <Typography variant="body2" color="primary">
-            Please rate your experience with this task:
-          </Typography>
-          <StyledRating
-            sx={{ mx: 0 }}
-            size="large"
-            defaultValue={4}
-            precision={0.5}
-            icon={<StarRoundedIcon fontSize="inherit" />}
-            emptyIcon={<StarOutlineRoundedIcon fontSize="inherit" />}
+        </Box>
+      </GrayCard>
+      <GrayCard>
+        <Box alignSelf="center">
+          <Box display="flex" justifyContent="center" mt={2} mb={5}>
+            <Typography variant="h6" fontWeight="normal" color="primary" mr={2}>
+              Rate your experience:
+            </Typography>
+            <StyledRating
+              sx={{ mx: 0 }}
+              size="large"
+              precision={0.5}
+              icon={<StarRoundedIcon fontSize="inherit" />}
+              emptyIcon={<StarOutlineRoundedIcon fontSize="inherit" />}
+            />
+          </Box>
+          <hr
+            style={{ border: `1px solid ${gigTheme.palette.secondary.main}` }}
           />
-        </Grid>
-        <Typography sx={{ mt: "3%" }} variant="body2" color="primary">
-          You will receive a reward of{" "}
           <Typography
-            variant="body2"
-            color="primaryCTA.primary"
-            display="inline"
+            variant="h6"
+            fontWeight="normal"
+            color="primary"
+            textAlign="center"
+            my={5}
           >
-            {/* TODO: replace with value from DB */}
-            0.5 ETH
-          </Typography>{" "}
-          when the requester approves your responses. Thank you for your time!
-        </Typography>
-        <Grid
-          container
-          sx={{
-            pt: "5%",
-            pb: "3%",
-            display: "flex",
-            justifyContent: "space-evenly",
-            flexDirection: "row",
-          }}
-        >
-          <SecondaryButtonCTA
-            size="small"
-            text="My Tasks"
-            to="/tasker/my-tasks"
-          />
-          <PrimaryButtonCTA
-            size="small"
-            text="Browse Tasks"
-            to="/browse-tasks"
-          />
-        </Grid>
+            When the requester approves your submission, you will receive a
+            reward of:
+          </Typography>
+          <Box
+            borderRadius={2}
+            width="fit-content"
+            display="flex"
+            flexDirection="row"
+            alignItems="center"
+            justifyContent="center"
+            mx="auto"
+            py={1}
+            px={2}
+            sx={{
+              backgroundImage: `linear-gradient(90deg, ${gigTheme.palette.primaryCTA.primary}, ${gigTheme.palette.primaryCTA.secondary})`,
+            }}
+          >
+            <Typography color="primary" fontWeight={400} fontSize={20}>
+              {"5"} ETH
+            </Typography>
+          </Box>
+          <Box display="flex" justifyContent="center" mt={5} mb={2}>
+            <SecondaryButtonCTA
+              text="My Tasks"
+              size="big"
+              to="/tasker/my-tasks"
+            />
+            <PrimaryButtonCTA
+              text="Browse Tasks"
+              size="big"
+              to="/browse-tasks"
+              sx={{ ml: 4 }}
+            />
+          </Box>
+        </Box>
       </GrayCard>
     </Container>
   );
