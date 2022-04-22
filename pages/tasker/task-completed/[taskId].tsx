@@ -37,18 +37,14 @@ export default function TaskCompleted() {
     const ethAddress = user.get("ethAddress");
 
     checkTaskerTaskHasNotRated(Moralis, taskId as string).then((res) => {
-      console.log(res);
-
-      // if (!res) {
-      //   alert(`Address ${ethAddress} has not claimed task ${taskId}.`);
-      //   router.push("/browse-tasks");
-      //   return;
-      // }
+      if (!res) {
+        alert(`Address ${ethAddress} not allowed to rate task ${taskId}.`);
+        router.push("/browse-tasks");
+        return;
+      }
 
       setIsAllowed(true);
     });
-
-    setIsAllowed(true);
   }, [isInitialized, Moralis, taskId, router, user]);
 
   if (!isAllowed) return <LoadingOverlay open={true} text="Verifying..." />;
