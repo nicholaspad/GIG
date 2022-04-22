@@ -144,22 +144,21 @@ export default function Form() {
         ];
         let newContractIface = new ethers.utils.Interface(newContractABI);
 
-        
-        const multiIface = new ethers.utils.Interface(MulticallABI);
-        let multicallAggData = multiIface.encodeFunctionData("aggregate", [
-          [
-            [
-              escrowFactoryAddress,
-              newContractIface.encodeFunctionData("createNewEscrow", [
-                maticTokenAddress,
-                maxTaskers,
-                requesterAddress,
-              ]),
-            ],
-            [],
-            [],
-          ],
-        ]);
+        // const multiIface = new ethers.utils.Interface(MulticallABI);
+        // let multicallAggData = multiIface.encodeFunctionData("aggregate", [
+        //   [
+        //     [
+        //       escrowFactoryAddress,
+        //       newContractIface.encodeFunctionData("createNewEscrow", [
+        //         maticTokenAddress,
+        //         maxTaskers,
+        //         requesterAddress,
+        //       ]),
+        //     ],
+        //     [],
+        //     [],
+        //   ],
+        // ]);
 
         // New contract
         // console.log("begin multicall");
