@@ -163,3 +163,17 @@ export async function postTaskFormData(
     responses: responses,
   });
 }
+
+/*
+  Posts rating from task-completed pages.
+*/
+export async function postTaskRating(
+  Moralis: MoralisType,
+  taskId: string,
+  rating: number
+): Promise<{ success: boolean; message: string }> {
+  return await Moralis.Cloud.run("postTaskRating", {
+    taskId: taskId,
+    rating: rating,
+  });
+}

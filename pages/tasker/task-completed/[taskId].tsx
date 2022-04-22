@@ -1,4 +1,10 @@
-import { Container, styled, Rating, Box } from "@mui/material";
+import {
+  Container,
+  styled,
+  Rating,
+  Box,
+  CircularProgress,
+} from "@mui/material";
 import PrimaryButtonCTA from "../../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../../components/buttons/SecondaryButtonCTA";
 import { Typography } from "@mui/material";
@@ -11,7 +17,10 @@ import { useMoralis } from "react-moralis";
 import { useEffect, useState } from "react";
 import PageHeader from "../../../components/common/PageHeader";
 import LoadingOverlay from "../../../components/common/LoadingOverlay";
-import { checkTaskerTaskHasNotRated } from "../../../src/Database";
+import {
+  checkTaskerTaskHasNotRated,
+  postTaskRating,
+} from "../../../src/Database";
 
 export default function TaskCompleted() {
   const router = useRouter();
@@ -22,12 +31,20 @@ export default function TaskCompleted() {
 
   const handleRating = async (rating: number) => {
     if (!taskId || !isInitialized) return;
+    if (rating <= 0 || rating > 5) return;
 
     setOpenPosting(true);
+    // sleep to allow time for the overlay
+    await new Promise((r) => setTimeout(r, 25));
 
-    // TODO: post rating to MoralisDB with validation
-    alert("Rating: " + rating);
+    const res = await postTaskRating(Moralis, taskId as string, rating);
+    if (!res.success) {
+      setOpenPosting(false);
+      alert(res.message);
+      return;
+    }
 
+    alert(res.message);
     setOpenPosting(false);
   };
 
