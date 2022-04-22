@@ -1,26 +1,40 @@
+// Question types
+
 export enum QuestionType {
   SINGLE_CHOICE,
 }
 
 export type SingleChoiceQuestion = {
-  idx: number;
-  id?: string;
-  question: string;
   options: string[];
 };
 
 export type GenericQuestion = {
-  type: number;
+  type: QuestionType;
   idx: number;
-  id?: string;
+  id: string;
   question: string;
-  options: string[];
+  content: SingleChoiceQuestion;
 };
+
+// Response types
+
+export type SingleChoiceResponse = {
+  idx: number;
+};
+
+export type GenericResponse = {
+  type: QuestionType;
+  questionId: string;
+  response: SingleChoiceResponse;
+};
+
+// Task types
 
 export type TaskProps = {
   id?: string;
   title: string;
   description: string;
+  estCompletionTime?: number;
   questions: GenericQuestion[];
 };
 

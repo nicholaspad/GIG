@@ -19,17 +19,35 @@ async function computeMaxRewardWei(maxReward) {
 /*
   Check that a task is claimed by a Tasker.
 */
-async function checkTaskerClaimedTask(ethAddress, taskId) {
+async function checkTaskerClaimedTask(taskerId, taskId) {
   const tableName = "TaskUsers";
 
   const TaskUsers = Moralis.Object.extend(tableName);
   const query = new Moralis.Query(TaskUsers);
   const res = await query
-    .equalTo("taskerId", ethAddress)
+    .equalTo("taskerId", taskerId)
     .equalTo("taskId", taskId)
     .find();
 
   return res.length > 0;
+}
+
+/*
+  Check if a task has already been submitted by a Tasker.
+*/
+async function checkTaskerSubmittedTask(taskerId, taskId) {
+  const tableName = "TaskUsers";
+
+  const TaskUsers = Moralis.Object.extend(tableName);
+  const query = new Moralis.Query(TaskUsers);
+  const res = await query
+    .equalTo("taskerId", taskerId)
+    .equalTo("taskId", taskId)
+    .first();
+
+  if (!res) return false;
+
+  return res.get("status") !== 0;
 }
 
 /* ------------------------------------------------------------------- */
@@ -40,6 +58,21 @@ Moralis.Cloud.define(
     const ethAddress = request.user.get("ethAddress");
     const taskId = request.params.taskId;
     return await checkTaskerClaimedTask(ethAddress, taskId);
+  },
+  {
+    fields: ["taskId"],
+    requireUser: true,
+  }
+);
+
+/* ------------------------------------------------------------------- */
+
+Moralis.Cloud.define(
+  "checkTaskerSubmittedTask",
+  async (request) => {
+    const ethAddress = request.user.get("ethAddress");
+    const taskId = request.params.taskId;
+    return await checkTaskerSubmittedTask(ethAddress, taskId);
   },
   {
     fields: ["taskId"],
@@ -480,6 +513,16 @@ Moralis.Cloud.define(
       res.forEach(async (e) => await e.destroy());
     }
 
+    async function destroyResponses(taskId) {
+      const tableName = "Responses";
+
+      const Responses = Moralis.Object.extend(tableName);
+      const query = new Moralis.Query(Responses);
+      const res = await query.equalTo("taskId", taskId).find();
+
+      res.forEach(async (e) => await e.destroy());
+    }
+
     async function destroyClaimedTasks(taskId) {
       const verifiedAndPaid = 2;
       const tableName = "TaskUsers";
@@ -519,6 +562,7 @@ Moralis.Cloud.define(
       };
 
     await destroyQuestions(taskId);
+    await destroyResponses(taskId);
     await destroyClaimedTasks(taskId);
 
     return res.destroy().then(
@@ -571,17 +615,12 @@ Moralis.Cloud.define(
         return false;
       if (
         newTask["questions"].some((question) => {
-          // See enum QuestionType for type IDs
-
-          // Multiple choice
-          if (question["type"] === QuestionType.SINGLE_CHOICE) {
-            // Check that number of choices is in [1, 5]
-            if (
-              question["options"].length < 1 ||
-              question["options"].length > 5
-            )
-              return true;
-            return false;
+          switch (question["type"]) {
+            case QuestionType.SINGLE_CHOICE:
+              const options = question["content"]["options"];
+              // Check that number of choices is in [1, 5]
+              if (options.length < 1 || options.length > 5) return true;
+              return false;
           }
 
           // Invalid/unknown question type, so fail
@@ -594,7 +633,12 @@ Moralis.Cloud.define(
       return true;
     }
 
-    async function insertNewTask(newTask, maxRewardETH, maxResponses) {
+    async function insertNewTask(
+      newTask,
+      maxRewardETH,
+      maxResponses,
+      contractAddress
+    ) {
       const tableName = "Tasks";
 
       const Tasks = Moralis.Object.extend(tableName);
@@ -604,6 +648,7 @@ Moralis.Cloud.define(
       task.set("title", newTask["title"]);
       task.set("description", newTask["description"]);
       task.set("startDate", new Date());
+      task.set("contractAddress", contractAddress);
       task.set("status", 0); // "in progress"
       task.set(
         "estCompletionTime",
@@ -632,7 +677,7 @@ Moralis.Cloud.define(
         q.set("type", question["type"]);
         q.set("title", question["question"]);
         q.set("idx", idx);
-        q.set("options", question["options"]);
+        q.set("content", question["content"]);
         await q.save();
       });
     }
@@ -641,6 +686,7 @@ Moralis.Cloud.define(
     const newTask = request.params.newTask;
     const maxRewardETH = request.params.maxRewardETH;
     const maxResponses = Number(request.params.maxResponses);
+    const contractAddress = request.params.contractAddress;
     const config = await Moralis.Config.get({ useMasterKey: true });
 
     if (!validateNewTask(newTask, maxRewardETH, maxResponses, config))
@@ -649,7 +695,12 @@ Moralis.Cloud.define(
         message: `Address ${ethAddress} failed to create task "${newTask["title"]}": please provide valid inputs`,
       };
 
-    const taskId = await insertNewTask(newTask, maxRewardETH, maxResponses);
+    const taskId = await insertNewTask(
+      newTask,
+      maxRewardETH,
+      maxResponses,
+      contractAddress
+    );
     await insertNewQuestions(newTask, taskId);
 
     return {
@@ -659,6 +710,182 @@ Moralis.Cloud.define(
   },
   {
     fields: ["newTask", "maxRewardETH", "maxResponses"],
+    requireUser: true,
+  }
+);
+
+/* ------------------------------------------------------------------- */
+
+Moralis.Cloud.define(
+  "getTaskFormData",
+  async (request) => {
+    async function getQuestions(taskId) {
+      const tableName = "Questions";
+      const Questions = Moralis.Object.extend(tableName);
+      const query = new Moralis.Query(Questions);
+      const res = await query.equalTo("taskId", taskId).find();
+
+      return res.map((q) => {
+        return {
+          id: q.id,
+          type: q.get("type"),
+          idx: q.get("idx"),
+          question: q.get("title"),
+          content: q.get("content"),
+        };
+      });
+    }
+
+    const taskId = request.params.taskId;
+    const ethAddress = request.user.get("ethAddress");
+    const tableName = "Tasks";
+
+    if (!(await checkTaskerClaimedTask(ethAddress, taskId))) return null;
+
+    const Tasks = Moralis.Object.extend(tableName);
+    const query = new Moralis.Query(Tasks);
+    const res = await query.equalTo("objectId", taskId).first();
+
+    if (!res) return null;
+
+    return {
+      id: res.id,
+      title: res.get("title"),
+      description: res.get("description"),
+      estCompletionTime: res.get("estCompletionTime"),
+      questions: await getQuestions(taskId),
+    };
+  },
+  {
+    fields: ["taskId"],
+    requireUser: true,
+  }
+);
+
+/* ------------------------------------------------------------------- */
+
+Moralis.Cloud.define(
+  "postTaskFormData",
+  async (request) => {
+    const QuestionType = {
+      SINGLE_CHOICE: 0,
+    };
+
+    async function validateResponses(responses, taskerId, taskId) {
+      const tableName = "Responses";
+
+      const Responses = Moralis.Object.extend(tableName);
+      let query = new Moralis.Query(Responses);
+
+      for (response of responses) {
+        // Check whether rows with taskerId + taskId already exist
+        let res = await query
+          .equalTo("taskerId", taskerId)
+          .equalTo("taskId", taskId)
+          .first();
+        if (res) return false;
+
+        // Check whether rows with questionId + taskId already exist
+        res = await query
+          .equalTo("questionId", response["questionId"])
+          .equalTo("taskId", taskId)
+          .first();
+        if (res) return false;
+
+        // Check whether questionId is valid
+        query = new Moralis.Query(Moralis.Object.extend("Questions"));
+        res = await query
+          .equalTo("objectId", response["questionId"])
+          .equalTo("taskId", taskId)
+          .find();
+        if (res.length !== 1) return false;
+
+        // Check whether taskId is valid
+        query = new Moralis.Query(Moralis.Object.extend("Tasks"));
+        res = await query.equalTo("objectId", taskId).find();
+        if (res.length !== 1) return false;
+
+        // Check schema of the actual response data
+        const r = response["response"];
+        switch (response["type"]) {
+          case QuestionType.SINGLE_CHOICE:
+            const keys = Object.keys(r);
+            if (keys.length !== 1) return false;
+            if (!keys.includes("idx")) return false;
+            if (typeof r["idx"] !== "number") return false;
+            break;
+        }
+      }
+
+      return true;
+    }
+
+    async function insertResponses(responses, taskerId, taskId) {
+      const tableName = "Responses";
+
+      const Responses = Moralis.Object.extend(tableName);
+
+      responses.forEach(async (response) => {
+        const r = new Responses();
+        r.set("questionId", response["questionId"]);
+        r.set("taskId", taskId);
+        r.set("type", response["type"]);
+        r.set("taskerId", taskerId);
+        r.set("response", response["response"]);
+        await r.save();
+      });
+    }
+
+    async function updateTaskStatus(taskerId, taskId) {
+      const tableName = "TaskUsers";
+
+      const TaskUsers = Moralis.Object.extend(tableName);
+      const query = new Moralis.Query(TaskUsers);
+      const res = await query
+        .equalTo("taskerId", taskerId)
+        .equalTo("taskId", taskId)
+        .first();
+
+      if (!res) return;
+
+      res.set("status", 1);
+      res.set("completedDate", new Date());
+
+      await res.save();
+    }
+
+    const responses = request.params.responses;
+    const taskId = request.params.taskId;
+    const ethAddress = request.user.get("ethAddress");
+
+    if (!(await checkTaskerClaimedTask(ethAddress, taskId)))
+      return {
+        success: false,
+        message: `Address ${ethAddress} has not claimed task ${taskId}.`,
+      };
+
+    if (await checkTaskerSubmittedTask(ethAddress, taskId))
+      return {
+        success: false,
+        message: `Address ${ethAddress} has already submitted task ${taskId}.`,
+      };
+
+    if (!(await validateResponses(responses, ethAddress, taskId)))
+      return {
+        success: false,
+        message: `Response data for task ${taskId} contains malformed data.`,
+      };
+
+    await insertResponses(responses, ethAddress, taskId);
+    await updateTaskStatus(ethAddress, taskId);
+
+    return {
+      success: true,
+      message: `Address ${ethAddress} successfully submitted task ${taskId}!`,
+    };
+  },
+  {
+    fields: ["responses"],
     requireUser: true,
   }
 );
