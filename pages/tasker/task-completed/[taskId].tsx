@@ -1,8 +1,8 @@
 import { Container, styled, Rating, Grid } from "@mui/material";
-import PrimaryButtonCTA from "../../components/buttons/PrimaryButtonCTA";
-import SecondaryButtonCTA from "../../components/buttons/SecondaryButtonCTA";
+import PrimaryButtonCTA from "../../../components/buttons/PrimaryButtonCTA";
+import SecondaryButtonCTA from "../../../components/buttons/SecondaryButtonCTA";
 import { Typography } from "@mui/material";
-import GrayCard from "../../components/common/DefaultGrayCard";
+import GrayCard from "../../../components/common/DefaultGrayCard";
 import StarOutlineRoundedIcon from "@mui/icons-material/StarOutlineRounded";
 import StarRoundedIcon from "@mui/icons-material/StarRounded";
 
