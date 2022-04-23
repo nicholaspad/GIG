@@ -220,6 +220,7 @@ export default function Form() {
 
         //
         // Deploy a new contract for this Task
+        /*
         console.log("escrowFactory");
         const escrowFactory = new ethers.Contract(
           escrowFactoryAddress,
@@ -276,6 +277,8 @@ export default function Form() {
         );
 
         return { contractAddress: newContractAddress, error: null };
+        await escrowFundTxn.wait();
+        console.log("6");*/
       }
       return { contractAddress: null, error: "Unknown" };
     } catch (error) {
