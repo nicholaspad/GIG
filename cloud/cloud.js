@@ -247,11 +247,11 @@ Moralis.Cloud.define(
 
     const Tasks = Moralis.Object.extend(tableName);
     const query = new Moralis.Query(Tasks);
-    const res = query.aggregate([
+    const res = await query.aggregate([
       { match: { _id: taskId } },
       {
         project: {
-          objectId: 0,
+          objectId: 1,
           title: 1,
           description: 1,
           startDate: 1,
@@ -263,6 +263,8 @@ Moralis.Cloud.define(
     ]);
 
     // compute and set average rating (avgRating) for each
+    for (let task of res)
+      task["avgRating"] = await computeAverageRating(task["objectId"]);
 
     return res;
   },
