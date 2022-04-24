@@ -77,3 +77,26 @@ async function checkTaskerTaskHasNotRated(taskerId, taskId) {
 
   return res.get("status") === 1 && res.get("hasRated") === false;
 }
+
+/*
+  Computes a task's average rating given its taskId.
+*/
+async function computeAverageRating(taskId) {
+  const tableName = "TaskUsers";
+
+  const TaskUsers = Moralis.Object.extend(tableName);
+  const query = new Moralis.Query(TaskUsers);
+
+  const res = await query.equalTo("taskId", taskId).find();
+  if (res.length === 0) return -1;
+
+  let avgRating = 0;
+  let countRating = 0;
+  res.forEach((task) => {
+    if (!task.get("taskerRating")) return;
+    avgRating += task.get("taskerRating");
+    countRating++;
+  });
+  if (countRating === 0) return -1;
+  return avgRating / countRating;
+}

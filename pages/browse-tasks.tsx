@@ -1,6 +1,6 @@
 import StarOutlineRoundedIcon from "@mui/icons-material/StarOutlineRounded";
 import StarRoundedIcon from "@mui/icons-material/StarRounded";
-import { Rating, styled } from "@mui/material";
+import { Box, Rating, styled } from "@mui/material";
 import { GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
@@ -60,14 +60,16 @@ const extraColumns: GridColDef[] = [
     renderHeader: () => <TableHeader>Rating</TableHeader>,
     renderCell: (params: GridValueGetterParams) =>
       params.row.rating >= 0 ? (
-        <StyledRating
-          readOnly
-          value={params.row.rating}
-          size="large"
-          precision={0.5}
-          icon={<StarRoundedIcon fontSize="inherit" />}
-          emptyIcon={<StarOutlineRoundedIcon fontSize="inherit" />}
-        />
+        <Box ml="-7px">
+          <StyledRating
+            readOnly
+            value={params.row.rating}
+            size="large"
+            precision={0.5}
+            icon={<StarRoundedIcon fontSize="inherit" />}
+            emptyIcon={<StarOutlineRoundedIcon fontSize="inherit" />}
+          />
+        </Box>
       ) : (
         <TableCell>No ratings yet!</TableCell>
       ),
