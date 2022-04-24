@@ -117,7 +117,7 @@ async function computeRequesterRating(requesterId) {
   let countRating = 0;
   for (let task of res) {
     const taskRating = await computeTaskRating(task.id);
-    if (taskRating === -1) return;
+    if (taskRating === -1) continue;
     avgRating += taskRating;
     countRating++;
   }
