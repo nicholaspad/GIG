@@ -111,9 +111,8 @@ Moralis.Cloud.define(
     ]);
 
     // compute and set average rating (avgRating) for each
-    res.forEach(async (task) => {
-      task["avgRating"] = await computeAverageRating(task["objectId"]);
-    });
+    for (let task of res)
+      task["avgRating"] = await computeTaskRating(task["objectId"]);
 
     const claimedTaskIds = {};
     (await getTaskerClaimedTaskIds(ethAddress)).forEach((task) => {
@@ -264,7 +263,7 @@ Moralis.Cloud.define(
 
     // compute and set average rating (avgRating) for each
     for (let task of res)
-      task["avgRating"] = await computeAverageRating(task["objectId"]);
+      task["avgRating"] = await computeRequesterRating(task["requesterId"]);
 
     return res;
   },
