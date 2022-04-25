@@ -1,4 +1,4 @@
-import { Container, Box, CircularProgress } from "@mui/material";
+import { Container, Box } from "@mui/material";
 import Question from "../../../components/taskerForm/Question";
 import PrimaryButtonCTA from "../../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../../components/buttons/SecondaryButtonCTA";
@@ -10,47 +10,63 @@ import { useRouter } from "next/router";
 import { useMoralis } from "react-moralis";
 import {
   checkTaskerClaimedTask,
+  checkTaskerSubmittedTask,
+  getTaskFormData,
+  postTaskFormData,
   taskerAbandonTask,
 } from "../../../src/Database";
 import LoadingOverlay from "../../../components/common/LoadingOverlay";
+import { GenericResponse, QuestionType, TaskProps } from "../../../src/Types";
+import { useFormik } from "formik";
 
 export default function TaskerForm() {
-  /* Test Data */
-  const q1 = {
-    id: "00001",
-    type: 1,
-    question: "How are you",
-    options: ["I'm fine", "I'm not fine", "None of your business"],
-  };
-
-  const q2 = {
-    id: "00002",
-    type: 1,
-    question: "Do you want Ether",
-    options: ["Yes", "No"],
-  };
-
-  const q3 = {
-    id: "00003",
-    type: 1,
-    question: "Do you like GIG?",
-    options: ["Yes", "Certainly", "Absolutely", "I'm a die hard fan"],
-  };
-
-  const formData = [q1, q2, q3];
-  const formInfo = {
-    title: "My Survey",
-    description: "Please select the best answer",
-    eta: 5,
-  };
-  /* End of Test Data */
-
   const router = useRouter();
   const { taskId } = router.query;
   const { isInitialized, Moralis, user } = useMoralis();
-  const [openLoading, setOpenLoading] = useState(false);
+  const [openPosting, setOpenPosting] = useState(false);
+  const [openAbandonLoading, setOpenAbandonLoading] = useState(false);
   const [isAllowed, setIsAllowed] = useState(false);
-  const [answers, setAnswers] = useState({});
+  const [data, setData] = useState<TaskProps>();
+  const formik = useFormik({
+    initialValues: {},
+    onSubmit: async (values: { [key: string]: string }) => {
+      if (Object.keys(values).some((k) => values[k] === null)) {
+        alert("Please answer all questions!");
+        return;
+      }
+      if (!data || !isInitialized) return;
+      if (!confirm(`Are you sure you want to submit task ${taskId}?`)) return;
+
+      setOpenPosting(true);
+
+      let qTypes: { [key: string]: QuestionType } = {};
+      data.questions.forEach((q) => {
+        if (!q.id) return;
+        qTypes[q.id] = q.type;
+      });
+
+      let responses = Object.keys(values).map((k) => {
+        switch (qTypes[k]) {
+          case QuestionType.SINGLE_CHOICE:
+            return {
+              type: QuestionType.SINGLE_CHOICE,
+              questionId: k,
+              response: { idx: Number(values[k]) },
+            };
+        }
+      }) as GenericResponse[];
+
+      const res = await postTaskFormData(Moralis, taskId as string, responses);
+      if (!res.success) {
+        setOpenPosting(false);
+        alert(res.message);
+        return;
+      }
+
+      alert(res.message);
+      router.push("/tasker/my-tasks");
+    },
+  });
 
   const handleAbandonTask = async (taskName: string) => {
     if (!taskId) return;
@@ -60,12 +76,12 @@ export default function TaskerForm() {
     )
       return;
 
-    setOpenLoading(true);
+    setOpenAbandonLoading(true);
 
     const res = await taskerAbandonTask(Moralis, taskId as string);
 
     if (!res.success) {
-      setOpenLoading(false);
+      setOpenAbandonLoading(false);
       alert(res.message);
       return;
     }
@@ -74,20 +90,8 @@ export default function TaskerForm() {
     router.push("/browse-tasks");
   };
 
-  const handleSetAnswers = (id: string, answer: string) => {
-    setAnswers({ ...answers, [id]: answer });
-  };
-
-  /* TODO: use this function after building submit handling */
-  const convertResponseFormat = (responses: { [key: string]: string }) => {
-    return Object.keys(responses).map((key) => ({
-      questionId: key,
-      response: responses[key],
-    }));
-  };
-
   useEffect(() => {
-    if (!isInitialized || !user || !taskId || !router || !user) return;
+    if (!isInitialized || !user || !taskId || !router) return;
 
     const ethAddress = user.get("ethAddress");
     checkTaskerClaimedTask(Moralis, taskId as string).then((res) => {
@@ -96,54 +100,56 @@ export default function TaskerForm() {
         router.push("/browse-tasks");
         return;
       }
-
-      setIsAllowed(true);
+      checkTaskerSubmittedTask(Moralis, taskId as string).then((res) => {
+        if (res) {
+          alert(`Address ${ethAddress} already submitted task ${taskId}.`);
+          router.push("/browse-tasks");
+          return;
+        }
+        setIsAllowed(true);
+      });
     });
   }, [isInitialized, Moralis, taskId, router, user]);
 
-  if (!isAllowed)
-    return (
-      <>
-        <PageHeader title="Verifying" />
-        <Box display="flex" flexDirection="column" alignItems="center">
-          <CircularProgress color="secondary" sx={{ mt: 2, mb: 3 }} />
-          <Typography
-            textAlign="center"
-            color="primary"
-            fontWeight={400}
-            fontSize={20}
-          >
-            Verifying...
-          </Typography>
-        </Box>
-      </>
-    );
+  useEffect(() => {
+    if (!isInitialized || !taskId || !isAllowed) return;
+
+    getTaskFormData(Moralis, taskId as string).then((res) => {
+      if (!res) {
+        alert("Failed to retrieve task data.");
+        return;
+      }
+
+      res.questions.forEach((q) => {
+        if (!q.id) return;
+        formik.setFieldValue(q.id, null);
+      });
+
+      setData(res);
+    });
+  }, [isAllowed, isInitialized, Moralis, taskId]);
+
+  if (!isAllowed) return <LoadingOverlay open={true} text="Verifying..." />;
+  if (!data) return <LoadingOverlay open={true} text="Loading Task..." />;
 
   return (
     <>
       <PageHeader title="Task" />
-      <LoadingOverlay open={openLoading} text="Abandoning Task..." />
+      <LoadingOverlay open={openPosting} text="Submitting Task..." />
+      <LoadingOverlay open={openAbandonLoading} text="Abandoning Task..." />
       <Container maxWidth="sm">
         <GrayCard sx={{ mt: 2 }}>
           <Box sx={{ p: 3 }}>
             <Typography variant="h4" color="primary" fontWeight={600}>
-              {formInfo.title}
+              {data.title}
             </Typography>
             <Typography sx={{ mt: 2 }} variant="body2" color="primary">
-              {formInfo.description}
+              {data.description}
             </Typography>
           </Box>
         </GrayCard>
-        {formData.map((props, idx) => (
-          <Question
-            type={props.type}
-            idx={idx}
-            id={props.id}
-            question={props.question}
-            options={props.options}
-            key={props.id}
-            handleSetAnswers={handleSetAnswers}
-          />
+        {data.questions.map((q) => (
+          <Question q={q} key={q.idx} handleChange={formik.handleChange} />
         ))}
         <Box
           sx={{
@@ -157,7 +163,7 @@ export default function TaskerForm() {
             size="small"
             text="Abandon"
             onClick={() => {
-              handleAbandonTask(formInfo.title);
+              handleAbandonTask(data.title);
             }}
           />
           <Box>
@@ -167,13 +173,17 @@ export default function TaskerForm() {
               align="center"
               fontStyle="italic"
             >
-              Approximate time to complete
+              Approx time to complete
             </Typography>
             <Typography variant="body1" color="primary" align="center">
-              {formInfo.eta} minutes
+              {data.estCompletionTime} mins
             </Typography>
           </Box>
-          <PrimaryButtonCTA size="small" text="Submit" to="/tasker/completed" />
+          <PrimaryButtonCTA
+            size="small"
+            text="Submit"
+            onClick={formik.handleSubmit}
+          />
         </Box>
       </Container>
     </>

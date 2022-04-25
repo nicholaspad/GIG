@@ -1,26 +1,34 @@
 import MCQuestion from "./MCQuestion";
 import { Box, Typography } from "@mui/material";
-import { GenericQuestion } from "../../src/Types";
+import {
+  GenericQuestion,
+  QuestionType,
+  SingleChoiceQuestion,
+} from "../../src/Types";
 
-export default function Question(
-  props: GenericQuestion & { handleSetAnswers: Function }
-) {
-  if (props.options && props.type === 1) {
-    return (
-      <MCQuestion
-        question={props.question}
-        idx={props.idx}
-        id={props.id}
-        options={props.options}
-        handleSetAnswers={props.handleSetAnswers}
-      />
-    );
+export default function Question(props: {
+  q: GenericQuestion;
+  handleChange: Function;
+}) {
+  switch (props.q.type) {
+    case QuestionType.SINGLE_CHOICE:
+      return (
+        <MCQuestion
+          type={-1} // dummy
+          question={props.q.question}
+          idx={props.q.idx}
+          id={props.q.id}
+          content={props.q.content as SingleChoiceQuestion}
+          handleChange={props.handleChange}
+        />
+      );
+    default:
+      return (
+        <Box my={4} px={3}>
+          <Typography color="error">
+            Error retrieving question {props.q.idx + 1}
+          </Typography>
+        </Box>
+      );
   }
-  return (
-    <Box>
-      <Typography color="primary">
-        Error: Question type not available
-      </Typography>
-    </Box>
-  );
 }

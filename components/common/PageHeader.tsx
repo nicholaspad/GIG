@@ -12,8 +12,14 @@ export default function PageHeader(props: {
   customSetUserData?: Function;
 }) {
   const { title, disableAuthFunc, customSetUserData } = props;
-  const { user, isAuthenticated, isUnauthenticated, authError, Moralis } =
-    useMoralis();
+  const {
+    user,
+    isAuthenticated,
+    isUnauthenticated,
+    authError,
+    Moralis,
+    isInitialized,
+  } = useMoralis();
   const [userData, setUserData] = useState<MoralisType.Object>();
 
   useEffect(() => {
@@ -21,7 +27,14 @@ export default function PageHeader(props: {
   }, [isUnauthenticated]);
 
   useEffect(() => {
-    if (disableAuthFunc || !isAuthenticated || authError || !user) return;
+    if (
+      !isInitialized ||
+      disableAuthFunc ||
+      !isAuthenticated ||
+      authError ||
+      !user
+    )
+      return;
 
     makeOrGetNewUser(Moralis).then((res) => {
       setUserData(res);
@@ -34,6 +47,7 @@ export default function PageHeader(props: {
     user,
     disableAuthFunc,
     customSetUserData,
+    isInitialized,
   ]);
 
   return (

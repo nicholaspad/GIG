@@ -10,16 +10,16 @@ import { GenericQuestion, QuestionType, TaskProps } from "../../src/Types";
 import PageHeader from "../../components/common/PageHeader";
 import PrimaryButtonCTA from "../../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../../components/buttons/SecondaryButtonCTA";
-import MCQuestion from "../../components/taskerForm/MCQuestion";
 import LoadingOverlay from "../../components/common/LoadingOverlay";
 import { createTask } from "../../src/Database";
 import { useMoralis } from "react-moralis";
 import { useRouter } from "next/router";
 import { computeUnitRewardWei } from "../../src/Helpers";
+import Question from "../../components/taskerForm/Question";
 import { ethers, BigNumber } from "ethers";
 import EscrowFactory from "../../src/utils/abi/EscrowFactory.json";
 import Escrow from "../../src/utils/abi/Escrow.json";
-// import ERC20ABI from "../../src/utils/abi/ERC20Token.json";
+import ERC20ABI from "../../src/utils/abi/ERC20Token.json";
 import MulticallABI from "../../src/utils/abi/Multicall.json";
 
 export default function Form() {
@@ -94,11 +94,18 @@ export default function Form() {
     setOpenPosting(true);
 
     // Deploy new contract for this Task
-    const stakeCryptoErr = await stakeCrypto();
-    if (stakeCryptoErr) {
-      alert(`There was an error creating this task: ${stakeCryptoErr}`);
-      return;
-    }
+    // const { contractAddress, error } = await stakeCrypto();
+    const contractAddress = "0x242f379b6852aa66E7FcB0e83f8DD00D36889311";
+    // if (error) {
+    //   setOpenPosting(false);
+    //   alert(`There was an error creating this task: ${error.toString()}`);
+    //   return;
+    // }
+    // if (!contractAddress) {
+    //   setOpenPosting(false);
+    //   alert("There was an error creating this task.");
+    //   return;
+    // }
 
     // Putting Task in Moralis
     // TODO - Add contract address to database info associated with newTask
@@ -106,7 +113,8 @@ export default function Form() {
       Moralis,
       newTask,
       parseFloat(cryptoAllocated),
-      maxTaskers
+      maxTaskers,
+      contractAddress
     );
     if (!res.success) {
       setOpenPosting(false);
@@ -118,55 +126,10 @@ export default function Form() {
     router.push("/requester/my-tasks");
   };
 
-  // ==================================
-  const requesterAddress = "0xbE287fc8Ae5047876d984EE19c93E08Fc900d981";
-  let newContractABI = [
-    "function createNewEscrow(address paymentToken, uint256 _numberOfTasks,address _requester)",
-  ];
-  console.log("1");
-  let newContractIface = new ethers.utils.Interface(newContractABI);
-  console.log("2");
-  const multiIface = new ethers.utils.Interface(MulticallABI);
-
-  // const callStructData = ethers.utils.AbiCoder.prototype.encode(
-  //   ["address", "bytes"],
-  //   [
-  //     escrowFactoryAddress,
-  //     newContractIface.encodeFunctionData("createNewEscrow", [
-  //       maticTokenAddress,
-  //       maxTaskers,
-  //       requesterAddress,
-  //     ]),
-  //   ]
-  // );
-  // console.log(callStructData);
-
-  // const callArrData = ethers.utils.AbiCoder.prototype.encode(
-  //   [],
-  //   [callStructData]
-  // );
-  // enc([a, b, c]) != enc([enc(a, b, c)]);
-
-  // let multicallAggData = multiIface.encodeFunctionData("aggregate", [
-  //   [
-  //     [
-  //       escrowFactoryAddress,
-  //       newContractIface.encodeFunctionData("createNewEscrow", [
-  //         maticTokenAddress,
-  //         maxTaskers,
-  //         requesterAddress,
-  //       ]),
-  //     ],
-  //     [],
-  //     [],
-  //   ],
-  // ]);
-
-  // move testing code into stakeCrypto
-
-  // =================================
-
-  const stakeCrypto = async () => {
+  const stakeCrypto = async (): Promise<{
+    contractAddress: string | null;
+    error: any;
+  }> => {
     try {
       // @ts-expect-error
       const { ethereum } = window;
@@ -181,22 +144,21 @@ export default function Form() {
         ];
         let newContractIface = new ethers.utils.Interface(newContractABI);
 
-
-        const multiIface = new ethers.utils.Interface(MulticallABI);
-        let multicallAggData = multiIface.encodeFunctionData("aggregate", [
-          [
-            [
-              escrowFactoryAddress,
-              newContractIface.encodeFunctionData("createNewEscrow", [
-                maticTokenAddress,
-                maxTaskers,
-                requesterAddress,
-              ]),
-            ],
-            [],
-            [],
-          ],
-        ]);
+        // const multiIface = new ethers.utils.Interface(MulticallABI);
+        // let multicallAggData = multiIface.encodeFunctionData("aggregate", [
+        //   [
+        //     [
+        //       escrowFactoryAddress,
+        //       newContractIface.encodeFunctionData("createNewEscrow", [
+        //         maticTokenAddress,
+        //         maxTaskers,
+        //         requesterAddress,
+        //       ]),
+        //     ],
+        //     [],
+        //     [],
+        //   ],
+        // ]);
 
         // New contract
         // console.log("begin multicall");
@@ -313,11 +275,14 @@ export default function Form() {
         const escrowFundTxn = await escrow.fund(
           bigNumCryptoAllocated.toString()
         );
+
+        return { contractAddress: newContractAddress, error: null };
         await escrowFundTxn.wait();
         console.log("6");*/
       }
+      return { contractAddress: null, error: "Unknown" };
     } catch (error) {
-      return error;
+      return { contractAddress: null, error: error };
     }
   };
 
@@ -378,6 +343,12 @@ export default function Form() {
             />
           </Box>
         </Grid>
+
+        <Typography color="secondary" align="center" fontStyle="italic" mt={3}>
+          After clicking "Post Task," a series of MetaMask popups will appear.
+          Please be patient as there may be delays during the task creation
+          process.
+        </Typography>
 
         {/* ===== Task Heading ===== */}
         <DefaultGrayCard>
@@ -481,6 +452,7 @@ export default function Form() {
           </FormControl>
           <Typography
             color="primary"
+            textAlign="center"
             mt={
               cryptoAllocatedError === false && maxTaskersError === false
                 ? 2
@@ -518,14 +490,8 @@ export default function Form() {
         </Box>
 
         {/* Render all options in questions */}
-        {questions.map((question: GenericQuestion, i: number) => (
-          <MCQuestion
-            key={i}
-            idx={i}
-            question={question.question}
-            options={question.options}
-            handleSetAnswers={() => {}}
-          />
+        {questions.map((q: GenericQuestion, i: number) => (
+          <Question q={q} key={q.idx} handleChange={() => {}} />
         ))}
 
         {/* ===== Modal to add another question ===== */}
@@ -624,10 +590,11 @@ export default function Form() {
 
                     const newQuestions = questions.concat([
                       {
+                        id: "-1", // dummy
                         idx: questions.length,
                         type: QuestionType.SINGLE_CHOICE,
                         question: currQuestionTitle,
-                        options: currQuestionChoices,
+                        content: { options: currQuestionChoices },
                       },
                     ]);
                     setQuestions(newQuestions);

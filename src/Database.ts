@@ -1,5 +1,5 @@
 import MoralisType from "moralis";
-import { TaskProps } from "./Types";
+import { GenericResponse, TaskProps } from "./Types";
 
 /*
   Edit the below functions on the Moralis Dashboard (Cloud Functions) or by
@@ -12,6 +12,15 @@ export async function checkTaskerClaimedTask(
   taskId: string
 ): Promise<boolean> {
   return await Moralis.Cloud.run("checkTaskerClaimedTask", { taskId: taskId });
+}
+
+export async function checkTaskerSubmittedTask(
+  Moralis: MoralisType,
+  taskId: string
+): Promise<boolean> {
+  return await Moralis.Cloud.run("checkTaskerSubmittedTask", {
+    taskId: taskId,
+  });
 }
 
 /*
@@ -99,11 +108,35 @@ export async function createTask(
   Moralis: MoralisType,
   newTask: TaskProps,
   cryptoAllocated: number,
-  maxTaskers: number
+  maxTaskers: number,
+  contractAddress: string
 ): Promise<{ success: boolean; message: string }> {
   return await Moralis.Cloud.run("createTask", {
     newTask: newTask,
     maxRewardETH: cryptoAllocated,
     maxResponses: maxTaskers,
+    contractAddress: contractAddress,
+  });
+}
+
+/* Retrieves task data for form completion pages. */
+export async function getTaskFormData(
+  Moralis: MoralisType,
+  taskId: string
+): Promise<TaskProps | null> {
+  return await Moralis.Cloud.run("getTaskFormData", {
+    taskId: taskId,
+  });
+}
+
+/* Posts response data for form completion pages. */
+export async function postTaskFormData(
+  Moralis: MoralisType,
+  taskId: string,
+  responses: GenericResponse[]
+): Promise<{ success: boolean; message: string }> {
+  return await Moralis.Cloud.run("postTaskFormData", {
+    taskId: taskId,
+    responses: responses,
   });
 }
