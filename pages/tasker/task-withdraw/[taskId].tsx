@@ -1,16 +1,14 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
-import { Typography } from "@mui/material";
-// import SecondaryButtonCTA from "../../../components/buttons/SecondaryButtonCTA";
 import PageHeader from "../../../components/common/PageHeader";
-// import TaskOverviewTemplate from "../../../components/task/TaskOverview";
+import TaskWithdrawTemplate from "../../../components/task/TaskWithdraw";
 import { getTaskOverviewData } from "../../../src/Database";
 import { TaskOverviewData } from "../../../src/Types";
 
 export default function TaskWithdraw() {
   const router = useRouter();
-  const { taskId, back } = router.query;
+  const { taskId } = router.query;
   const { isInitialized, Moralis } = useMoralis();
   const [data, setData] = useState<TaskOverviewData>();
 
@@ -40,11 +38,7 @@ export default function TaskWithdraw() {
   return (
     <>
       <PageHeader title="Withdraw Crypto" />
-      {console.log("data")}
-      {console.log(data)}
-      {/* // make sure this is when it's loaded
-      contract address: {data.contractAddress} */}
-      hi
+      <TaskWithdrawTemplate data={data} />
     </>
   );
 }

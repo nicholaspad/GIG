@@ -102,10 +102,7 @@ export default function MyTasks() {
               <SecondaryButtonCTA
                 text="Withdraw"
                 size="small"
-                // to="/transfer-crypto"
-                to={`/tasker/task-withdraw/${String(
-                  params.row.task_id
-                )}?back=/tasker/my-tasks`}
+                to={`/tasker/task-withdraw/${String(params.row.task_id)}`}
               />
             )}
           </Box>

@@ -1,4 +1,4 @@
-import { Typography, Stack, Grid, Button } from "@mui/material";
+import { Typography, Stack, Grid, Button, Box } from "@mui/material";
 import PrimaryButtonCTA from "../components/buttons/PrimaryButtonCTA";
 import SecondaryButtonCTA from "../components/buttons/SecondaryButtonCTA";
 import PageHeader from "../components/common/PageHeader";
@@ -10,7 +10,6 @@ import { ethers, BigNumber } from "ethers";
 import Escrow from "../src/utils/abi/Escrow.json";
 import ERC20ABI from "../src/utils/abi/ERC20Token.json";
 import { useState } from "react";
-import { Box } from "@mui/material";
 import { TaskOverviewData } from "../../src/Types";
 
 export default function TransferCrypto( props: {
