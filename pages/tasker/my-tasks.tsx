@@ -83,20 +83,33 @@ export default function MyTasks() {
       renderCell: (params: GridValueGetterParams) => (
         <>
           {/* Render Abandon buttons for "In Progress" rows only */}
+          {/* TODO: Render according to correct statuses 
+          - withdraw should be during status 2) */}
           <Box
-            visibility={
-              (params.row.status as TaskStatus) == 0 ? "visible" : "hidden"
-            }
-            mr={2}
+            // display="flex"
+            width={130}
+            m={2}
           >
-            <SecondaryButtonCTA
-              text="Abandon"
-              size="small"
-              onClick={() => {
-                handleAbandonTask(params.row.task_id, params.row.name);
-              }}
-            />
+            {(params.row.status as TaskStatus) == 0 ? (
+              <SecondaryButtonCTA
+                text="Abandon"
+                size="small"
+                onClick={() => {
+                  handleAbandonTask(params.row.task_id, params.row.name);
+                }}
+              />
+            ) : (
+              <SecondaryButtonCTA
+                text="Withdraw"
+                size="small"
+                // to="/transfer-crypto"
+                to={`/tasker/task-withdraw/${String(
+                  params.row.task_id
+                )}?back=/tasker/my-tasks`}
+              />
+            )}
           </Box>
+
           <PrimaryButtonCTA
             text={
               (params.row.status as TaskStatus) == 0 ? "Continue" : "Overview"
@@ -111,17 +124,6 @@ export default function MyTasks() {
                   )}?back=/tasker/my-tasks`
             }
           />
-          <Box
-            // render if withdraw is allowed
-            // visibility={}
-            ml={2}
-          >
-            <SecondaryButtonCTA
-              text="Withdraw"
-              size="small"
-              to="/transfer-crypto"
-            />
-          </Box>
         </>
       ),
     },
