@@ -117,7 +117,7 @@ export default function TaskCompleted() {
                   <Typography
                     variant="h6"
                     fontWeight="normal"
-                    color="primary"
+                    color="secondary"
                     mr={2}
                   >
                     Rate your experience:
