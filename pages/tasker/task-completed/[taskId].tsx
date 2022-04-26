@@ -19,6 +19,7 @@ import PageHeader from "../../../components/common/PageHeader";
 import LoadingOverlay from "../../../components/common/LoadingOverlay";
 import {
   checkTaskerTaskHasNotRated,
+  getTaskOverviewData,
   postTaskRating,
 } from "../../../src/Database";
 
@@ -29,6 +30,7 @@ export default function TaskCompleted() {
   const [openPosting, setOpenPosting] = useState(false);
   const [isAllowed, setIsAllowed] = useState(false);
   const [rating, setRating] = useState(0);
+  const [reward, setReward] = useState("");
 
   useEffect(() => {
     if (!taskId || !isInitialized || !router || !rating) return;
@@ -71,7 +73,11 @@ export default function TaskCompleted() {
         return;
       }
 
-      setIsAllowed(true);
+      getTaskOverviewData(Moralis, taskId as string).then((res) => {
+        let res_ = res[0] as any;
+        setReward(Moralis.Units.FromWei(res_["unitRewardWei"]));
+        setIsAllowed(true);
+      });
     });
   }, [isInitialized, Moralis, taskId, router, user]);
 
@@ -166,7 +172,7 @@ export default function TaskCompleted() {
               }}
             >
               <Typography color="primary" fontWeight={400} fontSize={20}>
-                {"5"} ETH
+                {reward} ETH
               </Typography>
             </Box>
             <Box display="flex" justifyContent="center" mt={5} mb={2}>
