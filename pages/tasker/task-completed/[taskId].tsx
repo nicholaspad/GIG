@@ -171,7 +171,12 @@ export default function TaskCompleted() {
                 backgroundImage: `linear-gradient(90deg, ${gigTheme.palette.primaryCTA.primary}, ${gigTheme.palette.primaryCTA.secondary})`,
               }}
             >
-              <Typography color="primary" fontWeight={400} fontSize={20}>
+              <Typography
+                color="primary"
+                textAlign="center"
+                fontWeight={400}
+                fontSize={20}
+              >
                 {reward} ETH
               </Typography>
             </Box>
