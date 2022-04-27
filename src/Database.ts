@@ -1,4 +1,5 @@
 import MoralisType from "moralis";
+import TaskDetails from "../pages/tasker/task-details/[taskId]";
 import { GenericResponse, TaskProps } from "./Types";
 
 /*
@@ -140,3 +141,57 @@ export async function postTaskFormData(
     responses: responses,
   });
 }
+
+export async function getTaskResponses(
+  Moralis: MoralisType,
+  taskId: string
+): Promise<MoralisType.Object<MoralisType.Attributes>[]> {
+  return await Moralis.Cloud.run("getTaskResponses", {
+    taskId: taskId,
+  })
+}
+
+export async function getTaskUsers(
+  Moralis: MoralisType,
+  taskId: string
+): Promise<MoralisType.Object<MoralisType.Attributes>[]> {
+  return await Moralis.Cloud.run("getTaskUsers", {
+    taskId: taskId,
+  })
+}
+
+export async function getUserResponse(
+  Moralis: MoralisType,
+  taskId: string,
+  userId: string,
+): Promise<MoralisType.Object<MoralisType.Attributes>[]> {
+  return await Moralis.Cloud.run("getUserResponse", {
+    taskId: taskId,
+    userId: userId,
+  })
+}
+
+export async function updateApprovalStatus(
+  Moralis: MoralisType,
+  objectId: string,
+  newStatus: number,
+  taskId: string,
+): Promise<{ success: boolean; message: string }> {
+  return await Moralis.Cloud.run("updateApprovalStatus", {
+    objectId: objectId,
+    newStatus: newStatus,
+    taskId: taskId,
+  })
+}
+
+export async function getTaskFormDataForView(
+  Moralis: MoralisType,
+  taskId: string,
+  taskerId: string
+): Promise<TaskProps | null> {
+  return await Moralis.Cloud.run("getTaskFormDataForView", {
+    taskId: taskId,
+    taskerId: taskerId,
+  });
+}
+

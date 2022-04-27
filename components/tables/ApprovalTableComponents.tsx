@@ -3,7 +3,6 @@ import {
   CircularProgress,
   Pagination,
   PaginationItem,
-  Rating,
   styled,
   TableContainer,
   Typography,
@@ -17,37 +16,34 @@ import {
   useGridApiContext,
   useGridSelector,
 } from "@mui/x-data-grid";
-import { TaskData } from "../../src/Types";
+import { ApprovalData } from "../../src/Types";
 import { TableCell, TableHeader } from "./Helpers";
-import { TableType } from "./TasksTableWrapper";
 
-export default function TasksTable(props: {
-  type: TableType;
-  data?: TaskData[];
+export default function ApprovalTable(props: {
+  data?: ApprovalData[];
   extraColumns: GridColDef[];
 }) {
   const columns: GridColDef[] = [
     {
-      field: "name",
+      field: "address",
       sortable: false,
       disableColumnMenu: true,
       type: "string",
-      minWidth: 300,
-      renderHeader: () => <TableHeader>Task Name</TableHeader>,
+      minWidth: 420,
+      renderHeader: () => <TableHeader>Tasker Address</TableHeader>,
       renderCell: (params: GridValueGetterParams) => (
-        <TableCell>{params.row.name}</TableCell>
+        <TableCell>{params.row.address}</TableCell>
       ),
     },
     {
-      field: "reward",
+      field: "duration",
       sortable: false,
       disableColumnMenu: true,
-      type: "number",
-      minWidth: 200,
-      align: "left",
-      renderHeader: () => <TableHeader>ETH Reward</TableHeader>,
+      type: "string",
+      minWidth: 150,
+      renderHeader: () => <TableHeader>Time Spent</TableHeader>,
       renderCell: (params: GridValueGetterParams) => (
-        <TableCell>{params.row.reward}</TableCell>
+        <TableCell>{params.row.duration} Minutes</TableCell>
       ),
     },
   ];
@@ -76,13 +72,13 @@ export default function TasksTable(props: {
         fontWeight={400}
         fontSize={20}
       >
-        No Tasks to display &#128532;
+        No Responses to display &#128532;
       </Typography>
     );
 
   return (
     <TableContainer sx={{ height: 600 }}>
-      <StyledTasksTable
+      <StyledApprovalsTable
         disableSelectionOnClick
         disableColumnSelector
         disableDensitySelector
@@ -91,7 +87,7 @@ export default function TasksTable(props: {
         components={{
           Pagination: CustomPagination,
         }}
-        getRowId={(row) => row.task_id}
+        getRowId={(row) => row.address}
         rows={props.data}
         columns={columns}
       />
@@ -99,7 +95,7 @@ export default function TasksTable(props: {
   );
 }
 
-const StyledTasksTable = styled(DataGrid)(({ theme }) => ({
+const StyledApprovalsTable = styled(DataGrid)(({ theme }) => ({
   border: 0,
   "& .MuiDataGrid-iconSeparator": {
     display: "none",

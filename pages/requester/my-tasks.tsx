@@ -110,7 +110,7 @@ export default function MyTasks() {
             size="small"
             to={
               (params.row.status as CreatedTaskStatus) === 0
-                ? "/requester/my-tasks" // TODO @nicholaspad @bzzbbz replace with link to page to approve pending tasks
+                ? `/requester/manage-task/${String(params.row.task_id)}`
                 : `/tasker/task-overview/${String(
                     params.row.task_id
                   )}?back=/requester/my-tasks`

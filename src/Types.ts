@@ -14,6 +14,7 @@ export type GenericQuestion = {
   id: string;
   question: string;
   content: SingleChoiceQuestion;
+  response?: number;
 };
 
 // Response types
@@ -49,6 +50,8 @@ export type TaskStatus = 0 | 1 | 2 | 3;
 
 export type CreatedTaskStatus = 0 | 1 | 2;
 
+export type ApprovalStatus = 1 | 2 | 3;
+
 export type TaskData = {
   task_id: string;
   name: string;
@@ -58,4 +61,12 @@ export type TaskData = {
   maxRewardWei?: string;
   numResponses?: number;
   maxResponses?: number;
+};
+
+export type ApprovalData = {
+  id: string,
+  address: string;
+  rating?: number;
+  duration: number;
+  status?: ApprovalStatus;
 };
