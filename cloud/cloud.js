@@ -1,56 +1,15 @@
-async function computeUnitRewardWei(maxReward, maxTaskers) {
-  const maxRewardWei = Number(
-    await Moralis.Cloud.units({
-      method: "toWei",
-      value: maxReward,
-    })
-  );
-  const unitRewardWei = maxRewardWei / maxTaskers - 1; // ensures that unitRewardWei*maxTaskers < maxRewardWei
-  return unitRewardWei.toString();
-}
-
-async function computeMaxRewardWei(maxReward) {
-  return await Moralis.Cloud.units({
-    method: "toWei",
-    value: maxReward,
-  });
-}
-
-/*
-  Check that a task is claimed by a Tasker.
-*/
-async function checkTaskerClaimedTask(taskerId, taskId) {
-  const tableName = "TaskUsers";
-
-  const TaskUsers = Moralis.Object.extend(tableName);
-  const query = new Moralis.Query(TaskUsers);
-  const res = await query
-    .equalTo("taskerId", taskerId)
-    .equalTo("taskId", taskId)
-    .find();
-
-  return res.length > 0;
-}
-
-/*
-  Check if a task has already been submitted by a Tasker.
-*/
-async function checkTaskerSubmittedTask(taskerId, taskId) {
-  const tableName = "TaskUsers";
-
-  const TaskUsers = Moralis.Object.extend(tableName);
-  const query = new Moralis.Query(TaskUsers);
-  const res = await query
-    .equalTo("taskerId", taskerId)
-    .equalTo("taskId", taskId)
-    .first();
-
-  if (!res) return false;
-
-  return res.get("status") !== 0;
-}
-
-/* ------------------------------------------------------------------- */
+Moralis.Cloud.define(
+  "checkTaskerTaskHasNotRated",
+  async (request) => {
+    const ethAddress = request.user.get("ethAddress");
+    const taskId = request.params.taskId;
+    return await checkTaskerTaskHasNotRated(ethAddress, taskId);
+  },
+  {
+    fields: ["taskId"],
+    requireUser: true,
+  }
+);
 
 Moralis.Cloud.define(
   "checkTaskerClaimedTask",
@@ -141,7 +100,6 @@ Moralis.Cloud.define(
         project: {
           objectId: 1, // taskId
           title: 1,
-          avgRating: 1,
           unitRewardWei: 1,
           maxRewardWei: 1,
           requesterId: 1,
@@ -151,6 +109,10 @@ Moralis.Cloud.define(
         },
       },
     ]);
+
+    // compute and set average rating (avgRating) for each
+    for (let task of res)
+      task["avgRating"] = await computeTaskRating(task["objectId"]);
 
     const claimedTaskIds = {};
     (await getTaskerClaimedTaskIds(ethAddress)).forEach((task) => {
@@ -284,21 +246,24 @@ Moralis.Cloud.define(
 
     const Tasks = Moralis.Object.extend(tableName);
     const query = new Moralis.Query(Tasks);
-    const res = query.aggregate([
+    const res = await query.aggregate([
       { match: { _id: taskId } },
       {
         project: {
-          objectId: 0,
+          objectId: 1,
           title: 1,
           description: 1,
           startDate: 1,
           unitRewardWei: 1,
           estCompletionTime: 1,
-          avgRating: 1,
           requesterId: 1,
         },
       },
     ]);
+
+    // compute and set average rating (avgRating) for each
+    for (let task of res)
+      task["avgRating"] = await computeRequesterRating(task["requesterId"]);
 
     return res;
   },
@@ -654,7 +619,6 @@ Moralis.Cloud.define(
         "estCompletionTime",
         Math.ceil((newTask["questions"].length * 30) / 60)
       ); // approx 30 seconds per question @bzzbbz @christine-sun @jennsun @nicholaspad
-      task.set("avgRating", -1);
       task.set("numResponses", 0);
       task.set("maxResponses", maxResponses);
       task.set(
@@ -886,6 +850,57 @@ Moralis.Cloud.define(
   },
   {
     fields: ["responses"],
+    requireUser: true,
+  }
+);
+
+/* ------------------------------------------------------------------- */
+
+Moralis.Cloud.define(
+  "postTaskRating",
+  async (request) => {
+    async function insertRating(taskerId, task, rating) {
+      const tableName = "TaskUsers";
+
+      const TaskUsers = Moralis.Object.extend(tableName);
+      const query = new Moralis.Query(TaskUsers);
+
+      const res = await query
+        .equalTo("taskerId", taskerId)
+        .equalTo("taskId", taskId)
+        .first();
+
+      res.set("taskerRating", rating);
+      res.set("hasRated", true);
+
+      await res.save();
+    }
+
+    const ethAddress = request.user.get("ethAddress");
+    const taskId = request.params.taskId;
+    const rating = Number(request.params.rating);
+
+    if (!(await checkTaskerTaskHasNotRated(ethAddress, taskId)))
+      return {
+        success: false,
+        message: `Address ${ethAddress} cannot rate task ${taskId}.`,
+      };
+
+    if (rating <= 0 || rating > 5)
+      return {
+        success: false,
+        message: `Out of bounds rating for task ${taskId}.`,
+      };
+
+    await insertRating(ethAddress, taskId, rating);
+
+    return {
+      success: true,
+      message: `Address ${ethAddress} successfully rated task ${taskId} as ${rating} stars!`,
+    };
+  },
+  {
+    fields: ["taskId"],
     requireUser: true,
   }
 );
