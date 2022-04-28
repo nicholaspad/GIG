@@ -1,5 +1,4 @@
 import MoralisType from "moralis";
-import TaskDetails from "../pages/tasker/task-details/[taskId]";
 import { GenericResponse, TaskProps } from "./Types";
 
 /*
