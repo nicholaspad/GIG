@@ -6,12 +6,15 @@ import { ethers } from "ethers";
 import { CreatedTaskStatus, TaskData } from "../../src/Types";
 import { gigTheme } from "../../src/Theme";
 import { useRouter } from "next/router";
+import { withdrawTaskerTask } from "../../src/Database";
+import { useMoralis } from "react-moralis";
 
 export default function TaskWithdrawTemplate(props: {
   data?: TaskOverviewData;
 }) {
   const { data } = props;
   const router = useRouter();
+  const { Moralis, user } = useMoralis();
   console.log("data of task");
   console.log(data);
   const escrowABI = Escrow.abi;
@@ -51,6 +54,16 @@ export default function TaskWithdrawTemplate(props: {
         alert(`Successfully withdrew ${data?.reward} ETH`);
 
         // change task status to completed - 4
+        const res = await withdrawTaskerTask(
+          Moralis,
+          user.get("ethAddress"),
+          data?.task_id as string
+        );
+        if (!res.success) {
+          alert(res.message);
+          return;
+        }
+        alert(res.message);
       }
     } catch (error) {
       console.log(error.data);

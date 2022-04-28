@@ -140,3 +140,15 @@ export async function postTaskFormData(
     responses: responses,
   });
 }
+
+/* Updates status after Tasker withdraws */
+export async function withdrawTaskerTask(
+  Moralis: MoralisType,
+  taskerId: string,
+  taskId: string,
+): Promise<{ success: boolean; message: string }> {
+  return await Moralis.Cloud.run("withdrawTaskerTask", {
+    taskerId: taskerId,
+    taskId: taskId,
+  });
+}

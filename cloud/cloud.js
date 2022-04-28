@@ -890,3 +890,40 @@ Moralis.Cloud.define(
     requireUser: true,
   }
 );
+
+/* ------------------------------------------------------------------- */
+
+Moralis.Cloud.define(
+  "withdrawTaskerTask",
+  async (request) => {
+    async function updateTaskStatus(taskerId, taskId) {
+      const tableName = "TaskUsers";
+
+      const TaskUsers = Moralis.Object.extend(tableName);
+      const query = new Moralis.Query(TaskUsers);
+
+      const res = await query
+        .equalTo("taskerId", taskerId)
+        .equalTo("taskId", taskId)
+        .first();
+
+      if (!res) return;
+
+      res.set("status", 4);
+      await res.save();
+    }
+
+    const taskId = request.params.taskId;
+    const ethAddress = request.user.get("ethAddress");
+
+    await updateTaskStatus(ethAddress, taskId);
+
+    return {
+      success: true,
+      message: `Address ${ethAddress} withdrew from task ${taskId}!`,
+    };
+  },
+  {
+    requireUser: true,
+  }
+);
