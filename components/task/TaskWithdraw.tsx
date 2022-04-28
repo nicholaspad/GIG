@@ -3,12 +3,17 @@ import PrimaryButtonCTA from "../../components/buttons/PrimaryButtonCTA";
 import { TaskOverviewData } from "../../src/Types";
 import Escrow from "../../src/utils/abi/Escrow.json";
 import { ethers } from "ethers";
+import { CreatedTaskStatus, TaskData } from "../../src/Types";
 import { gigTheme } from "../../src/Theme";
+import { useRouter } from "next/router";
 
 export default function TaskWithdrawTemplate(props: {
   data?: TaskOverviewData;
 }) {
   const { data } = props;
+  const router = useRouter();
+  console.log("data of task");
+  console.log(data);
   const escrowABI = Escrow.abi;
   const maticTokenAddress: string =
     "0x0000000000000000000000000000000000001010";
@@ -28,13 +33,32 @@ export default function TaskWithdrawTemplate(props: {
           escrowABI,
           signer
         );
+
+        // Get reference to MATIC token contract
+        // const maticContract = new ethers.Contract(
+        //   maticTokenAddress,
+        //   ERC20ABI,
+        //   signer
+        // );
+        // const approvalResult = await maticContract.approve(
+        //   escrowContractAddress,
+        //   "0"
+        // );
+        // await approvalResult.wait();
+
         const withdrawTxn = await escrowContract.withdraw();
         await withdrawTxn.wait();
+        alert(`Successfully withdrew ${data?.reward} ETH`);
+
+        // change task status to completed
+
       }
     } catch (error) {
       console.log(error.data);
-      alert(error.data);
+      alert(`Error: ${error.data}`);
     }
+    // after withdrawing go back to my-tasks
+    router.back();
   };
 
   return (
