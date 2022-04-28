@@ -50,8 +50,7 @@ export default function TaskWithdrawTemplate(props: {
         await withdrawTxn.wait();
         alert(`Successfully withdrew ${data?.reward} ETH`);
 
-        // change task status to completed
-
+        // change task status to completed - 4
       }
     } catch (error) {
       console.log(error.data);
