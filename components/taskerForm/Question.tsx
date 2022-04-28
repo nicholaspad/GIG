@@ -20,6 +20,7 @@ export default function Question(props: {
           id={props.q.id}
           content={props.q.content as SingleChoiceQuestion}
           handleChange={props.handleChange}
+          response={props.q.response}
         />
       );
     default:

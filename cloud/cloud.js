@@ -857,50 +857,210 @@ Moralis.Cloud.define(
 /* ------------------------------------------------------------------- */
 
 Moralis.Cloud.define(
-  "postTaskRating",
+  "checkRequesterCreatedTask",
   async (request) => {
-    async function insertRating(taskerId, task, rating) {
-      const tableName = "TaskUsers";
-
-      const TaskUsers = Moralis.Object.extend(tableName);
-      const query = new Moralis.Query(TaskUsers);
-
-      const res = await query
-        .equalTo("taskerId", taskerId)
-        .equalTo("taskId", taskId)
-        .first();
-
-      res.set("taskerRating", rating);
-      res.set("hasRated", true);
-
-      await res.save();
-    }
-
     const ethAddress = request.user.get("ethAddress");
-    const taskId = request.params.taskId;
-    const rating = Number(request.params.rating);
-
-    if (!(await checkTaskerTaskHasNotRated(ethAddress, taskId)))
-      return {
-        success: false,
-        message: `Address ${ethAddress} cannot rate task ${taskId}.`,
-      };
-
-    if (rating <= 0 || rating > 5)
-      return {
-        success: false,
-        message: `Out of bounds rating for task ${taskId}.`,
-      };
-
-    await insertRating(ethAddress, taskId, rating);
-
-    return {
-      success: true,
-      message: `Address ${ethAddress} successfully rated task ${taskId} as ${rating} stars!`,
-    };
+    return await checkRequesterCreatedTask(ethAddress, request.params.taskId)
   },
   {
     fields: ["taskId"],
+    requireUser: true,
+  }
+);
+
+/* ------------------------------------------------------------------- */
+
+Moralis.Cloud.define(
+  "getTaskResponses",
+  async (request) => {
+    async function getResponses(taskId) {
+      const pipeline = [
+        { group: { objectId: "$questionId", data: { $push: "$$ROOT" }}},
+      ];
+      tableName = "Responses";
+      const Responses = Moralis.Object.extend(tableName);
+      const query = new Moralis.Query(Responses);
+      const res = await query.equalTo("taskId", taskId).aggregate(pipeline);
+      return res;
+    }
+    const taskId = request.params.taskId;
+    const ethAddress = request.user.get("ethAddress");
+    if (!(await checkRequesterCreatedTask(ethAddress, taskId))) return [];
+    const responses = getResponses(taskId);
+    return responses;
+  },
+  {
+    fields: ["taskId"],
+    requireUser: true,
+  }
+);
+
+/* ------------------------------------------------------------------- */
+
+Moralis.Cloud.define(
+  "getTaskUsers",
+  async (request) => {
+    async function getTaskUsers(taskId) {
+      tableName = "TaskUsers";
+      const TaskUsers = Moralis.Object.extend(tableName);
+      const query = new Moralis.Query(TaskUsers);
+      query.equalTo("taskId", taskId);
+      query.notEqualTo("status", 0);
+      const res = await query.find();
+      return res;
+    }
+    const taskId = request.params.taskId;
+    const ethAddress = request.user.get("ethAddress");
+    if (!(await checkRequesterCreatedTask(ethAddress, taskId))) return [];
+    const taskUsers = getTaskUsers(taskId);
+    return taskUsers;
+  },
+  {
+    fields: ["taskId"],
+    requireUser: true,
+  }
+);
+
+Moralis.Cloud.define(
+  "getUserResponse",
+  async (request) => {
+    async function getTaskUsers(taskId, taskerId) {
+      tableName = "Responses";
+      const Responses = Moralis.Object.extend(tableName);
+      const query = new Moralis.Query(Responses);
+      query.equalTo("taskId", taskId);
+      query.equalTo("userId", taskerId);
+      const res = await query.find();
+      return res;
+    }
+    const taskId = request.params.taskId;
+    const ethAddress = request.user.get("ethAddress");
+    if (!(await checkRequesterCreatedTask(ethAddress, taskId))) return [];
+    const userResponse = getTaskUsers(taskId, request.params.taskerId);
+    return userResponse;
+  },
+  {
+    fields: ["taskId", "taskerId"],
+    requireUser: true,
+  }
+);
+
+Moralis.Cloud.define(
+  "updateApprovalStatus",
+  async (request) => {
+    if (request.params.newStatus !== 2 || request.params.newStatus !== 3) {
+      return {
+        success: false,
+        message: 'Task status must be updated to either "approved" or "rejected"'
+      };
+    }
+    const taskId = request.params.taskId;
+    const ethAddress = request.user.get("ethAddress");
+    if (!(await checkRequesterCreatedTask(ethAddress, taskId)))  {
+      return {
+        success: false,
+        message: "Approval update failed - unauthorized update!"
+      };
+    }
+    tableName = "TaskUsers";
+    const TaskUsers = Moralis.Object.extend(tableName);
+    const query = new Moralis.Query(TaskUsers);
+    return query.get(request.params.objectId).then(
+      (taskUser) => {
+        if (taskUser.get("status") !== 1) {
+          return {
+            success: false, 
+            message: "Cannot update status of tasks that are already approved/rejected"
+          };
+        }
+        taskUser.set("status", request.params.newStatus)
+        taskUser.save()
+        return {
+          success: true,
+          message: "Successfully updated approval status!"
+        };
+      },
+      (error) => {
+        return {
+          success: false,
+          message: `Failed to update approval status: ${error}`,
+        };
+      }
+    );
+  },
+  {
+    fields: ["objectId", "newStatus", "taskId"],
+    requireUser: true,
+  }
+);
+
+/* ------------------------------------------------------------------- */
+
+Moralis.Cloud.define(
+  "getTaskFormDataForView",
+  async (request) => {
+    const taskId = request.params.taskId;
+    const taskerId = request.params.taskerId;
+    const ethAddress = request.user.get("ethAddress");
+    if (!(await checkRequesterCreatedTask(ethAddress, taskId))) return null;
+
+    async function aggregateResponses(taskId, taskerId) {
+      const tableName = "Responses";
+      const TaskUsers = Moralis.Object.extend(tableName);
+      const query = new Moralis.Query(TaskUsers);
+      const pipeline = [
+        {
+          match: {
+            $expr: {
+              $and: [
+                { $eq: ["$taskId", taskId] },
+                { $eq: ["$taskerId", taskerId] },
+              ],
+            },
+          },
+        },
+    
+        {
+          lookup: {
+            from: "Questions",
+            localField: "questionId",
+            foreignField: "_id",
+            as: "question",
+          },
+        },
+      ];
+      return await query.aggregate(pipeline);
+    }
+    const responses = await aggregateResponses(taskId, taskerId);
+    const questionResponses = responses.map((r) => {
+      q = r["question"][0];
+      return {
+        id: q.id,
+        type: q["type"],
+        idx: q["idx"],
+        question: q["title"],
+        content: q["content"],
+        response: r["response"]["idx"],
+      };
+    });
+  
+
+    const tableName = "Tasks";
+    const Tasks = Moralis.Object.extend(tableName);
+    const query = new Moralis.Query(Tasks);
+    const res = await query.equalTo("objectId", taskId).first();
+    if (!res) return null;
+
+    return {
+      id: res.id,
+      title: res.get("title"),
+      description: res.get("description"),
+      estCompletionTime: res.get("estCompletionTime"),
+      questions: questionResponses,
+    };
+  },
+  {
+    fields: ["taskId", "taskerId"],
     requireUser: true,
   }
 );

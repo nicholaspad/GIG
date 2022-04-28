@@ -124,3 +124,16 @@ async function computeRequesterRating(requesterId) {
   if (countRating === 0) return -1;
   return avgRating / countRating;
 }
+
+async function checkRequesterCreatedTask(requesterId, taskId) {
+  const tableName = "Tasks";
+
+  const Tasks = Moralis.Object.extend(tableName);
+  const query = new Moralis.Query(Tasks);
+  const res = await query
+    .equalTo("requesterId", requesterId)
+    .equalTo("objectId", taskId)
+    .find();
+
+  return res.length > 0;
+}
