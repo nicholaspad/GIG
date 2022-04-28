@@ -8,11 +8,7 @@ import SecondaryButtonCTA from "../../../components/buttons/SecondaryButtonCTA";
 import LoadingOverlay from "../../../components/common/LoadingOverlay";
 import PageHeader from "../../../components/common/PageHeader";
 import { TableCell, TableHeader } from "../../../components/tables/Helpers";
-import {
-  getTaskResponses,
-  getTaskUsers,
-  updateApprovalStatus,
-} from "../../../src/Database";
+import { getTaskUsers, updateApprovalStatus } from "../../../src/Database";
 import { gigTheme } from "../../../src/Theme";
 import { ApprovalStatus, ApprovalData } from "../../../src/Types";
 import ApprovalsTable from "../../../components/tables/ApprovalTable";
@@ -98,13 +94,11 @@ export default function ManageResponses() {
       headerName: "",
       sortable: false,
       disableColumnMenu: true,
-      minWidth: data?.some((e) => e.status === 1) ? 290 : 165,
+      minWidth: data?.some((e) => e.status === 1) ? 400 : 165,
       flex: 1,
       align: "left",
       renderCell: (params: GridValueGetterParams) => (
         <>
-          {/* Render Abandon buttons for "In Progress" rows */}
-          {/* Use compact rendering if there are no "In Progress" rows */}
           <Box mr={2}>
             <SecondaryButtonCTA
               text={"Review"}
@@ -112,6 +106,8 @@ export default function ManageResponses() {
               to={`/requester/manage-task/${query.taskid}/${params.row.address}`}
             />
           </Box>
+          {/* Render Approval buttons for "Not Reviewed" rows */}
+          {/* Use compact rendering if there are no "Not Reviewed" rows */}
           {data?.some((e) => e.status === 1) ? (
             <>
               <Box
@@ -187,7 +183,7 @@ export default function ManageResponses() {
 
   return (
     <>
-      <PageHeader title="Requester Created Tasks" />
+      <PageHeader title="Requester Manage Tasks" />
       <LoadingOverlay open={openLoading} text="Processing Approval..." />
       <PrimaryButtonCTA
         text="← My Tasks"

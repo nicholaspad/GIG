@@ -32,10 +32,10 @@ export default function TasksTable(props: {
       sortable: false,
       disableColumnMenu: true,
       type: "string",
-      minWidth: 300,
+      minWidth: 250,
       renderHeader: () => <TableHeader>Task Name</TableHeader>,
       renderCell: (params: GridValueGetterParams) => (
-        <TableCell>{params.row.name}</TableCell>
+        <TableCell truncateLength={25}>{params.row.name}</TableCell>
       ),
     },
     {
@@ -43,11 +43,11 @@ export default function TasksTable(props: {
       sortable: false,
       disableColumnMenu: true,
       type: "number",
-      minWidth: 200,
+      minWidth: 150,
       align: "left",
       renderHeader: () => <TableHeader>ETH Reward</TableHeader>,
       renderCell: (params: GridValueGetterParams) => (
-        <TableCell>{params.row.reward}</TableCell>
+        <TableCell truncateLength={10}>{params.row.reward as string}</TableCell>
       ),
     },
   ];

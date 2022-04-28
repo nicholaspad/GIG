@@ -1,59 +1,15 @@
-import { get } from "http";
-import Moralis from "moralis/types";
-
-async function computeUnitRewardWei(maxReward, maxTaskers) {
-  const maxRewardWei = Number(
-    await Moralis.Cloud.units({
-      method: "toWei",
-      value: maxReward,
-    })
-  );
-  const unitRewardWei = maxRewardWei / maxTaskers - 1; // ensures that unitRewardWei*maxTaskers < maxRewardWei
-  return unitRewardWei.toString();
-}
-
-async function computeMaxRewardWei(maxReward) {
-  return await Moralis.Cloud.units({
-    method: "toWei",
-    value: maxReward,
-  });
-}
-
-/*
-  Check that a task is claimed by a Tasker.
-*/
-async function checkTaskerClaimedTask(taskerId, taskId) {
-  const tableName = "TaskUsers";
-
-  const TaskUsers = Moralis.Object.extend(tableName);
-  const query = new Moralis.Query(TaskUsers);
-  const res = await query
-    .equalTo("taskerId", taskerId)
-    .equalTo("taskId", taskId)
-    .find();
-
-  return res.length > 0;
-}
-
-/*
-  Check if a task has already been submitted by a Tasker.
-*/
-async function checkTaskerSubmittedTask(taskerId, taskId) {
-  const tableName = "TaskUsers";
-
-  const TaskUsers = Moralis.Object.extend(tableName);
-  const query = new Moralis.Query(TaskUsers);
-  const res = await query
-    .equalTo("taskerId", taskerId)
-    .equalTo("taskId", taskId)
-    .first();
-
-  if (!res) return false;
-
-  return res.get("status") !== 0;
-}
-
-/* ------------------------------------------------------------------- */
+Moralis.Cloud.define(
+  "checkTaskerTaskHasNotRated",
+  async (request) => {
+    const ethAddress = request.user.get("ethAddress");
+    const taskId = request.params.taskId;
+    return await checkTaskerTaskHasNotRated(ethAddress, taskId);
+  },
+  {
+    fields: ["taskId"],
+    requireUser: true,
+  }
+);
 
 Moralis.Cloud.define(
   "checkTaskerClaimedTask",
@@ -144,7 +100,6 @@ Moralis.Cloud.define(
         project: {
           objectId: 1, // taskId
           title: 1,
-          avgRating: 1,
           unitRewardWei: 1,
           maxRewardWei: 1,
           requesterId: 1,
@@ -154,6 +109,10 @@ Moralis.Cloud.define(
         },
       },
     ]);
+
+    // compute and set average rating (avgRating) for each
+    for (let task of res)
+      task["avgRating"] = await computeTaskRating(task["objectId"]);
 
     const claimedTaskIds = {};
     (await getTaskerClaimedTaskIds(ethAddress)).forEach((task) => {
@@ -287,21 +246,24 @@ Moralis.Cloud.define(
 
     const Tasks = Moralis.Object.extend(tableName);
     const query = new Moralis.Query(Tasks);
-    const res = query.aggregate([
+    const res = await query.aggregate([
       { match: { _id: taskId } },
       {
         project: {
-          objectId: 0,
+          objectId: 1,
           title: 1,
           description: 1,
           startDate: 1,
           unitRewardWei: 1,
           estCompletionTime: 1,
-          avgRating: 1,
           requesterId: 1,
         },
       },
     ]);
+
+    // compute and set average rating (avgRating) for each
+    for (let task of res)
+      task["avgRating"] = await computeRequesterRating(task["requesterId"]);
 
     return res;
   },
@@ -657,7 +619,6 @@ Moralis.Cloud.define(
         "estCompletionTime",
         Math.ceil((newTask["questions"].length * 30) / 60)
       ); // approx 30 seconds per question @bzzbbz @christine-sun @jennsun @nicholaspad
-      task.set("avgRating", -1);
       task.set("numResponses", 0);
       task.set("maxResponses", maxResponses);
       task.set(
@@ -894,18 +855,6 @@ Moralis.Cloud.define(
 );
 
 /* ------------------------------------------------------------------- */
-async function checkRequesterCreatedTask(requesterId, taskId) {
-  const tableName = "Tasks";
-
-  const Tasks = Moralis.Object.extend(tableName);
-  const query = new Moralis.Query(Tasks);
-  const res = await query
-    .equalTo("requesterId", requesterId)
-    .equalTo("objectId", taskId)
-    .find();
-
-  return res.length > 0;
-}
 
 Moralis.Cloud.define(
   "checkRequesterCreatedTask",
@@ -918,6 +867,8 @@ Moralis.Cloud.define(
     requireUser: true,
   }
 );
+
+/* ------------------------------------------------------------------- */
 
 Moralis.Cloud.define(
   "getTaskResponses",
@@ -943,6 +894,8 @@ Moralis.Cloud.define(
     requireUser: true,
   }
 );
+
+/* ------------------------------------------------------------------- */
 
 Moralis.Cloud.define(
   "getTaskUsers",
@@ -1006,22 +959,36 @@ Moralis.Cloud.define(
     tableName = "TaskUsers";
     const TaskUsers = Moralis.Object.extend(tableName);
     const query = new Moralis.Query(TaskUsers);
-    query.get(request.params.objectId).then(
+    return query.get(request.params.objectId).then(
       (taskUser) => {
+        if (taskUser.get("status") !== 1) {
+          return {
+            success: false, 
+            message: "Cannot update status of tasks that are already approved/rejected"
+          };
+        }
         taskUser.set("status", request.params.newStatus)
         taskUser.save()
+        return {
+          success: true,
+          message: "Successfully updated approval status!"
+        };
+      },
+      (error) => {
+        return {
+          success: false,
+          message: `Failed to update approval status: ${error}`,
+        };
       }
     );
-    return {
-      success: true,
-      message: `Approval successfully updated!"!`,
-    };
   },
   {
     fields: ["objectId", "newStatus", "taskId"],
     requireUser: true,
   }
 );
+
+/* ------------------------------------------------------------------- */
 
 Moralis.Cloud.define(
   "getTaskFormDataForView",

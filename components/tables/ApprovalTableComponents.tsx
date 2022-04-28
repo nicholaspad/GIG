@@ -43,7 +43,7 @@ export default function ApprovalTable(props: {
       minWidth: 150,
       renderHeader: () => <TableHeader>Time Spent</TableHeader>,
       renderCell: (params: GridValueGetterParams) => (
-        <TableCell>{params.row.duration} Minutes</TableCell>
+        <TableCell>{params.row.duration} mins</TableCell>
       ),
     },
   ];
