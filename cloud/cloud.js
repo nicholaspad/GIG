@@ -948,6 +948,12 @@ Moralis.Cloud.define(
 Moralis.Cloud.define(
   "updateApprovalStatus",
   async (request) => {
+    if (request.params.newStatus !== 2 || request.params.newStatus !== 3) {
+      return {
+        success: false,
+        message: 'Task status must be updated to either "approved" or "rejected"'
+      };
+    }
     const taskId = request.params.taskId;
     const ethAddress = request.user.get("ethAddress");
     if (!(await checkRequesterCreatedTask(ethAddress, taskId)))  {
@@ -1026,7 +1032,6 @@ Moralis.Cloud.define(
       return await query.aggregate(pipeline);
     }
     const responses = await aggregateResponses(taskId, taskerId);
-    console.log(responses);
     const questionResponses = responses.map((r) => {
       q = r["question"][0];
       return {

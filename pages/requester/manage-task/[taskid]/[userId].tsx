@@ -1,14 +1,11 @@
-import { Container, Box } from "@mui/material";
+import { Container } from "@mui/material";
 import Question from "../../../../components/taskerForm/Question";
 import PrimaryButtonCTA from "../../../../components/buttons/PrimaryButtonCTA";
 import { useEffect, useState } from "react";
 import PageHeader from "../../../../components/common/PageHeader";
 import { useRouter } from "next/router";
 import { useMoralis } from "react-moralis";
-import {
-  getTaskFormDataForView,
-  updateApprovalStatus,
-} from "../../../../src/Database";
+import { getTaskFormDataForView } from "../../../../src/Database";
 import LoadingOverlay from "../../../../components/common/LoadingOverlay";
 import { TaskProps } from "../../../../src/Types";
 
