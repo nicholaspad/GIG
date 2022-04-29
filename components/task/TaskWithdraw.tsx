@@ -24,6 +24,9 @@ export default function TaskWithdrawTemplate(props: {
   const escrowContractAddress = data?.contractAddress;
 
   const withdraw = async () => {
+    if (!data) return;
+    const escrowContractAddress = data.contractAddress;
+
     try {
       // @ts-expect-error
       const { ethereum } = window;
@@ -82,12 +85,18 @@ export default function TaskWithdrawTemplate(props: {
           />
           <Stack>
             <Box m={4}>
-              <Typography variant="h4" color="primary" textAlign="center">
-                The task
-                <Typography variant="h4" color="secondary" fontStyle="italic">
+              <Typography variant="h6" color="primary" textAlign="center">
+                Your submission for
+                <Typography
+                  my={2}
+                  component="div"
+                  variant="h4"
+                  color="secondary"
+                  fontStyle="italic"
+                >
                   {data.name}
                 </Typography>
-                has been approved. You have earned
+                has been approved! You have earned
               </Typography>
             </Box>
 
@@ -108,7 +117,7 @@ export default function TaskWithdrawTemplate(props: {
               }}
             >
               <Typography
-                variant="h3"
+                variant="h4"
                 color="primary"
                 fontWeight={500}
                 display="inline"
