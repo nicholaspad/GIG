@@ -845,7 +845,7 @@ Moralis.Cloud.define(
   "checkRequesterCreatedTask",
   async (request) => {
     const ethAddress = request.user.get("ethAddress");
-    return await checkRequesterCreatedTask(ethAddress, request.params.taskId)
+    return await checkRequesterCreatedTask(ethAddress, request.params.taskId);
   },
   {
     fields: ["taskId"],
@@ -860,7 +860,7 @@ Moralis.Cloud.define(
   async (request) => {
     async function getResponses(taskId) {
       const pipeline = [
-        { group: { objectId: "$taskerId", data: { $push: "$$ROOT" }}},
+        { group: { objectId: "$questionId", data: { $push: "$$ROOT" } } },
       ];
       tableName = "Responses";
       const Responses = Moralis.Object.extend(tableName);
@@ -1025,15 +1025,16 @@ Moralis.Cloud.define(
     if (request.params.newStatus !== 2 && request.params.newStatus !== 5) {
       return {
         success: false,
-        message: 'Task status must be updated to either "approved" or "rejected"'
+        message:
+          'Task status must be updated to either "approved" or "rejected"',
       };
     }
     const taskId = request.params.taskId;
     const ethAddress = request.user.get("ethAddress");
-    if (!(await checkRequesterCreatedTask(ethAddress, taskId)))  {
+    if (!(await checkRequesterCreatedTask(ethAddress, taskId))) {
       return {
         success: false,
-        message: "Approval update failed - unauthorized update!"
+        message: "Approval update failed - unauthorized update!",
       };
     }
     tableName = "TaskUsers";
@@ -1043,15 +1044,16 @@ Moralis.Cloud.define(
       (taskUser) => {
         if (taskUser.get("status") !== 1) {
           return {
-            success: false, 
-            message: "Cannot update status of tasks that are already approved/rejected"
+            success: false,
+            message:
+              "Cannot update status of tasks that are already approved/rejected",
           };
         }
-        taskUser.set("status", request.params.newStatus)
-        taskUser.save()
+        taskUser.set("status", request.params.newStatus);
+        taskUser.save();
         return {
           success: true,
-          message: "Successfully updated approval status!"
+          message: "Successfully updated approval status!",
         };
       },
       (error) => {
@@ -1093,7 +1095,7 @@ Moralis.Cloud.define(
             },
           },
         },
-    
+
         {
           lookup: {
             from: "Questions",
@@ -1117,7 +1119,6 @@ Moralis.Cloud.define(
         response: r["response"]["idx"],
       };
     });
-  
 
     const tableName = "Tasks";
     const Tasks = Moralis.Object.extend(tableName);
@@ -1157,39 +1158,30 @@ Moralis.Cloud.define(
   async (request) => {
     async function insertRating(taskerId, task, rating) {
       const tableName = "TaskUsers";
-
       const TaskUsers = Moralis.Object.extend(tableName);
       const query = new Moralis.Query(TaskUsers);
-
       const res = await query
         .equalTo("taskerId", taskerId)
         .equalTo("taskId", taskId)
         .first();
-
       res.set("taskerRating", rating);
       res.set("hasRated", true);
-
       await res.save();
     }
-
     const ethAddress = request.user.get("ethAddress");
     const taskId = request.params.taskId;
     const rating = Number(request.params.rating);
-
     if (!(await checkTaskerTaskHasNotRated(ethAddress, taskId)))
       return {
         success: false,
         message: `Address ${ethAddress} cannot rate task ${taskId}.`,
       };
-
     if (rating <= 0 || rating > 5)
       return {
         success: false,
         message: `Out of bounds rating for task ${taskId}.`,
       };
-
     await insertRating(ethAddress, taskId, rating);
-
     return {
       success: true,
       message: `Address ${ethAddress} successfully rated task ${taskId} as ${rating} stars!`,
