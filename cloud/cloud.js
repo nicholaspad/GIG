@@ -874,6 +874,16 @@ Moralis.Cloud.define("withdrawTaskerTask", async (request) => {
 
     res.set("status", 4);
     await res.save();
+
+Moralis.Cloud.define(
+  "checkRequesterCreatedTask",
+  async (request) => {
+    const ethAddress = request.user.get("ethAddress");
+    return await checkRequesterCreatedTask(ethAddress, request.params.taskId);
+  },
+  {
+    fields: ["taskId"],
+    requireUser: true,
   }
 
   const taskId = request.params.taskId;
@@ -940,6 +950,8 @@ Moralis.Cloud.define(
   }
 );
 
+/* ------------------------------------------------------------------- */
+  
 Moralis.Cloud.define(
   "getUserResponse",
   async (request) => {
@@ -1081,6 +1093,48 @@ Moralis.Cloud.define(
   },
   {
     fields: ["taskId", "taskerId"],
+    requireUser: true,
+  }
+);
+
+/* ------------------------------------------------------------------- */
+
+Moralis.Cloud.define(
+  "postTaskRating",
+  async (request) => {
+    async function insertRating(taskerId, task, rating) {
+      const tableName = "TaskUsers";
+      const TaskUsers = Moralis.Object.extend(tableName);
+      const query = new Moralis.Query(TaskUsers);
+      const res = await query
+        .equalTo("taskerId", taskerId)
+        .equalTo("taskId", taskId)
+        .first();
+      res.set("taskerRating", rating);
+      res.set("hasRated", true);
+      await res.save();
+    }
+    const ethAddress = request.user.get("ethAddress");
+    const taskId = request.params.taskId;
+    const rating = Number(request.params.rating);
+    if (!(await checkTaskerTaskHasNotRated(ethAddress, taskId)))
+      return {
+        success: false,
+        message: `Address ${ethAddress} cannot rate task ${taskId}.`,
+      };
+    if (rating <= 0 || rating > 5)
+      return {
+        success: false,
+        message: `Out of bounds rating for task ${taskId}.`,
+      };
+    await insertRating(ethAddress, taskId, rating);
+    return {
+      success: true,
+      message: `Address ${ethAddress} successfully rated task ${taskId} as ${rating} stars!`,
+    };
+  },
+  {
+    fields: ["taskId"],
     requireUser: true,
   }
 );
