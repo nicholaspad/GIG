@@ -17,9 +17,11 @@ import { TaskData, TaskStatus } from "../../src/Types";
 
 const statusMap = {
   0: "In progress",
-  1: "Pending verification",
-  2: "Verified & paid",
+  1: "Pending approval",
+  2: "Ready to Withdraw",
   3: "Abandoned",
+  4: "Paid",
+  5: "Rejected",
 };
 
 const statusColorMap = {
@@ -27,6 +29,8 @@ const statusColorMap = {
   1: gigTheme.palette.warning.main,
   2: gigTheme.palette.success.main,
   3: gigTheme.palette.error.main,
+  4: gigTheme.palette.success.main,
+  5: gigTheme.palette.error.main,
 };
 
 export default function MyTasks() {
@@ -98,13 +102,15 @@ export default function MyTasks() {
                   handleAbandonTask(params.row.task_id, params.row.name);
                 }}
               />
-            ) : (
+            ) : null}
+
+            {(params.row.status as TaskStatus) == 2 ? (
               <SecondaryButtonCTA
                 text="Withdraw"
                 size="small"
                 to={`/tasker/task-withdraw/${String(params.row.task_id)}`}
               />
-            )}
+            ) : null}
           </Box>
 
           <PrimaryButtonCTA

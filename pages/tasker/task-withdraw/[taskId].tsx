@@ -29,8 +29,6 @@ export default function TaskWithdraw() {
         requestorWallet: res_["requesterId"],
         created: res_["startDate"],
       };
-      console.log("temp data");
-      console.log(tempData);
       setData(tempData);
     });
   }, [isInitialized, Moralis, taskId]);

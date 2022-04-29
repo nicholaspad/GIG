@@ -94,18 +94,18 @@ export default function Form() {
     setOpenPosting(true);
 
     // Deploy new contract for this Task
-    // const { contractAddress, error } = await stakeCrypto();
-    const contractAddress = "0x242f379b6852aa66E7FcB0e83f8DD00D36889311";
-    // if (error) {
-    //   setOpenPosting(false);
-    //   alert(`There was an error creating this task: ${error.toString()}`);
-    //   return;
-    // }
-    // if (!contractAddress) {
-    //   setOpenPosting(false);
-    //   alert("There was an error creating this task.");
-    //   return;
-    // }
+    const { contractAddress, error } = await stakeCrypto();
+    // const contractAddress = "0x242f379b6852aa66E7FcB0e83f8DD00D36889311";
+    if (error) {
+      setOpenPosting(false);
+      alert(`There was an error creating this task: ${error.toString()}`);
+      return;
+    }
+    if (!contractAddress) {
+      setOpenPosting(false);
+      alert("There was an error creating this task.");
+      return;
+    }
 
     // Putting Task in Moralis
     // TODO - Add contract address to database info associated with newTask
@@ -139,10 +139,10 @@ export default function Form() {
         const signer = provider.getSigner();
 
         // Multicall test begin
-        let newContractABI = [
-          "function createNewEscrow(address paymentToken, uint256 _numberOfTasks,address _requester)",
-        ];
-        let newContractIface = new ethers.utils.Interface(newContractABI);
+        // let newContractABI = [
+        //   "function createNewEscrow(address paymentToken, uint256 _numberOfTasks,address _requester)",
+        // ];
+        // let newContractIface = new ethers.utils.Interface(newContractABI);
 
         // const multiIface = new ethers.utils.Interface(MulticallABI);
         // let multicallAggData = multiIface.encodeFunctionData("aggregate", [
@@ -220,7 +220,7 @@ export default function Form() {
 
         //
         // Deploy a new contract for this Task
-        /*
+        
         console.log("escrowFactory");
         const escrowFactory = new ethers.Contract(
           escrowFactoryAddress,
@@ -278,7 +278,7 @@ export default function Form() {
 
         return { contractAddress: newContractAddress, error: null };
         await escrowFundTxn.wait();
-        console.log("6");*/
+        console.log("6");
       }
       return { contractAddress: null, error: "Unknown" };
     } catch (error) {
@@ -394,7 +394,7 @@ export default function Form() {
               <Grid item xs={6}>
                 <Box display="flex" alignItems="center" justifyContent="left">
                   <Typography color="primary" sx={{ textAlign: "right" }}>
-                    Total ETH allocated:
+                    Total MATIC allocated:
                   </Typography>
                   <CustomTextField
                     onChange={(e) => {
@@ -464,7 +464,7 @@ export default function Form() {
               ? `Taskers will earn ${Moralis.Units.FromWei(
                   computeUnitRewardWei(Moralis, cryptoAllocated, maxTaskers)
                 )}
-          ETH per completed task. This reward is subject to change.`
+          MATIC per completed task. This reward is subject to change.`
               : null}
           </Typography>
           <Typography

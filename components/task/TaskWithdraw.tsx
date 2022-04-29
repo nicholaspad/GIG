@@ -8,15 +8,16 @@ import { gigTheme } from "../../src/Theme";
 import { useRouter } from "next/router";
 import { withdrawTaskerTask } from "../../src/Database";
 import { useMoralis } from "react-moralis";
+import LoadingOverlay from "../../components/common/LoadingOverlay";
+import { useState } from "react";
 
 export default function TaskWithdrawTemplate(props: {
   data?: TaskOverviewData;
 }) {
+  const [openWithdrawing, setOpenWithdrawing] = useState(false);
   const { data } = props;
   const router = useRouter();
   const { Moralis, user } = useMoralis();
-  console.log("data of task");
-  console.log(data);
   const escrowABI = Escrow.abi;
   const maticTokenAddress: string =
     "0x0000000000000000000000000000000000001010";
@@ -49,16 +50,13 @@ export default function TaskWithdrawTemplate(props: {
         // );
         // await approvalResult.wait();
 
+        setOpenWithdrawing(true);
         const withdrawTxn = await escrowContract.withdraw();
         await withdrawTxn.wait();
         alert(`Successfully withdrew ${data?.reward} ETH`);
 
         // change task status to completed - 4
-        const res = await withdrawTaskerTask(
-          Moralis,
-          user.get("ethAddress"),
-          data?.task_id as string
-        );
+        const res = await withdrawTaskerTask(Moralis, data?.task_id as string);
         if (!res.success) {
           alert(res.message);
           return;
@@ -70,6 +68,7 @@ export default function TaskWithdrawTemplate(props: {
       alert(`Error: ${error.data}`);
     }
     // after withdrawing go back to my-tasks
+    setOpenWithdrawing(false);
     router.back();
   };
 
@@ -77,6 +76,10 @@ export default function TaskWithdrawTemplate(props: {
     <>
       {data ? (
         <>
+          <LoadingOverlay
+            open={openWithdrawing}
+            text="Withdrawing Task Funds..."
+          />
           <Stack>
             <Box m={4}>
               <Typography variant="h4" color="primary" textAlign="center">
