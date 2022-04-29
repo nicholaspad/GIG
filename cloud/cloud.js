@@ -1150,3 +1150,53 @@ Moralis.Cloud.define(
   }
 );
 
+/* ------------------------------------------------------------------- */
+
+Moralis.Cloud.define(
+  "postTaskRating",
+  async (request) => {
+    async function insertRating(taskerId, task, rating) {
+      const tableName = "TaskUsers";
+
+      const TaskUsers = Moralis.Object.extend(tableName);
+      const query = new Moralis.Query(TaskUsers);
+
+      const res = await query
+        .equalTo("taskerId", taskerId)
+        .equalTo("taskId", taskId)
+        .first();
+
+      res.set("taskerRating", rating);
+      res.set("hasRated", true);
+
+      await res.save();
+    }
+
+    const ethAddress = request.user.get("ethAddress");
+    const taskId = request.params.taskId;
+    const rating = Number(request.params.rating);
+
+    if (!(await checkTaskerTaskHasNotRated(ethAddress, taskId)))
+      return {
+        success: false,
+        message: `Address ${ethAddress} cannot rate task ${taskId}.`,
+      };
+
+    if (rating <= 0 || rating > 5)
+      return {
+        success: false,
+        message: `Out of bounds rating for task ${taskId}.`,
+      };
+
+    await insertRating(ethAddress, taskId, rating);
+
+    return {
+      success: true,
+      message: `Address ${ethAddress} successfully rated task ${taskId} as ${rating} stars!`,
+    };
+  },
+  {
+    fields: ["taskId"],
+    requireUser: true,
+  }
+);
