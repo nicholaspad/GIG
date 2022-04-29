@@ -3,7 +3,6 @@ import PrimaryButtonCTA from "../../components/buttons/PrimaryButtonCTA";
 import { TaskOverviewData } from "../../src/Types";
 import Escrow from "../../src/utils/abi/Escrow.json";
 import { ethers } from "ethers";
-import { CreatedTaskStatus, TaskData } from "../../src/Types";
 import { gigTheme } from "../../src/Theme";
 import { useRouter } from "next/router";
 import { withdrawTaskerTask } from "../../src/Database";
@@ -17,7 +16,7 @@ export default function TaskWithdrawTemplate(props: {
   const [openWithdrawing, setOpenWithdrawing] = useState(false);
   const { data } = props;
   const router = useRouter();
-  const { Moralis, user } = useMoralis();
+  const { Moralis } = useMoralis();
   const escrowABI = Escrow.abi;
   const maticTokenAddress: string =
     "0x0000000000000000000000000000000000001010";
@@ -56,7 +55,7 @@ export default function TaskWithdrawTemplate(props: {
         setOpenWithdrawing(true);
         const withdrawTxn = await escrowContract.withdraw();
         await withdrawTxn.wait();
-        alert(`Successfully withdrew ${data?.reward} ETH`);
+        alert(`Successfully withdrew ${data?.reward} MATIC`);
 
         // change task status to completed - 4
         const res = await withdrawTaskerTask(Moralis, data?.task_id as string);
@@ -66,7 +65,7 @@ export default function TaskWithdrawTemplate(props: {
         }
         alert(res.message);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.data);
       alert(`Error: ${error.data}`);
     }
@@ -123,7 +122,7 @@ export default function TaskWithdrawTemplate(props: {
                 display="inline"
                 textAlign="center"
               >
-                {data.reward} ETH
+                {data.reward} MATIC
               </Typography>
             </Box>
           </Stack>

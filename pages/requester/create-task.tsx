@@ -86,7 +86,7 @@ export default function Form() {
       !isInitialized ||
       !confirm(
         `Are you sure you want to create task "${newTask.title}" with ${newTask.questions.length} question(s) ` +
-          `and ${maxTaskers} maximum responses? You will be required to stake ${cryptoAllocated} ETH.`
+          `and ${maxTaskers} maximum responses? You will be required to stake ${cryptoAllocated} MATIC.`
       )
     )
       return;
@@ -221,49 +221,48 @@ export default function Form() {
         //
         // Deploy a new contract for this Task
         
-        console.log("escrowFactory");
+        // console.log("escrowFactory");
         const escrowFactory = new ethers.Contract(
           escrowFactoryAddress,
           escrowFactoryABI,
           signer
         );
-        console.log("newContractResult");
+        // console.log("newContractResult");
         const newContractResult = await escrowFactory.createNewEscrow(
           maticTokenAddress,
           maxTaskers,
           requesterAddress
         );
-        console.log("matic address");
-        console.log(maticTokenAddress);
+        // console.log("matic address");
+        // console.log(maticTokenAddress);
         await newContractResult.wait(); // Wait for transaction to be mined
 
         const length = await escrowFactory.escrowArrayLength();
         // @TODO: this newContractAddress is what should be pushed to MoralisDB
         const newContractAddress = await escrowFactory.escrowArray(length - 1);
-        console.log("New contract address");
-        console.log(newContractAddress);
+        // console.log("New contract address");
+        // console.log(newContractAddress);
 
         // Fund the contract with the total crypto allocated
-        console.log("1");
         const escrow = new ethers.Contract(
           newContractAddress,
           escrowABI,
           signer
         );
-        console.log("2");
+
         // Get reference to MATIC Token contract
         const maticContract = new ethers.Contract(
           maticTokenAddress,
           ERC20ABI,
           signer
         );
-        console.log("3");
+
         var bigNumCryptoAllocated = BigNumber.from(
           parseFloat(cryptoAllocated) * 10 ** 8
         ).mul(BigNumber.from(10).pow(10));
 
         // Approve accessed to user's WMATIC
-        console.log("4");
+
         const approvalTxn = await maticContract.approve(
           (escrow as unknown as any).address,
           bigNumCryptoAllocated.toString()
@@ -271,14 +270,12 @@ export default function Form() {
         await approvalTxn.wait();
 
         // Fund the contract
-        console.log("5");
         const escrowFundTxn = await escrow.fund(
           bigNumCryptoAllocated.toString()
         );
 
         return { contractAddress: newContractAddress, error: null };
         await escrowFundTxn.wait();
-        console.log("6");
       }
       return { contractAddress: null, error: "Unknown" };
     } catch (error) {

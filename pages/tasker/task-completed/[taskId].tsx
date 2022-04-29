@@ -177,7 +177,7 @@ export default function TaskCompleted() {
                 fontWeight={400}
                 fontSize={20}
               >
-                {reward} ETH
+                {reward} MATIC
               </Typography>
             </Box>
             <Box display="flex" justifyContent="center" mt={5} mb={2}>

@@ -102,7 +102,7 @@ export default function TaskOverviewTemplate(props: {
                   }}
                 >
                   <Typography color="primary" fontWeight={400} fontSize={20}>
-                    {data.reward} ETH
+                    {data.reward} MATIC
                   </Typography>
                 </Box>
                 <SectionTitle>Time to complete</SectionTitle>
