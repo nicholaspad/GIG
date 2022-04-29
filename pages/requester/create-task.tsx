@@ -20,12 +20,15 @@ import { ethers, BigNumber } from "ethers";
 import EscrowFactory from "../../src/utils/abi/EscrowFactory.json";
 import Escrow from "../../src/utils/abi/Escrow.json";
 import ERC20ABI from "../../src/utils/abi/ERC20Token.json";
+import MulticallABI from "../../src/utils/abi/Multicall.json";
 
 export default function Form() {
-  const escrowFactoryAddress = process.env
-    .NEXT_PUBLIC_ESCROW_FACTORY_ADDRESS as string;
-  const maticTokenAddress = process.env
-    .NEXT_PUBLIC_MATIC_TOKEN_ADDRESS as string;
+  // const escrowFactoryAddress = process.env
+  //   .NEXT_PUBLIC_ESCROW_FACTORY_ADDRESS as string;
+  // const maticTokenAddress = process.env
+  //   .NEXT_PUBLIC_MATIC_TOKEN_ADDRESS as string;
+  const escrowFactoryAddress = "0x9EE10384ba4F3f0bA59dbb8c6FE4589bC696D4B7";
+  const maticTokenAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889";
   const { isInitialized, user, Moralis } = useMoralis();
   const escrowFactoryABI = EscrowFactory.abi;
   const escrowABI = Escrow.abi;
@@ -83,7 +86,7 @@ export default function Form() {
       !isInitialized ||
       !confirm(
         `Are you sure you want to create task "${newTask.title}" with ${newTask.questions.length} question(s) ` +
-          `and ${maxTaskers} maximum responses? You will be required to stake ${cryptoAllocated} ETH.`
+          `and ${maxTaskers} maximum responses? You will be required to stake ${cryptoAllocated} MATIC.`
       )
     )
       return;
@@ -92,6 +95,7 @@ export default function Form() {
 
     // Deploy new contract for this Task
     const { contractAddress, error } = await stakeCrypto();
+    // const contractAddress = "0x242f379b6852aa66E7FcB0e83f8DD00D36889311";
     if (error) {
       setOpenPosting(false);
       alert(`There was an error creating this task: ${error.toString()}`);
@@ -134,22 +138,110 @@ export default function Form() {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
 
+        // Multicall test begin
+        // let newContractABI = [
+        //   "function createNewEscrow(address paymentToken, uint256 _numberOfTasks,address _requester)",
+        // ];
+        // let newContractIface = new ethers.utils.Interface(newContractABI);
+
+        // const multiIface = new ethers.utils.Interface(MulticallABI);
+        // let multicallAggData = multiIface.encodeFunctionData("aggregate", [
+        //   [
+        //     [
+        //       escrowFactoryAddress,
+        //       newContractIface.encodeFunctionData("createNewEscrow", [
+        //         maticTokenAddress,
+        //         maxTaskers,
+        //         requesterAddress,
+        //       ]),
+        //     ],
+        //     [],
+        //     [],
+        //   ],
+        // ]);
+
+        // New contract
+        // console.log("begin multicall");
+        // let newContractABI = [
+        //   "function createNewEscrow(address paymentToken, uint256 _numberOfTasks,address _requester)",
+        // ];
+        // console.log("1");
+        // let newContractIface = new ethers.utils.Interface(newContractABI);
+        // console.log("2");
+        // const multiIface = new ethers.utils.Interface(MulticallABI);
+        // // call data
+        // console.log("3");
+        // const callStructData = ethers.utils.AbiCoder.prototype.encode(
+        //   ["address", "bytes"],
+        //   [
+        //     escrowFactoryAddress,
+        //     newContractIface.encodeFunctionData("createNewEscrow", [
+        //       maticTokenAddress,
+        //       maxTaskers,
+        //       requesterAddress,
+        //     ]),
+        //   ]
+        // );
+        // console.log(callStructData);
+        // console.log("3+");
+        // // const callArrData = ethers.utils.AbiCoder.prototype.encode(
+        // //   [],
+        // //   [callStructData]
+        // // );
+        // let multicallAggData = multiIface.encodeFunctionData("aggregate", [
+        //   callStructData,
+        // ]);
+
+        // // let newContractData = newContractIface.encodeFunctionData(
+        // //   "createNewEscrow",
+        // //   [maticTokenAddress, maxTaskers, requesterAddress]
+        // // );
+
+        // // console.log("newContractData", newContractData);
+        // console.log("4");
+        // const multicall = new ethers.Contract(
+        //   "0x08411ADd0b5AA8ee47563b146743C13b3556c9Cc",
+        //   MulticallABI,
+        //   signer
+        // );
+        // // const callStructData = ethers.utils.AbiCoder.prototype.encode(
+        // //   ["address", "bytes"],
+        // //   [escrowFactoryAddress, newContractData]
+        // // );
+        // // // note - address target is the address that holds the function you're calling
+        // // const callArrData = ethers.utils.AbiCoder.prototype.encode([
+        // //   callStructData,
+        // // ]);
+
+        // console.log("5");
+        // const multicallTxn = await multicall.aggregate(multicallAggData);
+        // await multicallTxn.wait();
+        // console.log("6");
+
+        //
         // Deploy a new contract for this Task
+        
+        // console.log("escrowFactory");
         const escrowFactory = new ethers.Contract(
           escrowFactoryAddress,
           escrowFactoryABI,
           signer
         );
+        // console.log("newContractResult");
         const newContractResult = await escrowFactory.createNewEscrow(
           maticTokenAddress,
           maxTaskers,
           requesterAddress
         );
+        // console.log("matic address");
+        // console.log(maticTokenAddress);
         await newContractResult.wait(); // Wait for transaction to be mined
 
         const length = await escrowFactory.escrowArrayLength();
-        // @nicholaspad this newContractAddress is what should be pushed to MoralisDB
+        // @TODO: this newContractAddress is what should be pushed to MoralisDB
         const newContractAddress = await escrowFactory.escrowArray(length - 1);
+        // console.log("New contract address");
+        // console.log(newContractAddress);
 
         // Fund the contract with the total crypto allocated
         const escrow = new ethers.Contract(
@@ -157,17 +249,20 @@ export default function Form() {
           escrowABI,
           signer
         );
+
         // Get reference to MATIC Token contract
         const maticContract = new ethers.Contract(
           maticTokenAddress,
           ERC20ABI,
           signer
         );
+
         var bigNumCryptoAllocated = BigNumber.from(
           parseFloat(cryptoAllocated) * 10 ** 8
         ).mul(BigNumber.from(10).pow(10));
 
         // Approve accessed to user's WMATIC
+
         const approvalTxn = await maticContract.approve(
           (escrow as unknown as any).address,
           bigNumCryptoAllocated.toString()
@@ -180,6 +275,7 @@ export default function Form() {
         );
 
         return { contractAddress: newContractAddress, error: null };
+        await escrowFundTxn.wait();
       }
       return { contractAddress: null, error: "Unknown" };
     } catch (error) {
@@ -295,7 +391,7 @@ export default function Form() {
               <Grid item xs={6}>
                 <Box display="flex" alignItems="center" justifyContent="left">
                   <Typography color="primary" sx={{ textAlign: "right" }}>
-                    Total ETH allocated:
+                    Total MATIC allocated:
                   </Typography>
                   <CustomTextField
                     onChange={(e) => {
@@ -365,7 +461,7 @@ export default function Form() {
               ? `Taskers will earn ${Moralis.Units.FromWei(
                   computeUnitRewardWei(Moralis, cryptoAllocated, maxTaskers)
                 )}
-          ETH per completed task. This reward is subject to change.`
+          MATIC per completed task. This reward is subject to change.`
               : null}
           </Typography>
           <Typography

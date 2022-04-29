@@ -43,6 +43,7 @@ export type TaskOverviewData = TaskData & {
   description: string;
   estimatedTime: number;
   requestorWallet: string;
+  contractAddress: string;
   created: Date;
 };
 

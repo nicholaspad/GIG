@@ -258,6 +258,8 @@ Moralis.Cloud.define(
           startDate: 1,
           unitRewardWei: 1,
           estCompletionTime: 1,
+          contractAddress: 1,
+          avgRating: 1,
           requesterId: 1,
         },
       },
@@ -841,17 +843,43 @@ Moralis.Cloud.define(
 
 /* ------------------------------------------------------------------- */
 
-Moralis.Cloud.define(
-  "checkRequesterCreatedTask",
-  async (request) => {
-    const ethAddress = request.user.get("ethAddress");
-    return await checkRequesterCreatedTask(ethAddress, request.params.taskId);
-  },
-  {
-    fields: ["taskId"],
-    requireUser: true,
+Moralis.Cloud.define("withdrawTaskerTask", async (request) => {
+  async function updateTaskStatus(taskerId, taskId) {
+    const tableName = "TaskUsers";
+
+    const TaskUsers = Moralis.Object.extend(tableName);
+    const query = new Moralis.Query(TaskUsers);
+
+    const res = await query
+      .equalTo("taskerId", taskerId)
+      .equalTo("taskId", taskId)
+      .first();
+
+    if (!res) return;
+
+    if (res.get("status") !== 2) return;
+
+    res.set("status", 4);
+    await res.save();
   }
-);
+
+  const taskId = request.params.taskId;
+  const ethAddress = request.user.get("ethAddress");
+
+  // check that tasker has already claimed task
+  if (!(await checkTaskerClaimedTask(ethAddress, taskId)))
+    return {
+      success: false,
+      message: `Address ${ethAddress} has not claimed task ${taskId}.`,
+    };
+
+  await updateTaskStatus(ethAddress, taskId);
+
+  return {
+    success: true,
+    message: `Address ${ethAddress} withdrew from task ${taskId}!`,
+  };
+});
 
 /* ------------------------------------------------------------------- */
 
@@ -900,42 +928,33 @@ Moralis.Cloud.define(
               $and: [
                 { $eq: ["$taskId", taskId] },
                 {
-                  $or: [
-                  { $eq: ["$status", 2] },
-                  { $eq: ["$status", 4] }, 
-                  ],
-                }
+                  $or: [{ $eq: ["$status", 2] }, { $eq: ["$status", 4] }],
+                },
               ],
             },
           },
         },
-    
+
         {
           lookup: {
             from: "Responses",
-            let: {taskId: "$taskId", taskerId: "$taskerId"},
+            let: { taskId: "$taskId", taskerId: "$taskerId" },
             pipeline: [
               {
-                 $match: {
-                    $expr: {
-                       $and: [
-                          {
-                             $eq: [
-                                "$taskId",
-                                "$$taskId"
-                             ]
-                          },
-                          {
-                             $eq: [
-                                "$taskerId",
-                                "$$taskerId"
-                             ]
-                          }
-                       ]
-                    }
-                 }
-              }
-           ],
+                $match: {
+                  $expr: {
+                    $and: [
+                      {
+                        $eq: ["$taskId", "$$taskId"],
+                      },
+                      {
+                        $eq: ["$taskerId", "$$taskerId"],
+                      },
+                    ],
+                  },
+                },
+              },
+            ],
             as: "responses",
           },
         },
@@ -950,10 +969,10 @@ Moralis.Cloud.define(
             return {
               idx: response.response.idx,
               questionId: response.questionId,
-            }
+            };
           }),
         };
-      }); 
+      });
     }
     const responses = await aggregateTaskUsers(taskId);
     return responses;
@@ -990,6 +1009,8 @@ Moralis.Cloud.define(
     requireUser: true,
   }
 );
+
+/* ------------------------------------------------------------------- */
 
 /* ------------------------------------------------------------------- */
 
@@ -1141,15 +1162,12 @@ Moralis.Cloud.define(
 );
 
 /* ------------------------------------------------------------------- */
-Moralis.Cloud.define(
-  "getTaskQuestions",
-  async (request) => {
-    const taskId = request.params.taskId;
-    const ethAddress = request.user.get("ethAddress");
-    if (!(await checkRequesterCreatedTask(ethAddress, taskId))) return [];
-    return await getQuestions(taskId);
-  }
-);
+Moralis.Cloud.define("getTaskQuestions", async (request) => {
+  const taskId = request.params.taskId;
+  const ethAddress = request.user.get("ethAddress");
+  if (!(await checkRequesterCreatedTask(ethAddress, taskId))) return [];
+  return await getQuestions(taskId);
+});
 
 /* ------------------------------------------------------------------- */
 

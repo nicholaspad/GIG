@@ -1,5 +1,10 @@
 import MoralisType from "moralis";
-import { GenericResponse, TaskProps, GenericQuestion, ExcelResponseRowData } from "./Types";
+import {
+  GenericResponse,
+  TaskProps,
+  GenericQuestion,
+  ExcelResponseRowData,
+} from "./Types";
 
 /*
   Edit the below functions on the Moralis Dashboard (Cloud Functions) or by
@@ -164,6 +169,16 @@ export async function postTaskFormData(
   });
 }
 
+/* Updates status after Tasker withdraws */
+export async function withdrawTaskerTask(
+  Moralis: MoralisType,
+  taskId: string
+): Promise<{ success: boolean; message: string }> {
+  return await Moralis.Cloud.run("withdrawTaskerTask", {
+    taskId: taskId,
+  });
+}
+
 export async function getTaskResponsesByQuestion(
   Moralis: MoralisType,
   taskId: string
@@ -194,7 +209,7 @@ export async function getTaskUsers(
 export async function getUserResponse(
   Moralis: MoralisType,
   taskId: string,
-  userId: string,
+  userId: string
 ): Promise<MoralisType.Object<MoralisType.Attributes>[]> {
   return await Moralis.Cloud.run("getUserResponse", {
     taskId: taskId,
@@ -206,7 +221,7 @@ export async function updateApprovalStatus(
   Moralis: MoralisType,
   objectId: string,
   newStatus: number,
-  taskId: string,
+  taskId: string
 ): Promise<{ success: boolean; message: string }> {
   return await Moralis.Cloud.run("updateApprovalStatus", {
     objectId: objectId,
@@ -242,7 +257,7 @@ export async function postTaskRating(
 
 export async function getTaskQuestions(
   Moralis: MoralisType,
-  taskId: string,
+  taskId: string
 ): Promise<GenericQuestion[]> {
   return await Moralis.Cloud.run("getTaskQuestions", {
     taskId: taskId,

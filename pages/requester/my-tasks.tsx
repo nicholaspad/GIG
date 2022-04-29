@@ -29,7 +29,7 @@ export default function MyTasks() {
     if (
       !isInitialized ||
       !confirm(
-        `Are you sure you want to abandon task "${taskName}"? You will be refunded approximately ${remainingReward} ETH.`
+        `Are you sure you want to abandon task "${taskName}"? You will be refunded approximately ${remainingReward} MATIC.`
       )
     )
       return;
@@ -140,7 +140,7 @@ export default function MyTasks() {
       type: "number",
       minWidth: 450,
       align: "left",
-      renderHeader: () => <TableHeader>ETH Used / Max</TableHeader>,
+      renderHeader: () => <TableHeader>MATIC Used / Max</TableHeader>,
       renderCell: (params: GridValueGetterParams) => (
         <TableCell>
           {params.row.numResponses * params.row.reward} /{" "}

@@ -17,9 +17,11 @@ import { TaskData, TaskStatus } from "../../src/Types";
 
 const statusMap = {
   0: "In progress",
-  1: "Pending verification",
-  2: "Verified & paid",
+  1: "Pending approval",
+  2: "Ready to Withdraw",
   3: "Abandoned",
+  4: "Paid",
+  5: "Rejected",
 };
 
 const statusColorMap = {
@@ -27,6 +29,8 @@ const statusColorMap = {
   1: gigTheme.palette.warning.main,
   2: gigTheme.palette.success.main,
   3: gigTheme.palette.error.main,
+  4: gigTheme.palette.success.main,
+  5: gigTheme.palette.error.main,
 };
 
 export default function MyTasks() {
@@ -77,26 +81,38 @@ export default function MyTasks() {
       headerName: "",
       sortable: false,
       disableColumnMenu: true,
-      minWidth: 290,
+      minWidth: 320,
       flex: 1,
       align: "left",
       renderCell: (params: GridValueGetterParams) => (
         <>
           {/* Render Abandon buttons for "In Progress" rows only */}
+          {/* TODO: Render according to correct statuses 
+          - withdraw should be during status 2) */}
           <Box
-            visibility={
-              (params.row.status as TaskStatus) == 0 ? "visible" : "hidden"
-            }
-            mr={2}
+            // display="flex"
+            width={130}
+            m={2}
           >
-            <SecondaryButtonCTA
-              text="Abandon"
-              size="small"
-              onClick={() => {
-                handleAbandonTask(params.row.task_id, params.row.name);
-              }}
-            />
+            {(params.row.status as TaskStatus) == 0 ? (
+              <SecondaryButtonCTA
+                text="Abandon"
+                size="small"
+                onClick={() => {
+                  handleAbandonTask(params.row.task_id, params.row.name);
+                }}
+              />
+            ) : null}
+
+            {(params.row.status as TaskStatus) == 2 ? (
+              <SecondaryButtonCTA
+                text="Withdraw"
+                size="small"
+                to={`/tasker/task-withdraw/${String(params.row.task_id)}`}
+              />
+            ) : null}
           </Box>
+
           <PrimaryButtonCTA
             text={
               (params.row.status as TaskStatus) == 0 ? "Continue" : "Overview"
