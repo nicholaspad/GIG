@@ -50,7 +50,7 @@ export type TaskStatus = 0 | 1 | 2 | 3;
 
 export type CreatedTaskStatus = 0 | 1 | 2;
 
-export type ApprovalStatus = 1 | 2 | 3;
+export type ApprovalStatus = 1 | 2 | 3 | 4 | 5;
 
 export type TaskData = {
   task_id: string;
@@ -70,3 +70,9 @@ export type ApprovalData = {
   duration: number;
   status?: ApprovalStatus;
 };
+
+export type ExcelResponseRowData = {
+  taskerId: string,
+  completedDate: Date,
+  responses: {idx: number, questionId: string}[],
+}

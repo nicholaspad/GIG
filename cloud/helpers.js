@@ -137,3 +137,20 @@ async function checkRequesterCreatedTask(requesterId, taskId) {
 
   return res.length > 0;
 }
+
+async function getQuestions(taskId) {
+  const tableName = "Questions";
+  const Questions = Moralis.Object.extend(tableName);
+  const query = new Moralis.Query(Questions);
+  const res = await query.equalTo("taskId", taskId).find();
+
+  return res.map((q) => {
+    return {
+      id: q.id,
+      type: q.get("type"),
+      idx: q.get("idx"),
+      question: q.get("title"),
+      content: q.get("content"),
+    };
+  });
+}

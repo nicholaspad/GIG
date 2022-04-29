@@ -8,10 +8,17 @@ import SecondaryButtonCTA from "../../../components/buttons/SecondaryButtonCTA";
 import LoadingOverlay from "../../../components/common/LoadingOverlay";
 import PageHeader from "../../../components/common/PageHeader";
 import { TableCell, TableHeader } from "../../../components/tables/Helpers";
-import { getTaskUsers, updateApprovalStatus } from "../../../src/Database";
+import {
+  getTaskUsers,
+  updateApprovalStatus,
+  getTaskApprovedResponsesByTasker,
+  getTaskQuestions,
+} from "../../../src/Database";
 import { gigTheme } from "../../../src/Theme";
 import { ApprovalStatus, ApprovalData } from "../../../src/Types";
 import ApprovalsTable from "../../../components/tables/ApprovalTable";
+import { saveAs } from "file-saver";
+import ExcelJS from "exceljs";
 
 export default function ManageResponses() {
   const { query, isReady } = useRouter();
@@ -20,6 +27,35 @@ export default function ManageResponses() {
   const [data, setData] = useState<ApprovalData[]>();
   const [refreshTable, setRefreshTable] = useState(false);
 
+  const handleDownloadExcel = async (taskId: string) => {
+    const headRow = ["Tasker Address", "Submission Time"];
+    let options: { [questionId: string]: string[] } = {};
+
+    getTaskApprovedResponsesByTasker(Moralis, taskId).then(async (res) => {
+      let file = new ExcelJS.Workbook();
+      let worksheet = file.addWorksheet("Survey Results");
+      const questions = await getTaskQuestions(Moralis, taskId);
+      for (let q of questions) {
+        headRow.push(q.question);
+        options[q.id] = q.content.options;
+      }
+      worksheet.addRow(headRow);
+      res.map((r) => {
+        const otherInfo = [r.taskerId, r.completedDate.toString()];
+        const responses = r.responses.map((response) => {
+          return options[response.questionId][response.idx];
+        });
+        const newRow = [...otherInfo, ...responses];
+        worksheet.addRow(newRow);
+      });
+      file.xlsx.writeBuffer().then((buffer) => {
+        saveAs(
+          new Blob([buffer], { type: "application/octet-stream" }),
+          "Results.xlsx"
+        );
+      });
+    });
+  };
   const handleApproveResponse = async (
     objectId: string,
     taskerId: string,
@@ -59,7 +95,7 @@ export default function ManageResponses() {
 
     setOpenLoading(true);
 
-    const res = await updateApprovalStatus(Moralis, objectId, 3, taskId);
+    const res = await updateApprovalStatus(Moralis, objectId, 5, taskId);
 
     if (!res.success) {
       setOpenLoading(false);
@@ -167,7 +203,7 @@ export default function ManageResponses() {
         let user = user_ as any;
         let duration = user.get("completedDate") - user.get("startDate");
         duration = Math.ceil(duration / 3600);
-        console.log(user);
+
         tempData.push({
           id: user["id"] as string,
           address: user.get("taskerId") as string,
@@ -176,7 +212,6 @@ export default function ManageResponses() {
           duration: duration,
         });
       }
-      console.log(tempData);
       setData(tempData);
     });
   }, [isInitialized, Moralis, refreshTable, isReady]);
@@ -185,25 +220,44 @@ export default function ManageResponses() {
     <>
       <PageHeader title="Requester Manage Tasks" />
       <LoadingOverlay open={openLoading} text="Processing Approval..." />
-      <PrimaryButtonCTA
-        text="← My Tasks"
-        size="small"
-        to="/requester/my-tasks"
-        sx={{ mx: "auto", mt: 2 }}
-      />
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
+        <PrimaryButtonCTA
+          text="← My Tasks"
+          size="small"
+          to="/requester/my-tasks"
+          sx={{ mr: 1, mt: 2 }}
+        />
+        <PrimaryButtonCTA
+          text="Download Results"
+          size="small"
+          onClick={() => {
+            handleDownloadExcel(query.taskid as string);
+          }}
+          sx={{ ml: 1, mt: 2 }}
+        />
+      </Box>
       <ApprovalsTable data={data} extraColumns={extraColumns} />
     </>
   );
 }
 
 const approvalStatusMap = {
-  1: "Not reviewed",
+  1: "Not Reviewed",
   2: "Approved",
-  3: "Rejected",
+  3: "Abandoned",
+  4: "Paid",
+  5: "Rejected",
 };
 
 const approvalStatusColorMap = {
   1: gigTheme.palette.warning.main,
   2: gigTheme.palette.success.main,
   3: gigTheme.palette.error.main,
+  4: gigTheme.palette.success.main,
+  5: gigTheme.palette.error.main,
 };
