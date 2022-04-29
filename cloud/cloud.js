@@ -883,7 +883,7 @@ Moralis.Cloud.define("withdrawTaskerTask", async (request) => {
 
   return {
     success: true,
-    message: Address ${ethAddress} withdrew from task ${taskId}!,
+    message: `Address ${ethAddress} withdrew from task ${taskId}!`,
   };
 });
 
