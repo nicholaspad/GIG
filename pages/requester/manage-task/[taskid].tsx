@@ -231,7 +231,7 @@ export default function ManageResponses() {
           to="/requester/my-tasks"
           sx={{ mr: 1, mt: 2 }}
         />
-        <PrimaryButtonCTA
+        <SecondaryButtonCTA
           text="Download Results"
           size="small"
           onClick={() => {
