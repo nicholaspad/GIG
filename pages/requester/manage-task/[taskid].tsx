@@ -203,7 +203,6 @@ export default function ManageResponses() {
         let user = user_ as any;
         let duration = user.get("completedDate") - user.get("startDate");
         duration = Math.ceil(duration / 3600);
-
         tempData.push({
           id: user["id"] as string,
           address: user.get("taskerId") as string,
