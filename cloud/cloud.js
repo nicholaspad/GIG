@@ -874,6 +874,20 @@ Moralis.Cloud.define("withdrawTaskerTask", async (request) => {
 
     res.set("status", 4);
     await res.save();
+  }
+
+  const taskId = request.params.taskId;
+  const ethAddress = request.user.get("ethAddress");
+
+  await updateTaskStatus(ethAddress, taskId);
+
+  return {
+    success: true,
+    message: Address ${ethAddress} withdrew from task ${taskId}!,
+  };
+});
+
+/* ------------------------------------------------------------------- */
 
 Moralis.Cloud.define(
   "checkRequesterCreatedTask",
