@@ -170,7 +170,7 @@ export async function getTaskResponsesByQuestion(
 ): Promise<MoralisType.Object<MoralisType.Attributes>[]> {
   return await Moralis.Cloud.run("getTaskResponsesByQuestion", {
     taskId: taskId,
-  })
+  });
 }
 
 export async function getTaskApprovedResponsesByTasker(
@@ -179,7 +179,7 @@ export async function getTaskApprovedResponsesByTasker(
 ): Promise<ExcelResponseRowData[]> {
   return await Moralis.Cloud.run("getTaskApprovedResponsesByTasker", {
     taskId: taskId,
-  })
+  });
 }
 
 export async function getTaskUsers(
@@ -188,7 +188,7 @@ export async function getTaskUsers(
 ): Promise<MoralisType.Object<MoralisType.Attributes>[]> {
   return await Moralis.Cloud.run("getTaskUsers", {
     taskId: taskId,
-  })
+  });
 }
 
 export async function getUserResponse(
@@ -199,7 +199,7 @@ export async function getUserResponse(
   return await Moralis.Cloud.run("getUserResponse", {
     taskId: taskId,
     userId: userId,
-  })
+  });
 }
 
 export async function updateApprovalStatus(
@@ -212,7 +212,7 @@ export async function updateApprovalStatus(
     objectId: objectId,
     newStatus: newStatus,
     taskId: taskId,
-  })
+  });
 }
 
 export async function getTaskFormDataForView(
