@@ -1,5 +1,10 @@
 import MoralisType from "moralis";
-import { GenericResponse, TaskProps } from "./Types";
+import {
+  GenericResponse,
+  TaskProps,
+  GenericQuestion,
+  ExcelResponseRowData,
+} from "./Types";
 
 /*
   Edit the below functions on the Moralis Dashboard (Cloud Functions) or by
@@ -173,11 +178,21 @@ export async function withdrawTaskerTask(
     taskId: taskId,
   });
 }
-export async function getTaskResponses(
+
+export async function getTaskResponsesByQuestion(
   Moralis: MoralisType,
   taskId: string
 ): Promise<MoralisType.Object<MoralisType.Attributes>[]> {
-  return await Moralis.Cloud.run("getTaskResponses", {
+  return await Moralis.Cloud.run("getTaskResponsesByQuestion", {
+    taskId: taskId,
+  });
+}
+
+export async function getTaskApprovedResponsesByTasker(
+  Moralis: MoralisType,
+  taskId: string
+): Promise<ExcelResponseRowData[]> {
+  return await Moralis.Cloud.run("getTaskApprovedResponsesByTasker", {
     taskId: taskId,
   });
 }
@@ -237,5 +252,14 @@ export async function postTaskRating(
   return await Moralis.Cloud.run("postTaskRating", {
     taskId: taskId,
     rating: rating,
+  });
+}
+
+export async function getTaskQuestions(
+  Moralis: MoralisType,
+  taskId: string
+): Promise<GenericQuestion[]> {
+  return await Moralis.Cloud.run("getTaskQuestions", {
+    taskId: taskId,
   });
 }

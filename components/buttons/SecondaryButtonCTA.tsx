@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, SxProps, Theme } from "@mui/material";
 import Link from "next/link";
 import { gigTheme } from "../../src/Theme";
 
@@ -7,6 +7,7 @@ export default function SecondaryButtonCTA(props: {
   text: string;
   to?: string;
   onClick?: Function;
+  sx?: SxProps<Theme>;
 }) {
   const isBig = props.size === "big";
 
@@ -25,6 +26,7 @@ export default function SecondaryButtonCTA(props: {
         "&:hover": {
           transform: "scale(1.05)",
         },
+        ...props.sx,
       }}
     >
       {props.to ? (
