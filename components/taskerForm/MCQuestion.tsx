@@ -14,6 +14,7 @@ export default function MCQuestion(
   props: GenericQuestion & {
     content: SingleChoiceQuestion;
     handleChange: Function;
+    response?: number;
   }
 ) {
   return (
@@ -31,7 +32,11 @@ export default function MCQuestion(
             {`${props.idx + 1}. ${props.question}`}
           </Typography>
         </FormLabel>
-        <RadioGroup name={props.id} onChange={props.handleChange as any}>
+        <RadioGroup
+          value={props.response}
+          name={props.id}
+          onChange={props.handleChange as any}
+        >
           {props.content.options.map((option, optionid) => (
             <FormControlLabel
               value={optionid}
