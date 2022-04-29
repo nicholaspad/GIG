@@ -45,7 +45,7 @@ export default function TasksTable(props: {
       type: "number",
       minWidth: 150,
       align: "left",
-      renderHeader: () => <TableHeader>ETH Reward</TableHeader>,
+      renderHeader: () => <TableHeader>MATIC Reward</TableHeader>,
       renderCell: (params: GridValueGetterParams) => (
         <TableCell truncateLength={10}>{params.row.reward as string}</TableCell>
       ),
