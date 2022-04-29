@@ -29,10 +29,10 @@ export default function ApprovalTable(props: {
       sortable: false,
       disableColumnMenu: true,
       type: "string",
-      minWidth: 420,
+      minWidth: 200,
       renderHeader: () => <TableHeader>Tasker Address</TableHeader>,
       renderCell: (params: GridValueGetterParams) => (
-        <TableCell>{params.row.address}</TableCell>
+        <TableCell truncateLength={15}>{params.row.address}</TableCell>
       ),
     },
     {

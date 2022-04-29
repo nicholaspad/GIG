@@ -23,12 +23,10 @@ import ERC20ABI from "../../src/utils/abi/ERC20Token.json";
 import MulticallABI from "../../src/utils/abi/Multicall.json";
 
 export default function Form() {
-  // const escrowFactoryAddress = process.env
-  //   .NEXT_PUBLIC_ESCROW_FACTORY_ADDRESS as string;
-  // const maticTokenAddress = process.env
-  //   .NEXT_PUBLIC_MATIC_TOKEN_ADDRESS as string;
-  const escrowFactoryAddress = "0x9EE10384ba4F3f0bA59dbb8c6FE4589bC696D4B7";
-  const maticTokenAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889";
+  const escrowFactoryAddress = process.env
+    .NEXT_PUBLIC_ESCROW_FACTORY_ADDRESS as string;
+  const maticTokenAddress = process.env
+    .NEXT_PUBLIC_MATIC_TOKEN_ADDRESS as string;
   const { isInitialized, user, Moralis } = useMoralis();
   const escrowFactoryABI = EscrowFactory.abi;
   const escrowABI = Escrow.abi;
@@ -220,7 +218,7 @@ export default function Form() {
 
         //
         // Deploy a new contract for this Task
-        
+
         // console.log("escrowFactory");
         const escrowFactory = new ethers.Contract(
           escrowFactoryAddress,
@@ -342,9 +340,9 @@ export default function Form() {
         </Grid>
 
         <Typography color="secondary" align="center" fontStyle="italic" mt={3}>
-          After clicking "Post Task," a series of MetaMask popups will appear.
-          Please be patient as there may be delays during the task creation
-          process.
+          After clicking &quot;Post Task,&quot; a series of MetaMask popups will
+          appear. Please be patient as there may be delays during the task
+          creation process.
         </Typography>
 
         {/* ===== Task Heading ===== */}

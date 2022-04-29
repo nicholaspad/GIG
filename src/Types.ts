@@ -43,7 +43,7 @@ export type TaskOverviewData = TaskData & {
   description: string;
   estimatedTime: number;
   requestorWallet: string;
-  contractAddress: string;
+  contractAddress?: string;
   created: Date;
 };
 
@@ -65,7 +65,7 @@ export type TaskData = {
 };
 
 export type ApprovalData = {
-  id: string,
+  id: string;
   address: string;
   rating?: number;
   duration: number;
@@ -73,7 +73,7 @@ export type ApprovalData = {
 };
 
 export type ExcelResponseRowData = {
-  taskerId: string,
-  completedDate: Date,
-  responses: {idx: number, questionId: string}[],
-}
+  taskerId: string;
+  completedDate: Date;
+  responses: { idx: number; questionId: string }[];
+};

@@ -130,12 +130,12 @@ export default function ManageResponses() {
       headerName: "",
       sortable: false,
       disableColumnMenu: true,
-      minWidth: data?.some((e) => e.status === 1) ? 400 : 165,
+      minWidth: data?.some((e) => e.status === 1) ? 410 : 165,
       flex: 1,
       align: "left",
       renderCell: (params: GridValueGetterParams) => (
         <>
-          <Box mr={2}>
+          <Box mx={2}>
             <SecondaryButtonCTA
               text={"Review"}
               size="small"
@@ -213,7 +213,7 @@ export default function ManageResponses() {
       }
       setData(tempData);
     });
-  }, [isInitialized, Moralis, refreshTable, isReady]);
+  }, [isInitialized, Moralis, refreshTable, isReady, query.taskid]);
 
   return (
     <>

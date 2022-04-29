@@ -131,7 +131,7 @@ export default function TaskCompleted() {
                   <StyledRating
                     sx={{ mx: 0 }}
                     size="large"
-                    precision={0.5}
+                    precision={1}
                     icon={<StarRoundedIcon fontSize="inherit" />}
                     emptyIcon={<StarOutlineRoundedIcon fontSize="inherit" />}
                     readOnly={rating > 0 && rating <= 5}

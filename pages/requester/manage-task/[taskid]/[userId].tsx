@@ -31,7 +31,7 @@ export default function TaskerForm() {
         setData(res);
       }
     );
-  }, [isInitialized, Moralis, taskId]);
+  }, [isInitialized, Moralis, taskId, userId]);
 
   // if (!isAllowed) return <LoadingOverlay open={true} text="Verifying..." />;
   if (!data) return <LoadingOverlay open={true} text="Loading Task..." />;

@@ -13,7 +13,7 @@ export default function ApprovalsTable(props: {
     <Container maxWidth="lg">
       <TaskerPageHeader
         title={"Manage Responses"}
-        subtitle={"Review, approve & reject tasker responses"}
+        subtitle={"Review, approve & reject Tasker responses."}
       />
       <CustomizableGrayCard sx={{ px: 5, py: 2.5, mb: 5 }}>
         <ApprovalTable data={props.data} extraColumns={props.extraColumns} />

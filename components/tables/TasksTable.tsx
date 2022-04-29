@@ -43,7 +43,7 @@ export default function TasksTable(props: {
       sortable: false,
       disableColumnMenu: true,
       type: "number",
-      minWidth: 150,
+      minWidth: 165,
       align: "left",
       renderHeader: () => <TableHeader>MATIC Reward</TableHeader>,
       renderCell: (params: GridValueGetterParams) => (
