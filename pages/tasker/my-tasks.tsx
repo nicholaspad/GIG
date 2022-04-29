@@ -81,7 +81,7 @@ export default function MyTasks() {
       headerName: "",
       sortable: false,
       disableColumnMenu: true,
-      minWidth: 290,
+      minWidth: 320,
       flex: 1,
       align: "left",
       renderCell: (params: GridValueGetterParams) => (

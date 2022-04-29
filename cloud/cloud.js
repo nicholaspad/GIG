@@ -941,7 +941,7 @@ Moralis.Cloud.define(
 );
 
 /* ------------------------------------------------------------------- */
-  
+
 Moralis.Cloud.define(
   "getUserResponse",
   async (request) => {
