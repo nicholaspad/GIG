@@ -91,6 +91,48 @@ export default function Landing() {
               authenticate({ signingMessage: "GIG Authentication" });
             }}
           />
+          <Typography
+            color="primary"
+            textAlign="center"
+            fontWeight={300}
+            marginTop={8}
+            marginBottom={2}
+            sx={{
+              fontSize: {
+                lg: 20,
+                md: 18,
+                sm: 16,
+              },
+            }}
+          >
+            Curious about the code?
+          </Typography>
+          <a
+            href="https://github.com/nicholaspad/GIG"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <Box
+              component="img"
+              src="/github.png"
+              borderRadius={3}
+              padding={1}
+              sx={{
+                background: gigTheme.palette.primary.main,
+                cursor: isAuthenticating ? "progress" : "pointer",
+                pointerEvents: isAuthenticating ? "none" : "auto",
+                transitionDuration: "0.2s",
+                "&:hover": {
+                  transform: "scale(1.05)",
+                },
+                width: {
+                  lg: 120,
+                  md: 110,
+                  xs: 100,
+                },
+              }}
+            />
+          </a>
           {isAuthenticating ? (
             <>
               <CircularProgress color="secondary" sx={{ mt: 6 }} />
